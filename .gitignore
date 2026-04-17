@@ -1,0 +1,6 @@
+.obsidian/
+.DS_Store
+config/keys.env
+*.app/
+__pycache__/
+*.pyc
