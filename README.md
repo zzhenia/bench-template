@@ -153,3 +153,29 @@ Each bench is a private GitHub repo. Commit regularly:
 ```
 
 Or let Claude generate the commit message automatically with just `/push`.
+
+---
+
+## Prior art and analogous frameworks
+
+The bench sits in a space that several communities have approached differently:
+
+**Personal Operating Systems (Notion/Airtable)**
+The most common version — a "Life OS" with linked databases across projects, tasks, and notes. Same instinct as the bench (central registry, cross-system linking), but no-code and no automation layer.
+
+**Scripts to Rule Them All** (GitHub's pattern)
+Standardized `script/` folder with `setup`, `bootstrap`, `test`, `server` etc. Same instinct: one repo, consistent conventions, all operations as named scripts. The bench's `actions/on-demand/` and `actions/recurring/` structure follows this pattern.
+
+**Dotfiles repos**
+The dotfiles community does something adjacent — a versioned, portable personal environment. Usually stops at config/tooling though, not cross-API automation.
+
+**Personal data warehouses**
+A smaller niche: people running dbt + Airbyte locally to pipe Toggl, Strava, and finance data into Postgres for personal analytics. Overlaps with Toggl + Sheets integrations.
+
+**Self-hosted automation (n8n, Activepieces)**
+The no-code/low-code crowd uses these for the same multi-system glue. More visual, less programmable, no git history or Claude integration.
+
+**The gap most people hit**
+The common failure mode in all these is the registry problem — no single source of truth for "what project maps to what ticket in what system." `bench-index.csv` solves exactly that. Most people end up with duplicated bookmarks, copy-pasted IDs, and no automation because of it.
+
+The closest conceptual match overall is **internal developer platforms (IDPs)** — applied personally. The bench is platform engineering for an org of one.
