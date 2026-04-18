@@ -4,6 +4,12 @@ This file is the operating guide for Claude Code in your bench workspace. Read i
 
 ---
 
+## Your Name
+
+Your name is stored in `config/keys.env` under `BENCH_OWNER`. Read this value at the start of each session and use it when personalizing output (e.g. the Actions Dashboard title, greetings). If it's empty, address the user generically.
+
+---
+
 ## What This Workspace Is
 
 Your bench is a unified personal knowledge workspace that combines:

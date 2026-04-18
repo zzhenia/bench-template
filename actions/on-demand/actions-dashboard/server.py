@@ -113,7 +113,7 @@ HTML = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Bench Dashboard</title>
+<title>__DASHBOARD_TITLE__</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
   :root {
@@ -184,7 +184,7 @@ HTML = """<!DOCTYPE html>
 </style>
 </head>
 <body>
-<h1>Bench Dashboard</h1>
+<h1>__DASHBOARD_TITLE__</h1>
 <p class="subtitle">Local automation hub — click Run to stream output below</p>
 
 <div id="app"></div>
@@ -328,8 +328,11 @@ class Handler(BaseHTTPRequestHandler):
             actions = discover_actions()
             keys = load_keys()
             jira_url = keys.get("JIRA_URL", keys.get("ZV_JIRA_URL", ""))
+            owner = keys.get("BENCH_OWNER", "").strip()
+            title = f"{owner}\u2019s Actions Dashboard" if owner else "Actions Dashboard"
             actions_json = json.dumps(actions)
             page = (HTML
+                    .replace("__DASHBOARD_TITLE__", title)
                     .replace("__ACTIONS_JSON__", actions_json)
                     .replace("__JIRA_URL__", jira_url))
             body = page.encode()

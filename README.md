@@ -45,7 +45,11 @@ chmod +x setup.sh && ./setup.sh
 
 This copies `config/keys.env.template` → `config/keys.env`. Fill in your API keys before running any actions.
 
-**4. Open in Claude Code**
+**4. Enter your name**
+
+During setup you'll be asked: *"Hello! How shall I call you?"* — your name is saved in `config/keys.env` as `BENCH_OWNER` and appears in the Actions Dashboard header (e.g. "Ben's Actions Dashboard"). You can change it anytime by editing `config/keys.env`.
+
+**5. Open in Claude Code**
 
 Install the **Claude Code** extension from the VS Code Extensions panel (search "Claude Code" by Anthropic). Once installed, open the integrated terminal and run:
 
@@ -54,6 +58,16 @@ claude .
 ```
 
 Claude will read `master-instructions.md` at the start of each session. Your commands (`/note`, `/push`, `/status`, `/ai`) are ready immediately.
+
+---
+
+## Getting started checklist
+
+Once setup is complete, work through these to get familiar with your bench:
+
+- [ ] **Enter your name** — run `./setup.sh` and answer the welcome prompt (or edit `BENCH_OWNER` in `config/keys.env` directly)
+- [ ] **Create your first note** — start a conversation with Claude, then run `/note` to save a session note to a convo folder
+- [ ] **Open the Actions Dashboard** — run `python3 actions/dashboard/server.py` and visit http://localhost:7391 to see your actions listed
 
 ---
 
