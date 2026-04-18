@@ -22,18 +22,29 @@ API integrations (Jira, Asana, Toggl) are optional — the bench works without t
 
 **1. Create your bench from this template**
 
-Click **"Use this template"** on GitHub → name it (e.g. `my-bench`) → clone it locally.
+Click **"Use this template"** on GitHub → name it (e.g. `my-bench`) → set it to Private → click **Create repository**.
 
-**2. Run setup**
+**2. Clone and open in VS Code**
+
+In Terminal:
 
 ```bash
-cd my-bench
+git clone https://github.com/your-username/my-bench.git
+```
+
+GitHub may ask you to log in — follow the prompts. Then open VS Code → **File → Open Folder** → navigate to `my-bench` and click Open.
+
+**3. Run setup**
+
+In the VS Code integrated terminal (`Ctrl+`` ` or `Cmd+`` `):
+
+```bash
 chmod +x setup.sh && ./setup.sh
 ```
 
 This copies `config/keys.env.template` → `config/keys.env`. Fill in your API keys before running any actions.
 
-**3. Open in Claude Code**
+**4. Open in Claude Code**
 
 ```bash
 claude .
