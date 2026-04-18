@@ -26,13 +26,14 @@ Click **"Use this template"** on GitHub → name it (e.g. `my-bench`) → set it
 
 **2. Clone and open in VS Code**
 
-Open VS Code → click **Clone Git Repository** on the Welcome tab (or **Cmd+Shift+P** → "Git: Clone"). Paste your repo URL:
+1. Open VS Code → click **Clone Git Repository** on the Welcome tab
+2. Your GitHub repos appear in the dropdown — click your new bench repo
+3. Pick a folder to save it in (e.g. your home folder or a `dev/` folder)
+4. Click **Open** when VS Code asks
 
-```
-https://github.com/your-username/my-bench.git
-```
+You should see the bench files (`.claude`, `actions`, `config`, `convos`, etc.) at the root of the sidebar — not nested inside a subfolder.
 
-Choose where to save it, then click **Open** when VS Code asks. You should see the bench files (`.claude`, `actions`, `config`, `convos`, etc.) at the root of the sidebar — not nested inside a subfolder.
+> **Tip:** If your repos don't appear in the dropdown, paste the clone URL instead: `https://github.com/your-username/my-bench.git` (copy it from the green **Code** button on your repo's GitHub page).
 
 **3. Run setup**
 
