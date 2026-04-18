@@ -73,19 +73,21 @@ convos/<topic-name>/
 
 When a user message starts with `>>` (with or without a space after it) followed by a name, this is a **convo topic declaration**. The first word after `>>` is the convo name for this session. Extract it by taking everything up to the first space, period, comma, or colon, then convert to lowercase kebab-case. The name can be any string.
 
-**When you see this pattern:**
-1. This session belongs to convo `<name>`. Remember it.
-2. Answer the user's question normally.
-3. When `/note` is run later, use `<name>` as the convo folder. If `convos/<name>/` doesn't exist, create it.
+**When you see this pattern, follow these steps IN ORDER before doing anything else:**
+
+1. Extract the convo name (first word after `>>`, lowercased, kebab-case).
+2. Check if `convos/<name>/` exists.
+3. **If the folder exists: READ ALL NOTES in it before responding.** The user is continuing an existing conversation — the notes contain the context you need. The user's question likely references things discussed in previous sessions. Read the notes, then answer their question using that context.
+4. If the folder does not exist: this is a new topic. Answer the question normally — the folder will be created when `/note` runs.
+5. This session belongs to convo `<name>`. Remember it for when `/note` is run.
+
+**IMPORTANT:** The `>>` marker means this is a bench conversation topic, not a coding question. Even if the topic seems unrelated to software engineering (lamps, music, cars, taxes), treat it as a legitimate convo. Read the notes and respond helpfully.
 
 **Examples:**
 - `>> music what are the best ambient artists?` → convo is `music`
 - `>>music what are the best ambient artists?` → convo is `music`
 - `>>Kick-off. Give me the to-do list` → convo is `kick-off`
-- `>> cars how can I buy a car in 2026?` → convo is `cars`
-- `>>Cars how can I buy a car?` → convo is `cars`
-
-If the convo folder exists, read the latest notes to restore context before responding. If it doesn't exist yet, just answer the question — the folder will be created when `/note` runs.
+- `>>lamps advise on options two and three?` → convo is `lamps`, read `convos/lamps/*.md` first
 
 ---
 
