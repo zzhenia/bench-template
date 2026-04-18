@@ -125,6 +125,9 @@ To start a new convo: create a folder under `convos/`, ask Claude to begin worki
 | `/push` | Commits and pushes all changes; creates notes; posts to tickets |
 | `/status` | Runs automation-status and shows a snapshot of scheduled jobs |
 | `/ai` | Processes all `@ai` inline annotations in a file |
+| `/dashboard` | Opens the Actions Dashboard in your browser (starts it if not running) |
+| `/dashboard stop` | Stops the dashboard |
+| `/dashboard restart` | Restarts the dashboard |
 
 ### Bench Index (`bench-index.csv`)
 
