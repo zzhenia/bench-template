@@ -46,6 +46,8 @@ This copies `config/keys.env.template` → `config/keys.env`. Fill in your API k
 
 **4. Open in Claude Code**
 
+Install the **Claude Code** extension from the VS Code Extensions panel (search "Claude Code" by Anthropic). Once installed, open the integrated terminal and run:
+
 ```bash
 claude .
 ```
