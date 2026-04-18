@@ -36,5 +36,5 @@ Write a session note for this conversation. Follow these steps:
    - If no ticket is found, the script searches automatically; if still none, it prints a proposal — relay that to the user.
 
 **Naming convention:** Always use `YYMMDD-short-description.md` — never a bare `YYMMDD.md`.
-**Note location:** Notes go directly in the convo folder — no `notes/` or `assets/` subfolders.
+**Note location:** Notes go directly in `convos/<folder>/YYMMDD-description.md`. NEVER create or write into `notes/` or `assets/` subfolders inside convo folders. Even if those subfolders already exist, ignore them — always write the note file directly in the convo folder root.
 **Jira comment format:** One sentence summarising the session + the note file path. Never paste the full note body manually — `bench_ticket.py` handles formatting.
