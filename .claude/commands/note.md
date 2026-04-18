@@ -7,20 +7,25 @@ Write a session note for this conversation. Follow these steps:
 
 1. **Identify the convo folder.**
 
-   **If `@<name>` was used in the conversation:**
-   - The `@` marker declares the convo topic. The name after `@` IS the folder name. Do not ask the user to confirm or rename it.
-   - Look for a folder under `convos/` that matches the name exactly (case-insensitive).
-   - If an exact match exists (e.g. `@music` → `convos/music/`), use it.
-   - If NO exact match exists, the topic is new. **Immediately create the folder** `convos/<name>/` (kebab-case) without asking. Add a row to `bench-index.csv` with `slug` = folder name, `type` = `convo`, `convo_folder` = `convos/<name>/`, and leave `jira`/`asana` empty. Then proceed to write the note.
-   - Do NOT ask "what should I name it?" — the `@` marker already provided the name.
-   - Do NOT fall back to a "closest" unrelated folder. `@music` does NOT match `the-bench`.
+   **First, scan every user message in this conversation for the pattern `@<name>` at the start of a message.** The pattern is: a message that begins with `@` followed by a word or hyphenated-word (e.g. `@music`, `@ice-cream`, `@faa-rules`). The text between `@` and the first space is the convo name.
 
-   **If no `@` marker was used:**
+   Examples:
+   - `@music could you recommend some artists?` → convo name is `music`
+   - `@ice-cream what was popular in 1970?` → convo name is `ice-cream`
+   - `@faa-rules tell me about drone regulations` → convo name is `faa-rules`
+
+   **If an `@<name>` marker was found:**
+   - The convo name is decided. Do NOT ask the user to confirm, rename, or choose.
+   - If `convos/<name>/` exists, use it.
+   - If it does NOT exist, **create it immediately**: `mkdir -p convos/<name>/`. Add a row to `bench-index.csv` with `slug` = the name, `type` = `convo`, `convo_folder` = `convos/<name>/`, and leave `jira`/`asana` empty.
+   - Then proceed directly to step 2. No questions.
+
+   **If NO `@` marker was found anywhere in the conversation:**
    - Determine the folder from the session topic. If it clearly matches an existing convo, use it.
    - If it doesn't clearly match, ask the user with these options:
      1. Create a new convo folder (suggest a name based on the session topic)
      2. Use an existing folder (list the closest matches)
-   - Do NOT guess or force-attach a note to a convo that isn't clearly relevant. Always offer the "create new" option when the topic is new.
+   - Do NOT guess or force-attach a note to a convo that isn't clearly relevant.
 
 2. **Get today's date** in YYMMDD format (e.g. 260403).
 
