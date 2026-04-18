@@ -8,9 +8,11 @@ Write a session note for this conversation. Follow these steps:
 1. **Identify the convo folder.**
 
    **If `@<name>` was used in the conversation:**
-   - The `@` marker declares the convo topic. Look for a folder under `convos/` that matches the name exactly (case-insensitive).
+   - The `@` marker declares the convo topic. The name after `@` IS the folder name. Do not ask the user to confirm or rename it.
+   - Look for a folder under `convos/` that matches the name exactly (case-insensitive).
    - If an exact match exists (e.g. `@music` → `convos/music/`), use it.
-   - If NO exact match exists, the topic is new. Create the folder: `convos/<topic>/` (kebab-case). Add a row to `bench-index.csv` with `slug` = folder name, `type` = `convo`, `convo_folder` = `convos/<topic>/`, and leave `jira`/`asana` empty.
+   - If NO exact match exists, the topic is new. **Immediately create the folder** `convos/<name>/` (kebab-case) without asking. Add a row to `bench-index.csv` with `slug` = folder name, `type` = `convo`, `convo_folder` = `convos/<name>/`, and leave `jira`/`asana` empty. Then proceed to write the note.
+   - Do NOT ask "what should I name it?" — the `@` marker already provided the name.
    - Do NOT fall back to a "closest" unrelated folder. `@music` does NOT match `the-bench`.
 
    **If no `@` marker was used:**
