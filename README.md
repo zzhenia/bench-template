@@ -65,9 +65,12 @@ Claude will read `master-instructions.md` at the start of each session. Your com
 
 Once setup is complete, work through these to get familiar with your bench:
 
+- [ ] **Review the Getting Started checklist** — you're reading it now!
 - [ ] **Enter your name** — run `./setup.sh` and answer the welcome prompt (or edit `BENCH_OWNER` in `config/keys.env` directly)
 - [ ] **Create your first note** — start a conversation with Claude, then run `/note` to save a session note to a convo folder
+- [ ] **Create your first action** — copy `actions/on-demand/meeting-minutes/` to a new folder, rename it, and edit `instructions.md`
 - [ ] **Open the Actions Dashboard** — run `python3 actions/dashboard/server.py` and visit http://localhost:7391 to see your actions listed
+- [ ] **Review bench-index.csv** — open it to see how actions, convos, and tickets are tracked in one place
 
 ---
 
