@@ -47,7 +47,41 @@ def jira_configured(keys: dict) -> bool:
     return all(keys.get(k) for k in ("JIRA_EMAIL", "JIRA_API_TOKEN", "JIRA_URL"))
 
 def asana_configured(keys: dict) -> bool:
-    return bool(keys.get("ASANA_PAT") and keys.get("ASANA_WORKSPACE_GID"))
+    if not keys.get("ASANA_PAT"):
+        return False
+    if not keys.get("ASANA_WORKSPACE_GID"):
+        # Auto-fetch workspace GID from Asana API
+        gid = _auto_fetch_asana_workspace(keys)
+        if gid:
+            keys["ASANA_WORKSPACE_GID"] = gid
+            return True
+        return False
+    return True
+
+
+def _auto_fetch_asana_workspace(keys: dict) -> str | None:
+    """Fetch the first workspace GID using the Asana PAT and save it to keys.env."""
+    try:
+        r = requests.get(
+            "https://app.asana.com/api/1.0/workspaces",
+            headers={"Authorization": f"Bearer {keys['ASANA_PAT']}", "Accept": "application/json"},
+            params={"limit": 1},
+        )
+        r.raise_for_status()
+        workspaces = r.json().get("data", [])
+        if not workspaces:
+            print("  Asana: no workspaces found for this PAT")
+            return None
+        gid = workspaces[0]["gid"]
+        name = workspaces[0].get("name", "")
+        print(f"  Asana: auto-detected workspace {gid} ({name}) — saving to keys.env")
+        # Append to keys.env
+        with open(KEYS_FILE, "a") as f:
+            f.write(f"\nASANA_WORKSPACE_GID={gid}\n")
+        return gid
+    except Exception as e:
+        print(f"  Asana: could not auto-detect workspace ({e})")
+        return None
 
 # ── CSV helpers ──────────────────────────────────────────────────────────────
 
