@@ -6,11 +6,16 @@ description: Write a session note for this conversation in the correct convos fo
 Write a session note for this conversation. Follow these steps:
 
 1. **Identify the convo folder.**
-   - Look back through the conversation for an `@<name>` marker. When a user types `@topic` at the start of a message, it signals the start of a conversation on that topic. Use this as the convo folder name.
-   - Match `@name` to the closest existing folder under `convos/` (case-insensitive, partial match allowed).
-   - If the folder exists, use it.
-   - If no folder matches, create a new one: `convos/<topic>/` (kebab-case). Add a row to `bench-index.csv` with `slug` = folder name, `type` = `convo`, `convo_folder` = `convos/<topic>/`, and leave `jira`/`asana` empty.
-   - If no `@` marker was used, determine the folder from the session topic. If it clearly matches an existing convo, use it. If it doesn't clearly match any existing convo, ask the user with these options:
+
+   **If `@<name>` was used in the conversation:**
+   - The `@` marker declares the convo topic. Look for a folder under `convos/` that matches the name exactly (case-insensitive).
+   - If an exact match exists (e.g. `@music` → `convos/music/`), use it.
+   - If NO exact match exists, the topic is new. Create the folder: `convos/<topic>/` (kebab-case). Add a row to `bench-index.csv` with `slug` = folder name, `type` = `convo`, `convo_folder` = `convos/<topic>/`, and leave `jira`/`asana` empty.
+   - Do NOT fall back to a "closest" unrelated folder. `@music` does NOT match `the-bench`.
+
+   **If no `@` marker was used:**
+   - Determine the folder from the session topic. If it clearly matches an existing convo, use it.
+   - If it doesn't clearly match, ask the user with these options:
      1. Create a new convo folder (suggest a name based on the session topic)
      2. Use an existing folder (list the closest matches)
    - Do NOT guess or force-attach a note to a convo that isn't clearly relevant. Always offer the "create new" option when the topic is new.
