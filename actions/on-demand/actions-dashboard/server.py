@@ -9,16 +9,18 @@ import csv
 import json
 import socketserver
 import subprocess
+import threading
+import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
-BASE = Path(__file__).resolve().parents[2]
+BASE = Path(__file__).resolve().parents[3]
 PORT = 7391
 
 # ── Auto-discovery ───────────────────────────────────────────────────────────
 
-SKIP_FOLDERS = {"dashboard", "~archive", "~empty", "Templates"}
+SKIP_FOLDERS = {"dashboard", "actions-dashboard", "~archive", "~empty", "Templates"}
 RUN_PATTERNS = ["run.sh", "*.py"]
 
 
@@ -195,10 +197,10 @@ HTML = """<!DOCTYPE html>
   <div id="term-output"></div>
 </div>
 
-<p class="footer">Auto-discovered from actions/ folders. Reload page to refresh.</p>
+<p class="footer">Auto-discovered from actions/ folders. Updates automatically.</p>
 
 <script>
-const ACTIONS   = __ACTIONS_JSON__;
+let ACTIONS   = __ACTIONS_JSON__;
 const JIRA_URL  = "__JIRA_URL__";
 
 let currentStream = null;
@@ -283,11 +285,31 @@ function renderSection(title, actions) {
 </table>`;
 }
 
-const onDemand  = ACTIONS.filter(a => a.type === 'on-demand');
-const recurring = ACTIONS.filter(a => a.type === 'recurring');
-document.getElementById('app').innerHTML =
-  renderSection('On-demand', onDemand) +
-  renderSection('Recurring', recurring);
+function renderAll() {
+  const onDemand  = ACTIONS.filter(a => a.type === 'on-demand');
+  const recurring = ACTIONS.filter(a => a.type === 'recurring');
+  document.getElementById('app').innerHTML =
+    renderSection('On-demand', onDemand) +
+    renderSection('Recurring', recurring);
+}
+
+// Initial render
+renderAll();
+
+// Poll for new actions every 3 seconds — re-render if changed
+let lastSignature = JSON.stringify(ACTIONS.map(a => a.id).sort());
+setInterval(async () => {
+  try {
+    const resp = await fetch('/api/actions');
+    const fresh = await resp.json();
+    const sig = JSON.stringify(fresh.map(a => a.id).sort());
+    if (sig !== lastSignature) {
+      ACTIONS = fresh;
+      lastSignature = sig;
+      renderAll();
+    }
+  } catch(e) {}
+}, 3000);
 </script>
 </body>
 </html>"""
@@ -313,6 +335,15 @@ class Handler(BaseHTTPRequestHandler):
             body = page.encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", len(body))
+            self.end_headers()
+            self.wfile.write(body)
+
+        elif parsed.path == "/api/actions":
+            actions = discover_actions()
+            body = json.dumps(actions).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", len(body))
             self.end_headers()
             self.wfile.write(body)
@@ -366,5 +397,7 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
 
 if __name__ == "__main__":
     server = ThreadedHTTPServer(("127.0.0.1", PORT), Handler)
-    print(f"Bench Dashboard -> http://localhost:{PORT}")
+    url = f"http://localhost:{PORT}"
+    print(f"Bench Dashboard -> {url}")
+    threading.Timer(0.5, lambda: webbrowser.open(url)).start()
     server.serve_forever()
