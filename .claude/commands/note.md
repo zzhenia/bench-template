@@ -5,7 +5,13 @@ description: Write a session note for this conversation in the correct convos fo
 
 Write a session note for this conversation. Follow these steps:
 
-1. **Identify the convo folder.** Based on what we discussed this session, determine which folder under `convos/` this note belongs to. If it's unclear, ask: "Which convos/ folder should I write today's note in?"
+1. **Identify the convo folder.**
+   - Look back through the conversation for an `@<name>` marker. When a user types `@topic` at the start of a message, it signals the start of a conversation on that topic. Use this as the convo folder name.
+   - Match `@name` to the closest existing folder under `convos/` (case-insensitive, partial match allowed).
+   - If the folder exists, use it.
+   - If no folder matches, create a new one: `convos/<topic>/` (kebab-case). Add a row to `bench-index.csv` with `slug` = folder name, `type` = `convo`, `convo_folder` = `convos/<topic>/`, and leave `jira`/`asana` empty.
+   - If no `@` marker was used in the conversation, determine the folder from the session topic. If it clearly matches an existing convo, use it. If it's unclear, ask: "Which convos/ folder should I write today's note in?"
+   - Do NOT guess or force-attach a note to a convo that isn't clearly relevant.
 
 2. **Get today's date** in YYMMDD format (e.g. 260403).
 
@@ -23,4 +29,5 @@ Write a session note for this conversation. Follow these steps:
    - If no ticket is found, the script searches automatically; if still none, it prints a proposal — relay that to the user.
 
 **Naming convention:** Always use `YYMMDD-short-description.md` — never a bare `YYMMDD.md`.
+**Note location:** Notes go directly in the convo folder — no `notes/` or `assets/` subfolders.
 **Jira comment format:** One sentence summarising the session + the note file path. Never paste the full note body manually — `bench_ticket.py` handles formatting.
