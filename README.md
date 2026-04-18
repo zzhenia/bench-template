@@ -69,7 +69,7 @@ Once setup is complete, work through these to get familiar with your bench:
 - [ ] **Enter your name** — run `./setup.sh` and answer the welcome prompt (or edit `BENCH_OWNER` in `config/keys.env` directly)
 - [ ] **Create your first note** — start a conversation with Claude, then run `/note` to save a session note to a convo folder
 - [ ] **Create your first action** — copy `actions/on-demand/meeting-minutes/` to a new folder, rename it, and edit `instructions.md`
-- [ ] **Open the Actions Dashboard** — run `python3 actions/dashboard/server.py` and visit http://localhost:7391 to see your actions listed
+- [ ] **Open the Actions Dashboard** — run `bash actions/on-demand/actions-dashboard/run.sh` and visit http://localhost:7391 to see your actions listed
 - [ ] **Review bench-index.csv** — open it to see how actions, convos, and tickets are tracked in one place
 
 ---
@@ -83,8 +83,8 @@ your-bench/
 ├── config/
 │   └── keys.env.template    ← copy to keys.env and fill in your API keys
 ├── actions/
-│   ├── dashboard/           ← local web dashboard (http://localhost:7391)
 │   ├── on-demand/           ← manually triggered actions
+│   │   ├── actions-dashboard/  ← local web dashboard (http://localhost:7391)
 │   │   ├── bench-ticket/    ← ticket lookup + comment posting utility
 │   │   ├── automation-status/  ← snapshot of scheduled automations
 │   │   └── meeting-minutes/ ← example action (copy to create your own)
@@ -147,10 +147,10 @@ python3 actions/on-demand/bench-ticket/bench_ticket.py search <slug>
 A local web interface that lists all your actions from `bench-index.csv`.
 
 ```bash
-python3 actions/dashboard/server.py
+bash actions/on-demand/actions-dashboard/run.sh
 ```
 
-Then open http://localhost:7391.
+This opens http://localhost:7391 in your browser automatically.
 
 ---
 
