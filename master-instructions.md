@@ -58,11 +58,12 @@ Each folder is an **ongoing topic** with persistent context across sessions.
 **Schema:**
 ```
 convos/<topic-name>/
-├── assets/            ← source material
-└── notes/           ← dated session summaries (format: YYMMDD-short-description.md)
+├── YYMMDD-short-description.md   ← session notes live directly here
+├── YYMMDD-another-topic.md
+└── ...
 ```
 
-**How to use:** At the start of a session, read the latest note(s) in `notes/` (they carry the standing context). Write a new dated note at the end of each session summarizing decisions made.
+**How to use:** At the start of a session, read the latest note(s) in the convo folder (they carry the standing context). Write a new dated note at the end of each session summarizing decisions made.
 
 **Session note naming convention:** `YYMMDD-short-description.md` — date followed by one or two kebab-case words describing the session topic (e.g. `260405-csv-fix.md`, `260403-folder-structure.md`)
 
@@ -74,8 +75,8 @@ Use `@<name>` at the start of a message to set the active convo for a session (e
 
 **On switch:**
 1. Match `@name` to the closest folder under `convos/` (case-insensitive, partial match allowed).
-2. Read the most recent `notes/` entries to restore context.
-3. Save the session note to that folder's `notes/` at the end of the session.
+2. Read the most recent notes in the convo folder to restore context.
+3. Save the session note directly in that convo folder at the end of the session.
 
 **If no match is found:** Complete the session normally, then ask at note-saving time: *"Should I file this into an existing convo, or create a new one?"*
 
@@ -88,12 +89,7 @@ When a conversation doesn't clearly belong to an existing folder, ask: *"Should 
 If creating a new convo:
 
 1. Name the folder in kebab-case (e.g. `learning-spanish`).
-2. Create the standard scaffold:
-   ```
-   convos/<topic-name>/
-   ├── assets/
-   └── notes/
-   ```
+2. Create the folder under `convos/`. Notes go directly inside it — no subfolders needed.
 3. Add a row to `bench-index.csv`:
    - `slug` = folder name
    - `type` = `convo`
@@ -138,8 +134,8 @@ Items where `type = both` share a single row.
 
 ## Claude Operating Rules
 
-1. **Read before acting.** At the start of a topic session, read the relevant `notes/` history before responding.
-2. **Write session notes.** After meaningful sessions, create or update a dated note in `notes/` summarizing decisions, context, and next steps.
-3. **Don't alter sub-folder file names.** Keep the standard `instructions.md` files inside `actions/` folders only; convos rely on `notes/`. The root guide is `master-instructions.md`.
-4. **assets/ is for inputs.** Drop source material (PDFs, screenshots, CSVs, text) into `assets/` — never commit credentials or sensitive personal data.
+1. **Read before acting.** At the start of a topic session, read the latest notes in the convo folder before responding.
+2. **Write session notes.** After meaningful sessions, create a dated note directly in the convo folder summarizing decisions, context, and next steps.
+3. **Don't alter sub-folder file names.** Keep the standard `instructions.md` files inside `actions/` folders only. The root guide is `master-instructions.md`.
+4. **assets/ is for action inputs only.** Drop source material (PDFs, screenshots, CSVs, text) into the action's `assets/` folder — never commit credentials or sensitive personal data. Convo folders do not have assets subfolders.
 5. **Keep commits clean.** Commit after meaningful milestones, not every file save.
