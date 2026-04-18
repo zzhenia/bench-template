@@ -7,20 +7,21 @@ Write a session note for this conversation. Follow these steps:
 
 1. **Identify the convo folder.**
 
-   **First, scan every user message in this conversation for the pattern `@<name>` at the start of a message.** The pattern is: a message that begins with `@` followed by a word or hyphenated-word (e.g. `@music`, `@ice-cream`, `@faa-rules`). The text between `@` and the first space is the convo name.
+   **First, scan every user message in this conversation for the `>>` marker at the start of a message.** The pattern is: a message that begins with `>>` followed by a space and then a word or hyphenated-word. The text between `>> ` and the next space is the convo name.
 
    Examples:
-   - `@music could you recommend some artists?` → convo name is `music`
-   - `@ice-cream what was popular in 1970?` → convo name is `ice-cream`
-   - `@faa-rules tell me about drone regulations` → convo name is `faa-rules`
+   - `>> music what are the best ambient artists?` → convo name is `music`
+   - `>> ice-cream what was popular in 1970?` → convo name is `ice-cream`
+   - `>> faa-rules tell me about drone regulations` → convo name is `faa-rules`
+   - `>> 2026-taxes how do I file my return?` → convo name is `2026-taxes`
 
-   **If an `@<name>` marker was found:**
+   **If a `>> <name>` marker was found:**
    - The convo name is decided. Do NOT ask the user to confirm, rename, or choose.
    - If `convos/<name>/` exists, use it.
    - If it does NOT exist, **create it immediately**: `mkdir -p convos/<name>/`. Add a row to `bench-index.csv` with `slug` = the name, `type` = `convo`, `convo_folder` = `convos/<name>/`, and leave `jira`/`asana` empty.
    - Then proceed directly to step 2. No questions.
 
-   **If NO `@` marker was found anywhere in the conversation:**
+   **If NO `>>` marker was found anywhere in the conversation:**
    - Determine the folder from the session topic. If it clearly matches an existing convo, use it.
    - If it doesn't clearly match, ask the user with these options:
      1. Create a new convo folder (suggest a name based on the session topic)

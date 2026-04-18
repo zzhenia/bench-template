@@ -115,7 +115,15 @@ To add an action: copy `actions/on-demand/meeting-minutes/` as a starting point,
 ### Convos
 Ongoing research topics with persistent context across sessions. Each session ends with a dated note (`YYMMDD-short-description.md`) written by `/note`.
 
-To start a new convo: create a folder under `convos/`, ask Claude to begin working, run `/note` at the end.
+To start a new convo, begin your message with `>> name`:
+
+```
+>> music what are the best ambient artists for 2026?
+```
+
+Claude will answer your question. When you run `/note`, it automatically creates `convos/music/` (if it doesn't exist) and writes the session note there. No manual folder creation needed.
+
+To continue an existing convo, use the same `>> name` to restore context from previous notes.
 
 ### Commands
 
