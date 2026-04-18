@@ -71,7 +71,7 @@ convos/<topic-name>/
 
 ### The >> topic convention
 
-When a user message starts with `>>` followed by a space and a name (e.g. `>> music`, `>> ice-cream`, `>> faa-rules`), this is a **convo topic declaration**. The word after `>> ` is the convo name for this session. The name can be any string — a word, hyphenated-word, or number.
+When a user message starts with `>>` (with or without a space after it) followed by a name, this is a **convo topic declaration**. The first word after `>>` is the convo name for this session. Extract it by taking everything up to the first space, period, comma, or colon, then convert to lowercase kebab-case. The name can be any string.
 
 **When you see this pattern:**
 1. This session belongs to convo `<name>`. Remember it.
@@ -80,9 +80,10 @@ When a user message starts with `>>` followed by a space and a name (e.g. `>> mu
 
 **Examples:**
 - `>> music what are the best ambient artists?` → convo is `music`
+- `>>music what are the best ambient artists?` → convo is `music`
+- `>>Kick-off. Give me the to-do list` → convo is `kick-off`
 - `>> cars how can I buy a car in 2026?` → convo is `cars`
-- `>> faa-rules tell me about drone regulations` → convo is `faa-rules`
-- `>> 2026-taxes how do I file?` → convo is `2026-taxes`
+- `>>Cars how can I buy a car?` → convo is `cars`
 
 If the convo folder exists, read the latest notes to restore context before responding. If it doesn't exist yet, just answer the question — the folder will be created when `/note` runs.
 

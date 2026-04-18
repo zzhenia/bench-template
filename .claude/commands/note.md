@@ -7,13 +7,15 @@ Write a session note for this conversation. Follow these steps:
 
 1. **Identify the convo folder.**
 
-   **First, scan every user message in this conversation for the `>>` marker at the start of a message.** The pattern is: a message that begins with `>>` followed by a space and then a word or hyphenated-word. The text between `>> ` and the next space is the convo name.
+   **First, scan every user message in this conversation for `>>` at the start of a message.** The pattern is: a message that begins with `>>` (with or without a space after it), followed by the convo name. The convo name is the first word — extract it by taking everything up to the first space, period, comma, or colon, then convert to lowercase kebab-case.
 
-   Examples:
+   Examples — all of these are valid:
    - `>> music what are the best ambient artists?` → convo name is `music`
+   - `>>music what are the best ambient artists?` → convo name is `music`
    - `>> ice-cream what was popular in 1970?` → convo name is `ice-cream`
-   - `>> faa-rules tell me about drone regulations` → convo name is `faa-rules`
+   - `>>Kick-off. Give me the to-do list` → convo name is `kick-off`
    - `>> 2026-taxes how do I file my return?` → convo name is `2026-taxes`
+   - `>>Cars how can I buy a car?` → convo name is `cars`
 
    **If a `>> <name>` marker was found:**
    - The convo name is decided. Do NOT ask the user to confirm, rename, or choose.
