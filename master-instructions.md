@@ -69,16 +69,23 @@ convos/<topic-name>/
 
 **Current convos:** See `bench-index.csv` (rows where `type = convo` or `type = both`).
 
-### Switching convo context with @name
+### The @topic convention
 
-Use `@<name>` at the start of a message to set the active convo for a session (e.g. `@formula`).
+**IMPORTANT:** When a user message starts with `@word` or `@hyphenated-word` followed by a space (e.g. `@music`, `@ice-cream`, `@faa-rules`), this is a **convo topic declaration**, NOT a file reference. The word after `@` is the convo name for this session.
 
-**On switch:**
-1. Match `@name` to the closest folder under `convos/` (case-insensitive, partial match allowed).
-2. Read the most recent notes in the convo folder to restore context.
-3. Save the session note directly in that convo folder at the end of the session.
+**When you see this pattern:**
+1. Acknowledge the topic internally — this session belongs to convo `<name>`.
+2. Answer the user's question normally.
+3. When `/note` is run later, use `<name>` as the convo folder. If `convos/<name>/` doesn't exist, create it.
 
-**If no match is found:** Complete the session normally, then ask at note-saving time: *"Should I file this into an existing convo, or create a new one?"*
+**Examples:**
+- `@music what are the best ambient artists?` → convo is `music`, answer the question about ambient artists
+- `@cars how can I buy a car in 2026?` → convo is `cars`, answer the question about buying cars
+- `@faa-rules tell me about drone regulations` → convo is `faa-rules`, answer about drone regulations
+
+**Do NOT** interpret the `@` as a file reference, code symbol, or resource lookup. In this workspace, `@word` at the start of a message always means "this conversation is about [word]."
+
+If the convo folder exists, read the latest notes to restore context before responding. If it doesn't exist yet, just answer the question — the folder will be created when `/note` runs.
 
 ---
 
