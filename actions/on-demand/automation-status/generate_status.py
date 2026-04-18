@@ -14,14 +14,11 @@ from pathlib import Path
 
 AGENTS_DIR = Path.home() / "Library" / "LaunchAgents"
 ASSETS_DIR = Path(__file__).parent / "assets"
+# Repo root: this script lives at actions/on-demand/automation-status/
+REPO_ROOT = str(Path(__file__).resolve().parents[3])
 
 WEEKDAY_NAMES = {0: "Sunday", 1: "Monday", 2: "Tuesday", 3: "Wednesday",
                  4: "Thursday", 5: "Friday", 6: "Saturday"}
-
-# Labels to include (prefix match).
-# Default catch-all: any launchd agent with label starting with "com."
-# Set LAUNCHD_PREFIXES in config/keys.env to narrow this down, e.g. com.yourname.
-WATCH_PREFIXES = ("com.",)
 
 
 def parse_schedule(plist_data):
@@ -86,7 +83,10 @@ def main():
                 continue
 
         label = data.get("Label", "")
-        if not any(label.startswith(p) for p in WATCH_PREFIXES):
+        # Only include automations whose script path is inside this repo
+        args = " ".join(data.get("ProgramArguments", []))
+        working_dir = data.get("WorkingDirectory", "")
+        if REPO_ROOT not in args and REPO_ROOT not in working_dir:
             continue
 
         schedule = parse_schedule(data)
@@ -113,12 +113,12 @@ def main():
         "|------------|----------|--------|-----------|----------|",
     ]
     for r in rows:
-        # Strip the common prefix for readability
+        # Strip common com.xxx. prefix for readability
         label_short = r["label"]
-        for p in WATCH_PREFIXES:
-            if label_short.startswith(p):
-                label_short = label_short[len(p):]
-                break
+        if "." in label_short:
+            parts = label_short.split(".")
+            if len(parts) > 2:
+                label_short = ".".join(parts[2:])
         log = r["last_log"].replace("|", "\\|")[:80]
         lines.append(
             f"| **{label_short}** | {r['schedule']} | {r['status']} | {r['exit_code']} | {log} |"
