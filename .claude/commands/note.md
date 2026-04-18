@@ -10,8 +10,10 @@ Write a session note for this conversation. Follow these steps:
    - Match `@name` to the closest existing folder under `convos/` (case-insensitive, partial match allowed).
    - If the folder exists, use it.
    - If no folder matches, create a new one: `convos/<topic>/` (kebab-case). Add a row to `bench-index.csv` with `slug` = folder name, `type` = `convo`, `convo_folder` = `convos/<topic>/`, and leave `jira`/`asana` empty.
-   - If no `@` marker was used in the conversation, determine the folder from the session topic. If it clearly matches an existing convo, use it. If it's unclear, ask: "Which convos/ folder should I write today's note in?"
-   - Do NOT guess or force-attach a note to a convo that isn't clearly relevant.
+   - If no `@` marker was used, determine the folder from the session topic. If it clearly matches an existing convo, use it. If it doesn't clearly match any existing convo, ask the user with these options:
+     1. Create a new convo folder (suggest a name based on the session topic)
+     2. Use an existing folder (list the closest matches)
+   - Do NOT guess or force-attach a note to a convo that isn't clearly relevant. Always offer the "create new" option when the topic is new.
 
 2. **Get today's date** in YYMMDD format (e.g. 260403).
 
