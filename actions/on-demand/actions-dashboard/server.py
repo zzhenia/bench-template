@@ -150,31 +150,35 @@ HTML = """<!DOCTYPE html>
   .btn-play:disabled { background: #444; color: #666; cursor: not-allowed; }
   .btn-play svg { width: 10px; height: 10px; fill: currentColor; }
 
+  .actions-toolbar {
+    position: sticky; top: 0; z-index: 3;
+    background: var(--bg); padding-bottom: 6px;
+  }
   #terminal {
-    display: none;
-    margin-top: 28px;
+    display: none; margin-top: 10px; margin-bottom: 6px;
     border: 1px solid var(--border);
-    border-radius: 7px;
+    border-radius: 6px;
     overflow: hidden;
   }
   .term-header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 8px 14px;
+    padding: 5px 10px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
   }
-  #term-title { font-size: 12px; color: var(--muted); }
-  .btn-clear {
+  .term-actions { display: flex; gap: 6px; }
+  #term-title { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .btn-clear, .btn-copy {
     background: none; border: 1px solid var(--border); border-radius: 4px;
     color: var(--muted); cursor: pointer; font-size: 11px; padding: 2px 8px;
   }
-  .btn-clear:hover { color: var(--text); border-color: #555; }
+  .btn-clear:hover, .btn-copy:hover { color: var(--text); border-color: #555; }
   #term-output {
     font-family: "SF Mono", "Menlo", "Monaco", monospace;
-    font-size: 12px; line-height: 1.6; color: #ccc;
+    font-size: 11px; line-height: 1.5; color: #ccc;
     background: #0e0e0e;
-    padding: 14px 16px;
-    min-height: 80px; max-height: 340px;
+    padding: 8px 12px;
+    max-height: 180px;
     overflow-y: auto;
     white-space: pre-wrap; word-break: break-all;
   }
@@ -187,15 +191,20 @@ HTML = """<!DOCTYPE html>
 <h1>__DASHBOARD_TITLE__</h1>
 <p class="subtitle">Local automation hub — click Run to stream output below</p>
 
-<div id="app"></div>
-
-<div id="terminal">
-  <div class="term-header">
-    <span id="term-title"></span>
-    <button class="btn-clear" onclick="clearTerminal()">Clear</button>
+<div class="actions-toolbar">
+  <div id="terminal">
+    <div class="term-header">
+      <span id="term-title"></span>
+      <div class="term-actions">
+        <button class="btn-copy" onclick="copyTerminal()" title="Copy output">Copy</button>
+        <button class="btn-clear" onclick="clearTerminal()">Clear</button>
+      </div>
+    </div>
+    <div id="term-output"></div>
   </div>
-  <div id="term-output"></div>
 </div>
+
+<div id="app"></div>
 
 <p class="footer">Auto-discovered from actions/ folders. Updates automatically.</p>
 
@@ -210,6 +219,11 @@ let activeBtnHTML = '';
 function clearTerminal() {
   document.getElementById('term-output').innerHTML = '';
   document.getElementById('terminal').style.display = 'none';
+}
+
+function copyTerminal() {
+  const text = document.getElementById('term-output').textContent;
+  navigator.clipboard.writeText(text);
 }
 
 function appendLine(text, cls) {
