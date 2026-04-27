@@ -121,6 +121,7 @@ def jira_headers(keys: dict) -> dict:
     return {"Authorization": f"Basic {creds}", "Content-Type": "application/json"}
 
 def jira_post_comment(base_url: str, key: str, body: str, headers: dict):
+    """Post a rich-text (ADF) comment to a Jira issue."""
     adf_body = {
         "version": 1,
         "type": "doc",
@@ -162,10 +163,14 @@ def asana_headers(keys: dict) -> dict:
     return {"Authorization": f"Bearer {keys['ASANA_PAT']}", "Accept": "application/json"}
 
 def asana_post_comment(task_gid: str, body: str, headers: dict):
+    """Post a rich-text (HTML) comment to an Asana task."""
+    # Asana supports html_text for rich text rendering
+    lines = body.split("\n")
+    html_body = "<br>".join(f"<b>{line}</b>" if i == 0 else line for i, line in enumerate(lines))
     r = requests.post(
         f"{ASANA_API}/tasks/{task_gid}/stories",
         headers=headers,
-        json={"data": {"text": body}},
+        json={"data": {"html_text": f"<body>{html_body}</body>"}},
     )
     r.raise_for_status()
 
@@ -210,12 +215,47 @@ def cmd_lookup(slug: str):
     print(f"asana:  {row['asana'] or '(none)'}")
 
 
+def _build_brief_comment(note_path: Path) -> str:
+    """Extract a one-line summary from the note file for external ticket comments.
+
+    Format: "Session note: <title>. See <relative-path>"
+    External systems (Jira/Asana) get a brief pointer, not the full note body.
+    """
+    text = note_path.read_text().strip()
+    # Extract title from first heading line (# Title)
+    title = ""
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("# "):
+            title = stripped.lstrip("# ").strip()
+            break
+        if stripped and not stripped.startswith("---") and not stripped.startswith("**"):
+            title = stripped
+            break
+    # Extract date if present
+    date_str = ""
+    for line in text.splitlines():
+        if line.strip().startswith("**Date:**"):
+            date_str = line.strip().replace("**Date:**", "").strip()
+            break
+    # Build relative path from bench root
+    try:
+        rel_path = note_path.resolve().relative_to(BENCH_ROOT)
+    except ValueError:
+        rel_path = note_path.name
+    summary = f"Session note: {title}"
+    if date_str:
+        summary += f" ({date_str})"
+    summary += f"\nSee: {rel_path}"
+    return summary
+
+
 def cmd_post(slug: str, note_file: str):
     note_path = Path(note_file)
     if not note_path.exists():
         print(f"Note file not found: {note_file}")
         sys.exit(1)
-    body = note_path.read_text().strip()
+    body = _build_brief_comment(note_path)
 
     keys = load_keys()
     has_jira  = jira_configured(keys)

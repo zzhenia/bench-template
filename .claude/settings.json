@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/prompt_session_note.sh",
+            "if": "Bash(git push*)",
+            "timeout": 15,
+            "statusMessage": "Checking session note..."
+          }
+        ]
+      }
+    ]
+  }
+}

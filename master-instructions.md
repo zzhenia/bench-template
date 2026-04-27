@@ -126,7 +126,7 @@ Items where `type = both` share a single row.
 ### Ticket workflow (run at every `/note` and `/push`)
 
 1. **Look up the slug** in `bench-index.csv` for the active convo/action.
-2. **If a ticket exists** — post the session note as a comment using `bench_ticket.py`.
+2. **If a ticket exists** — post a brief comment using `bench_ticket.py` (title + date + file path only — never the full note body). Comments on external systems (Jira/Asana) must be short pointers back to the bench, rendered in rich text (ADF for Jira, HTML for Asana), not Markdown.
 3. **If no ticket exists** — the script searches Jira+Asana automatically; if still none, it proposes creation.
 4. Always update `bench-index.csv` after adding a new ticket key/GID.
 

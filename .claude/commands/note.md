@@ -47,4 +47,4 @@ Write a session note for this conversation. Follow these steps:
 
 **Naming convention:** Always use `YYMMDD-short-description.md` — never a bare `YYMMDD.md`.
 **Note location:** Notes go directly in `convos/<folder>/YYMMDD-description.md`. NEVER create or write into `notes/` or `assets/` subfolders inside convo folders. Even if those subfolders already exist, ignore them — always write the note file directly in the convo folder root.
-**Jira comment format:** One sentence summarising the session + the note file path. Never paste the full note body manually — `bench_ticket.py` handles formatting.
+**Ticket comment format:** `bench_ticket.py` posts a brief summary (title + date + file path) to Jira/Asana — never the full note body. External ticket comments must be short pointers back to the bench, rendered in rich text (ADF for Jira, HTML for Asana), not Markdown.
