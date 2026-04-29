@@ -292,14 +292,21 @@ def cmd_post(slug: str, note_file: str):
         asana_workspace = keys["ASANA_WORKSPACE_GID"]
 
         if not asana_gid:
-            print(f"No Asana task for '{slug}', searching...")
-            found = asana_search(slug, ah, asana_workspace)
-            if found:
-                asana_gid = found
-                update_row(slug, asana=found)
-                print(f"  Updated bench-index.csv with Asana {found}")
+            if not sys.stdin.isatty():
+                print(f"No Asana task for '{slug}' — skipping (non-interactive).")
             else:
-                print(f"  No Asana match.")
+                print(f"No Asana task for '{slug}', searching...")
+                found = asana_search(slug, ah, asana_workspace)
+                if found:
+                    confirm = input(f"  Link Asana {found} to '{slug}'? [y/N] ").strip().lower()
+                    if confirm == "y":
+                        asana_gid = found
+                        update_row(slug, asana=found)
+                        print(f"  Updated bench-index.csv with Asana {found}")
+                    else:
+                        print(f"  Skipped Asana link.")
+                else:
+                    print(f"  No Asana match.")
 
     posted = False
     if jira_key and has_jira:
@@ -339,6 +346,11 @@ def cmd_search(slug: str):
         jira_key = jira_search(keys["JIRA_URL"], slug, jira_headers(keys), keys)
     if has_asana:
         asana_gid = asana_search(slug, asana_headers(keys), keys["ASANA_WORKSPACE_GID"])
+        if asana_gid:
+            confirm = input(f"  Link Asana {asana_gid} to '{slug}'? [y/N] ").strip().lower()
+            if confirm != "y":
+                print(f"  Skipped Asana link.")
+                asana_gid = None
 
     if jira_key or asana_gid:
         update_row(slug, jira=jira_key or "", asana=asana_gid or "")
