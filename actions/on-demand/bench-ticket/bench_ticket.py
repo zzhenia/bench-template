@@ -120,13 +120,33 @@ def jira_headers(keys: dict) -> dict:
     ).decode()
     return {"Authorization": f"Basic {creds}", "Content-Type": "application/json"}
 
+def _build_adf_from_lines(body: str) -> dict:
+    """Convert a multi-line comment into Atlassian Document Format (ADF).
+
+    First line becomes bold, remaining lines become normal paragraphs.
+    """
+    lines = body.split("\n")
+    content = []
+    for i, line in enumerate(lines):
+        if not line.strip():
+            continue
+        if i == 0:
+            # Bold header line
+            content.append({
+                "type": "paragraph",
+                "content": [{"type": "text", "text": line, "marks": [{"type": "strong"}]}],
+            })
+        else:
+            content.append({
+                "type": "paragraph",
+                "content": [{"type": "text", "text": line}],
+            })
+    return {"version": 1, "type": "doc", "content": content}
+
+
 def jira_post_comment(base_url: str, key: str, body: str, headers: dict):
     """Post a rich-text (ADF) comment to a Jira issue."""
-    adf_body = {
-        "version": 1,
-        "type": "doc",
-        "content": [{"type": "paragraph", "content": [{"type": "text", "text": body}]}],
-    }
+    adf_body = _build_adf_from_lines(body)
     r = requests.post(
         f"{base_url}/rest/api/3/issue/{key}/comment",
         headers=headers,
@@ -164,12 +184,20 @@ def asana_headers(keys: dict) -> dict:
 
 def asana_post_comment(task_gid: str, body: str, headers: dict):
     """Post a rich-text (HTML) comment to an Asana task."""
-    # Asana supports html_text for rich text rendering
     lines = body.split("\n")
-    html_body = "<br>".join(f"<b>{line}</b>" if i == 0 else line for i, line in enumerate(lines))
+    html_parts = []
+    for i, line in enumerate(lines):
+        if not line.strip():
+            continue
+        if i == 0:
+            html_parts.append(f"<strong>{line}</strong>")
+        else:
+            html_parts.append(line)
+    html_body = "\n".join(html_parts)
+    post_headers = {**headers, "Content-Type": "application/json"}
     r = requests.post(
         f"{ASANA_API}/tasks/{task_gid}/stories",
-        headers=headers,
+        headers=post_headers,
         json={"data": {"html_text": f"<body>{html_body}</body>"}},
     )
     r.raise_for_status()
@@ -216,15 +244,17 @@ def cmd_lookup(slug: str):
 
 
 def _build_brief_comment(note_path: Path) -> str:
-    """Extract a one-line summary from the note file for external ticket comments.
+    """Build a descriptive summary from the note file for external ticket comments.
 
-    Format: "Session note: <title>. See <relative-path>"
-    External systems (Jira/Asana) get a brief pointer, not the full note body.
+    Extracts the title, date, and discussion topics to produce a 2-3 sentence
+    summary that gives context without requiring the reader to open the file.
     """
     text = note_path.read_text().strip()
+    lines = text.splitlines()
+
     # Extract title from first heading line (# Title)
     title = ""
-    for line in text.splitlines():
+    for line in lines:
         stripped = line.strip()
         if stripped.startswith("# "):
             title = stripped.lstrip("# ").strip()
@@ -232,22 +262,51 @@ def _build_brief_comment(note_path: Path) -> str:
         if stripped and not stripped.startswith("---") and not stripped.startswith("**"):
             title = stripped
             break
+
     # Extract date if present
     date_str = ""
-    for line in text.splitlines():
+    for line in lines:
         if line.strip().startswith("**Date:**"):
             date_str = line.strip().replace("**Date:**", "").strip()
             break
+
+    # Extract discussion topics — collect bullet points or text under that heading
+    topics = []
+    in_topics = False
+    for line in lines:
+        stripped = line.strip()
+        if "Discussion Topics" in stripped:
+            in_topics = True
+            continue
+        if in_topics:
+            if stripped.startswith("####") or stripped.startswith("# "):
+                break  # hit next section
+            if stripped.startswith("<!--"):
+                continue
+            if stripped.startswith("- "):
+                topics.append(stripped.lstrip("- ").strip())
+            elif stripped and not stripped.startswith("<!--"):
+                topics.append(stripped)
+
     # Build relative path from bench root
     try:
         rel_path = note_path.resolve().relative_to(BENCH_ROOT)
     except ValueError:
         rel_path = note_path.name
-    summary = f"Session note: {title}"
+
+    # Build summary: title + date header, then topic sentences, then file ref
+    header = f"Session note: {title}"
     if date_str:
-        summary += f" ({date_str})"
-    summary += f"\nSee: {rel_path}"
-    return summary
+        header += f" ({date_str})"
+
+    if topics:
+        # Take first 3 topics, strip trailing periods, then join with ". "
+        cleaned = [t.rstrip(".") for t in topics[:3]]
+        summary_text = ". ".join(cleaned) + "."
+        comment = f"{header}\n{summary_text}\nSee: {rel_path}"
+    else:
+        comment = f"{header}\nSee: {rel_path}"
+    return comment
 
 
 def cmd_post(slug: str, note_file: str):

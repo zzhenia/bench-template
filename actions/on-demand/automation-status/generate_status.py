@@ -140,8 +140,12 @@ def main():
         ]
 
     ASSETS_DIR.mkdir(exist_ok=True)
-    output_path.write_text("\n".join(lines))
-    print(f"Written: {output_path}")
+    content = "\n".join(lines)
+    output_path.write_text(content)
+
+    # Print to stdout so the dashboard terminal can display results
+    print(content)
+    print(f"\nWritten: {output_path}")
     return str(output_path)
 
 

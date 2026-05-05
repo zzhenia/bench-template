@@ -13,6 +13,31 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/check_ai_annotations.sh",
+            "timeout": 5,
+            "statusMessage": "Checking for @ai annotations..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/session-note.sh",
+            "timeout": 10,
+            "statusMessage": "Session note reminder..."
+          }
+        ]
+      }
     ]
   }
 }
