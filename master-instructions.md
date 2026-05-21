@@ -153,11 +153,52 @@ Items where `type = both` share a single row.
 
 ## Writing Style
 
-When producing any written output (notes, SOPs, briefs, generated content, descriptions), follow these rules:
+These rules apply to all produced writing: notes, SOPs, briefs, articles, descriptions, generated content. They do not apply to code, commit messages, or casual conversation unless the output is meant to be read as prose.
 
-**Banned phrases** (avoid unless absolutely necessary):
+### Voice and Tone
+
+- Write like you speak, but don't be cheesy. Natural, direct, confident.
+- Use American English.
+- Use the active voice. Passive voice makes writing ambiguous and hard to follow. Aim for active 90% of the time.
+- Avoid first-person ("I," "me," "myself") when writing on behalf of an organization or producing reference material. "We" is acceptable; rephrasing to remove the pronoun entirely is better.
+- Be authoritative. Don't hedge. If you're unsure, research until you are sure. Drop phrases like "It is said that…", "This is possibly…", "Studies show…" (cite the study instead).
+- Put yourself in the position of someone encountering the topic for the first time. Spell out acronyms on first use (unless universally known, like GPS). Don't assume shared context.
+
+### Structure
+
+- Don't bury the lead. The most relevant information belongs in the opening section. Keep introductions under 100 words.
+- Keep paragraphs to 2-4 sentences. Keep sentences around 25 words or fewer. Use single spaces.
+- For anything longer than ~800 words, include a short bullet-point summary after the introduction.
+- Use bullet points, tables, and bolding where they make information easier to scan. Bold sparingly.
+- Add relevant hyperlinks when referencing specific information.
+- Conclusions should land one or two key takeaways, then point the reader somewhere next.
+
+### Rhythm and Flow
+
+- Vary sentence length. A mix of short, medium, and long sentences creates a rhythm that keeps the reader moving. Five short sentences in a row become monotonous; one long sentence surrounded by short ones has impact.
+- Create a "slippery slope": each sentence should pull the reader into the next. Ask questions, then answer them. Build small journeys within sections. Use visual metaphors and concrete examples to hold attention.
+- If you think an article, paragraph, sentence, or word is too long, it is.
+
+### Banned Phrases
+
+Avoid these unless there is genuinely no better alternative:
+
 "In conclusion", "Not only X, but also Y", "It is important to note that", "That being said", "Ultimately", "Furthermore", "Moreover", "Additionally", "For instance", "For example", "This means that", "In other words", "In summary", "As previously mentioned", "Crucial role", "Play a crucial role", "Vital role", "Whether you're a [X] or a [Y]", "Significant", "Important", "Essential", "Beneficial", "Solution", "Impactful", "Enhance", "Efficient", "Optimize", "Challenges", "Increased efficiency", "Crucial", "Lucrative", "Ensures"
 
-**Sentence rhythm:** Vary sentence length. Avoid staccato (choppy, overly short back-to-back sentences).
+### Punctuation
 
-**Punctuation:** Minimize em dashes; default to parentheses instead.
+- Minimize em dashes; default to parentheses instead.
+- Use AP-style title capitalization for headings.
+
+### AI Usage
+
+- AI is a tool, not a crutch. Use it for outlines, prompts, proofreading, and explanation. Never copy-paste generated text wholesale. Rewrite, reshape, and own the output.
+- Always verify facts that come from AI. It cannot be trusted as a fact-checker.
+
+### Quality Checks
+
+Run produced writing through these (or their equivalents) before considering it done:
+
+1. **Hemingway Editor** (or similar) — aim for 6th to 8th grade readability. Avoid red and green highlights; use yellow sparingly.
+2. **Grammarly** (or similar) — catch grammar issues, but understand every suggestion before accepting it. Dismiss the ones that make the sentence sound unnatural.
+3. **Capitalize My Title** (AP style) — for headings and titles.
