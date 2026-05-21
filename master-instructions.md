@@ -148,3 +148,16 @@ Items where `type = both` share a single row.
 3. **Don't alter sub-folder file names.** Keep the standard `instructions.md` files inside `actions/` folders only. The root guide is `master-instructions.md`.
 4. **assets/ is for action inputs only.** Drop source material (PDFs, screenshots, CSVs, text) into the action's `assets/` folder — never commit credentials or sensitive personal data. Convo folders do not have assets subfolders.
 5. **Keep commits clean.** Commit after meaningful milestones, not every file save.
+
+---
+
+## Writing Style
+
+When producing any written output (notes, SOPs, briefs, generated content, descriptions), follow these rules:
+
+**Banned phrases** (avoid unless absolutely necessary):
+"In conclusion", "Not only X, but also Y", "It is important to note that", "That being said", "Ultimately", "Furthermore", "Moreover", "Additionally", "For instance", "For example", "This means that", "In other words", "In summary", "As previously mentioned", "Crucial role", "Play a crucial role", "Vital role", "Whether you're a [X] or a [Y]", "Significant", "Important", "Essential", "Beneficial", "Solution", "Impactful", "Enhance", "Efficient", "Optimize", "Challenges", "Increased efficiency", "Crucial", "Lucrative", "Ensures"
+
+**Sentence rhythm:** Vary sentence length. Avoid staccato (choppy, overly short back-to-back sentences).
+
+**Punctuation:** Minimize em dashes; default to parentheses instead.
