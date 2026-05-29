@@ -47,7 +47,14 @@ actions/<action-name>/
 
 **How to use:** Drop reference material into `assets/`, then invoke the action by asking Claude to follow `instructions.md` in that folder.
 
+**Action matching rule:** Before responding to any task, check whether the request matches an existing action in `actions/`. If it does, read and follow that action's `instructions.md` before producing any output. Do not rely on general knowledge or freeform generation when a dedicated action exists — the instructions file is the source of truth for tone, format, and content rules.
+
 **Current actions:** See `bench-index.csv` (rows where `type = action` or `type = both`).
+
+**When creating a new action**, always do all three:
+1. Create the action folder under `actions/on-demand/` or `actions/recurring/`.
+2. Add a row to `bench-index.csv`.
+3. Add an entry to the `ACTIONS` list in `actions/on-demand/actions-dashboard/server.py` — the dashboard is the comprehensive catalogue of everything built on this bench.
 
 ---
 
@@ -123,12 +130,16 @@ If creating a new convo:
 
 Items where `type = both` share a single row.
 
+### Linking external integrations (Jira, Asana, etc.)
+
+**Never add a Jira ticket, Asana task, or any other external integration to `bench-index.csv` without explicit user confirmation.** When a new action or convo is created, leave the `jira`, `asana`, and other integration columns empty. If `bench_ticket.py` proposes a match, relay the proposal to the user and wait for approval before writing it to the index. The same applies when updating existing rows with new ticket links.
+
 ### Ticket workflow (run at every `/note` and `/push`)
 
 1. **Look up the slug** in `bench-index.csv` for the active convo/action.
 2. **If a ticket exists** — post a brief comment using `bench_ticket.py` (title + date + file path only — never the full note body). Comments on external systems (Jira/Asana) must be short pointers back to the bench, rendered in rich text (ADF for Jira, HTML for Asana), not Markdown.
-3. **If no ticket exists** — the script searches Jira+Asana automatically; if still none, it proposes creation.
-4. Always update `bench-index.csv` after adding a new ticket key/GID.
+3. **If no ticket exists** — the script searches Jira+Asana automatically; if still none, it proposes creation. **Do not auto-link** — relay the proposal to the user and wait for confirmation.
+4. Only update `bench-index.csv` with a new ticket key/GID after the user confirms the link.
 
 ---
 
