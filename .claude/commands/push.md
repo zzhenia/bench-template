@@ -7,7 +7,12 @@ Stage all changes and push to remote. Follow these steps:
 
 1. Run `git diff --cached`, `git diff`, and `git status` to understand what has changed.
 2. If a commit message was passed as an argument, use it exactly. Otherwise write a concise one-line message (imperative mood, under 72 characters) based on the diff.
-3. Run:
+3. **Pull before pushing** to avoid conflicts with other machines:
+   ```bash
+   git fetch origin && git pull --rebase origin "$(git branch --show-current)" 2>/dev/null || true
+   ```
+   If there are merge conflicts, resolve them before proceeding.
+4. Run:
    ```bash
    git add -A && git commit -m "<message>" && git push
    ```
@@ -20,3 +25,5 @@ Stage all changes and push to remote. Follow these steps:
    where `<slug>` matches the convo/action folder name in `bench-index.csv`. Relay any "no ticket found" proposals to the user.
 
 After running, report: commit message used, push success/failure, note files created, tickets posted.
+
+**Ticket references:** Every time you mention a Jira or Asana ticket in output (tables, lists, or inline), always include the ticket title/summary alongside the key. For example: `ZHEN-6235 — REF workflow redesign`, not just `ZHEN-6235`.

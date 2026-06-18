@@ -4,8 +4,12 @@ bench_ticket.py — Bench Index ticket utility.
 
 Commands:
   lookup <slug>               Print Jira/Asana refs for a slug.
-  post   <slug> <note-file>   Post note as a comment to ticket(s). Searches if
+  post   <slug> <note-file> [--key KEY]
+                              Post note as a comment to ticket(s). Searches if
                               no ticket found; proposes creation if still none.
+                              The slug's `jira` field may hold a comma-separated
+                              list of keys; use --key to choose which one to post
+                              to (and to add a new key to the list).
   search <slug>               Search Jira+Asana for a ticket; update CSV if found.
   update <slug> [--jira KEY] [--asana GID]
                               Manually write ticket refs into bench-index.csv.
@@ -143,6 +147,16 @@ def _build_adf_from_lines(body: str) -> dict:
             })
     return {"version": 1, "type": "doc", "content": content}
 
+
+def jira_get_summary(base_url: str, key: str, headers: dict) -> str:
+    """Fetch the summary (title) of a Jira issue."""
+    r = requests.get(
+        f"{base_url}/rest/api/3/issue/{key}?fields=summary",
+        headers=headers,
+    )
+    if r.ok:
+        return r.json().get("fields", {}).get("summary", "")
+    return ""
 
 def jira_post_comment(base_url: str, key: str, body: str, headers: dict):
     """Post a rich-text (ADF) comment to a Jira issue."""
@@ -309,7 +323,7 @@ def _build_brief_comment(note_path: Path) -> str:
     return comment
 
 
-def cmd_post(slug: str, note_file: str):
+def cmd_post(slug: str, note_file: str, key: str = ""):
     note_path = Path(note_file)
     if not note_path.exists():
         print(f"Note file not found: {note_file}")
@@ -329,14 +343,30 @@ def cmd_post(slug: str, note_file: str):
         print(f"Slug '{slug}' not found in bench-index.csv — add it first.")
         sys.exit(1)
 
-    jira_key  = row.get("jira", "").strip()
+    jira_keys = [k.strip() for k in row.get("jira", "").split(",") if k.strip()]
     asana_gid = row.get("asana", "").strip()
+    jira_key  = ""  # the single ticket we will actually post to
 
     if has_jira:
         jh = jira_headers(keys)
         base_url = keys["JIRA_URL"]
 
-        if not jira_key:
+        if key:
+            # Caller chose a specific ticket — post there and remember it on the slug.
+            jira_key = key.strip()
+            if jira_key not in jira_keys:
+                jira_keys.append(jira_key)
+                update_row(slug, jira=",".join(jira_keys))
+                print(f"  Added Jira {jira_key} to '{slug}' (now: {', '.join(jira_keys)})")
+        elif len(jira_keys) == 1:
+            jira_key = jira_keys[0]
+        elif len(jira_keys) > 1:
+            # Catch-all slug linked to several tickets — don't guess which one.
+            print(f"'{slug}' is linked to multiple Jira tickets — re-run with --key <KEY>:")
+            for k in jira_keys:
+                summary = jira_get_summary(base_url, k, jh)
+                print(f"  {k} — {summary}" if summary else f"  {k}")
+        else:
             print(f"No Jira ticket for '{slug}', searching...")
             found = jira_search(base_url, slug, jh, keys)
             if found:
@@ -371,7 +401,9 @@ def cmd_post(slug: str, note_file: str):
     if jira_key and has_jira:
         try:
             jira_post_comment(base_url, jira_key, body, jh)
-            print(f"Posted to Jira {jira_key}")
+            summary = jira_get_summary(base_url, jira_key, jh)
+            label = f"Posted to Jira {jira_key} — {summary}" if summary else f"Posted to Jira {jira_key}"
+            print(label)
             posted = True
         except Exception as e:
             print(f"Jira post failed: {e}")
@@ -439,6 +471,8 @@ def main():
     p_post = sub.add_parser("post")
     p_post.add_argument("slug")
     p_post.add_argument("note_file")
+    p_post.add_argument("--key", default="",
+                        help="Specific Jira key to post to (for slugs linked to several tickets)")
 
     p_search = sub.add_parser("search")
     p_search.add_argument("slug")
@@ -453,7 +487,7 @@ def main():
     if args.cmd == "lookup":
         cmd_lookup(args.slug)
     elif args.cmd == "post":
-        cmd_post(args.slug, args.note_file)
+        cmd_post(args.slug, args.note_file, args.key)
     elif args.cmd == "search":
         cmd_search(args.slug)
     elif args.cmd == "update":
