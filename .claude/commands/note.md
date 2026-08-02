@@ -47,6 +47,7 @@ Write a session note for this conversation. Follow these steps:
    - If the slug has no linked ticket at all, search for candidates and present them to the user — do not auto-link or auto-post.
 
 **Naming convention:** Always use `YYMMDD-short-description.md` — never a bare `YYMMDD.md`.
+**Memory files:** `_memory-index.md` and `_memory-master.md` inside convo folders are machine-maintained memory files (nightly convo-memory job). NEVER write session content into them, never edit them, and never count them as existing notes when checking for today's note.
 **Note location:** Notes go directly in `convos/<folder>/YYMMDD-description.md`. NEVER create or write into `notes/` or `assets/` subfolders inside convo folders. Even if those subfolders already exist, ignore them — always write the note file directly in the convo folder root.
 **Ticket comment format:** `bench_ticket.py` posts a brief summary (title + date + file path) to Jira/Asana — never the full note body. External ticket comments must be short pointers back to the bench, rendered in rich text (ADF for Jira, HTML for Asana), not Markdown.
 **Ticket references:** Every time you mention a Jira or Asana ticket in output (tables, lists, or inline), always include the ticket title/summary alongside the key. For example: `ZHEN-6235 — REF workflow redesign`, not just `ZHEN-6235`.

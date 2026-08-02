@@ -42,7 +42,9 @@ Each folder is a **repeatable, parameterized task** — the Claude equivalent of
 ```
 actions/<action-name>/
 ├── assets/            ← source material (PDFs, screenshots, text)
-└── instructions.md  ← the prompt/procedure Claude follows
+├── instructions.md    ← the prompt/procedure Claude follows
+├── eval.md            ← evaluation checklist (test cases, pass/fail criteria)
+└── BUGS.md            ← known bugs and issues
 ```
 
 **How to use:** Drop reference material into `assets/`, then invoke the action by asking Claude to follow `instructions.md` in that folder.
@@ -51,10 +53,11 @@ actions/<action-name>/
 
 **Current actions:** See `bench-index.csv` (rows where `type = action` or `type = both`).
 
-**When creating a new action**, always do all three:
+**When creating a new action**, always do all four:
 1. Create the action folder under `actions/on-demand/` or `actions/recurring/`.
-2. Add a row to `bench-index.csv`.
-3. Add an entry to the `ACTIONS` list in `actions/on-demand/actions-dashboard/server.py` — the dashboard is the comprehensive catalogue of everything built on this bench.
+2. Write an `eval.md` with test cases covering the action's core functionality, edge cases, and expected behavior. Each test should have steps and pass/fail criteria. Also create a `BUGS.md` (can start empty with just a heading).
+3. Add a row to `bench-index.csv`.
+4. Add an entry to the `ACTIONS` list in `actions/on-demand/actions-dashboard/server.py` — the dashboard is the comprehensive catalogue of everything built on this bench.
 
 ---
 
@@ -65,12 +68,23 @@ Each folder is an **ongoing topic** with persistent context across sessions.
 **Schema:**
 ```
 convos/<topic-name>/
-├── YYMMDD-short-description.md   ← session notes live directly here
+├── YYMMDD-short-description.md   ← session notes live directly here (Layer 0 — the log)
 ├── YYMMDD-another-topic.md
-└── ...
+├── _memory-index.md              ← Layer 1 — detailed memory with [YYMMDD] citations (machine-maintained)
+└── _memory-master.md             ← Layer 2 — compact wake summary, ~60 lines (machine-maintained)
 ```
 
-**How to use:** At the start of a session, read the latest note(s) in the convo folder (they carry the standing context). Write a new dated note at the end of each session summarizing decisions made.
+**How to use:** At the start of a session, read `_memory-master.md` plus any notes dated after its `through YYMMDD` watermark (line 2 of the master). If no master exists, read the latest note(s). Write a new dated note at the end of each session summarizing decisions made.
+
+### Memory compression (Layer 1/2)
+
+Convo folders with 5+ notes get OptMem-style three-layer memory, maintained by the nightly `convo-memory` job (`actions/recurring/convo-memory/`, Claude Haiku, 02:30):
+
+- **Layer 0 (log):** dated session notes — written by `/note` as always, never deleted or edited by the pipeline
+- **Layer 1 (index):** `_memory-index.md` — every fact/decision as a `- [YYMMDD]` bullet citing its source note; only grows, never loses evidence
+- **Layer 2 (wake):** `_memory-master.md` — compact summary regenerated from the index, capped at ~60 lines regardless of note count
+
+Rules: never hand-edit `_memory-*.md` files; never write session content into them. Details: `actions/recurring/convo-memory/instructions.md`.
 
 **Session note naming convention:** `YYMMDD-short-description.md` — date followed by one or two kebab-case words describing the session topic (e.g. `260405-csv-fix.md`, `260403-folder-structure.md`)
 
@@ -84,7 +98,9 @@ When a user message starts with `>>` (with or without a space after it) followed
 
 1. Extract the convo name (first word after `>>`, lowercased, kebab-case).
 2. Check if `convos/<name>/` exists.
-3. **If the folder exists: READ ALL NOTES in it before responding.** The user is continuing an existing conversation — the notes contain the context you need. The user's question likely references things discussed in previous sessions. Read the notes, then answer their question using that context.
+3. **If the folder exists: read its memory before responding.** The user is continuing an existing conversation — the memory contains the context you need. Use the layered read path:
+   - If `_memory-master.md` exists: read it, extract the `through YYMMDD` watermark from line 2, and read only notes dated **after** the watermark. Drill into `_memory-index.md` when the question needs detail behind a master line; open a raw note `[YYMMDD]` as a last resort.
+   - If no `_memory-master.md` exists: read all notes (small folder).
 4. If the folder does not exist: this is a new topic. Answer the question normally — the folder will be created when `/note` runs.
 5. This session belongs to convo `<name>`. Remember it for when `/note` is run.
 
@@ -154,7 +170,7 @@ Items where `type = both` share a single row.
 
 ## Claude Operating Rules
 
-1. **Read before acting.** At the start of a topic session, read the latest notes in the convo folder before responding.
+1. **Read before acting.** At the start of a topic session, read the convo folder's `_memory-master.md` plus notes newer than its watermark (or the latest notes if no master exists) before responding.
 2. **Write session notes.** After meaningful sessions, create a dated note directly in the convo folder summarizing decisions, context, and next steps.
 3. **Don't alter sub-folder file names.** Keep the standard `instructions.md` files inside `actions/` folders only. The root guide is `master-instructions.md`.
 4. **assets/ is for action inputs only.** Drop source material (PDFs, screenshots, CSVs, text) into the action's `assets/` folder — never commit credentials or sensitive personal data. Convo folders do not have assets subfolders.

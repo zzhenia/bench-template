@@ -99,6 +99,7 @@ your-bench/
 │   │   ├── automation-status/  ← snapshot of scheduled automations
 │   │   └── meeting-minutes/ ← example action (copy to create your own)
 │   ├── recurring/           ← scheduled actions (launchd / cron)
+│   │   ├── convo-memory/    ← nightly memory compression (three-layer OptMem)
 │   │   └── weekly-check-ins/
 │   └── ~archive/
 ├── convos/
