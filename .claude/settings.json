@@ -35,6 +35,12 @@
             "command": "bash .claude/scripts/session-note.sh",
             "timeout": 10,
             "statusMessage": "Session note reminder..."
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/response-length-budget.py\"",
+            "timeout": 10,
+            "statusMessage": "Checking response length..."
           }
         ]
       }
