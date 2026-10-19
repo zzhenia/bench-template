@@ -1,0 +1,33 @@
+/* ZV-Bench Obsidian Typography */
+
+/* Base typography for editor and preview */
+body {
+  line-height: 1.7;
+  letter-spacing: 0.015em;
+  word-spacing: 0.02em;
+}
+
+.markdown-source-view,
+.markdown-preview-view,
+.editor-cm {
+  line-height: 1.7;
+  letter-spacing: 0.015em;
+  word-spacing: 0.02em;
+}
+
+/* List items maintain spacing */
+ul li,
+ol li {
+  line-height: 1.7;
+}
+
+/* Code blocks: preserve monospace spacing */
+pre,
+code {
+  line-height: 1.6;
+}
+
+/* Headings: slightly tighter spacing */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.4;
+}

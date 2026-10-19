@@ -1,0 +1,47 @@
+---
+name: eod
+description: End-of-day wrap-up — save progress, create session note, document next steps, and stop any running services.
+model: haiku
+---
+
+The user is ending their working day. Perform these steps quickly and without asking questions:
+
+1. **Stop running services.** Kill any app servers started during this session:
+   ```bash
+   kill $(lsof -ti:8001) 2>/dev/null   # YT Autopilot
+   ```
+
+2. **Create/update the session note.** Use the `/note` workflow — determine the convo folder from the conversation context, write a session note summarising:
+   - What was built or changed this session
+   - Key decisions made
+   - Current state (what works, what's broken)
+   - Blockers or open questions
+   - What to do next (prioritised)
+
+3. **EOD Reflection.** Generate and append an end-of-day reflection to the daily log:
+   - Check if `convos/daily-log/YYYY-MM-DD.md` exists (where YYYY-MM-DD is today's date).
+   - If it does **not** exist, create it with a minimal skeleton:
+     ```markdown
+     ## YYYY-MM-DD
+     ### Plan
+     (no plan recorded today)
+     ### Activity Log
+     (no activity logged today)
+     ```
+   - Run: `python3 tools/on-demand/daily-log/eod_reflection.py`
+   - Append the script's stdout to `convos/daily-log/YYYY-MM-DD.md`.
+   - If the script exits with code 0 but produces no output (e.g. reflection already exists), skip silently.
+   - If the script fails, log a warning and continue — do not block the rest of the EOD flow.
+
+4. **Update memory.** If the session involved a significant project, update or create a memory file in the memory directory with the current status so the next conversation can pick up immediately.
+
+5. **Post to ticket — Jira only, never Asana.** Run `bench_ticket.py post` to push the note to the linked Jira ticket (if any); this never touches the Asana API.
+
+6. **Commit and push.** Stage all changes, create a commit with a message summarising the session's work, and push to the remote. Use the `/push` workflow — auto-generate the commit message from the diff.
+
+7. **Report.** Tell the user:
+   - What was saved and where
+   - What to reference tomorrow to resume (`/note`, memory file, plan file if applicable)
+   - A one-line summary of where things stand
+
+Do NOT ask the user any questions — make reasonable choices for all decisions (convo folder, note filename, etc.). The goal is a fast, clean exit.
