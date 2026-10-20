@@ -148,11 +148,17 @@ POST /rest/api/3/bulk/issues/move
 
 ## Ticket Posting — Confirmation Required
 
-**NEVER post a comment to any Jira or Asana ticket without explicit user
-confirmation.** This applies everywhere: `/note`, `/push`, manual posting. Even
-when a slug has only one linked ticket, present the target (key + title) plus a
-"Skip" option and wait for the user to choose. Use `bench_ticket.py lookup`
-(never a bare `post`) to read linked tickets without triggering a post.
+The bench's project-management tool is `PM_TOOL` in `config/bench.env`
+(`jira`, `asana` or `none`, chosen in `setup.sh`). With `none` (or empty) there
+is no ticket step anywhere — skip it silently.
+
+With `jira` or `asana`: **NEVER post a comment to a ticket without explicit user
+confirmation.** This applies everywhere: `/note`, `/push`, `/eod`, manual
+posting. Post only to a ticket already linked to the slug in `bench-index.csv`:
+run `bench_ticket.py lookup <slug>`, present the target (key + title) plus a
+"Skip" option, wait for the user to choose, then `post … --key <KEY>`. Never
+search for tickets or link one to a slug yourself — linking is the user's job
+(`bench_ticket.py update`).
 
 ---
 

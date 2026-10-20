@@ -22,11 +22,22 @@ if [ -z "$CURRENT_NAME" ]; then
   fi
 fi
 
+# Project-management tool for ticket comments (stored in config/bench.env)
+CURRENT_PM=$(grep '^PM_TOOL=' config/bench.env | cut -d= -f2-)
+if [ -z "$CURRENT_PM" ]; then
+  echo ""
+  read -rp "Project-management tool for ticket comments — jira, asana or none? [none] " PM
+  PM=$(echo "${PM:-none}" | tr '[:upper:]' '[:lower:]')
+  case "$PM" in jira|asana|none) ;; *) echo "  '$PM' not recognised — using none."; PM=none ;; esac
+  sed -i '' "s/^PM_TOOL=.*/PM_TOOL=$PM/" config/bench.env
+  echo "✓ PM tool: $PM (change it in config/bench.env)"
+fi
+
 echo ""
 echo "✓ Bench ready."
 echo ""
 echo "  Next steps:"
-echo "  1. Edit config/keys.env with your API keys (optional)."
+echo "  1. If you picked jira or asana, add its credentials to config/keys.env."
 echo "  2. Open this folder in Claude Code: claude ."
 echo "  3. Run /status to verify automations, /note to write your first session note."
 echo ""

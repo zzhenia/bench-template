@@ -15,7 +15,7 @@ Each team member runs their own bench — a private repo where Claude Code has p
 - Python 3.10+
 - A GitHub account
 
-API integrations (Jira, Asana, Toggl) are optional — the bench works without them.
+API integrations (Jira, Asana, Toggl) are optional — the bench works without them. `setup.sh` asks which project-management tool you use (`jira`, `asana` or `none`) and saves it as `PM_TOOL` in `config/bench.env`; with `none` there is no ticket step.
 
 > **On supported environments.** The bench runs in any terminal — Terminal.app,
 > iTerm, ssh — and every action works there. What Warp and Cursor add is the
@@ -107,6 +107,7 @@ your-bench/
 ├── bench-index.csv          ← index of all actions and convos + ticket links
 ├── CLAUDE.md                ← always-loaded operating rules
 ├── config/
+│   ├── bench.env            ← non-secret settings (PM_TOOL)
 │   ├── keys.env.template    ← copy to keys.env and fill in your API keys
 │   ├── warp/                ← Warp setup kit (zshrc block, wp, tab configs)
 │   └── cursor/              ← Cursor setup kit (cw, per-project folderOpen tasks)
@@ -160,8 +161,8 @@ To continue an existing convo, use the same `>> name` to restore context from pr
 
 | Command | What it does |
 |---------|-------------|
-| `/note` | Writes a session note to the active convo folder; posts to linked ticket |
-| `/push` | Commits and pushes all changes; creates notes; posts to tickets |
+| `/note` | Writes a session note to the active convo folder; offers to post to the linked ticket |
+| `/push` | Commits and pushes all changes; creates notes; offers to post to linked tickets |
 | `/status` | Runs automation-status and shows a snapshot of scheduled jobs |
 | `/ai` | Processes all `@ai` inline annotations in a file |
 | `/dashboard` | Opens the Actions Dashboard in your browser (starts it if not running) |
@@ -175,14 +176,10 @@ To continue an existing convo, use the same `>> name` to restore context from pr
 
 Tracks every action and convo with their linked Jira/Asana tickets. When you add a new action or convo, add a row. The ticket workflow in `/note` and `/push` reads from this file.
 
-To add a ticket manually:
+Links are added by hand — nothing searches for or auto-links tickets, and posting only goes to a ticket already linked here:
 ```bash
 python3 actions/on-demand/bench-ticket/bench_ticket.py update <slug> --jira PROJ-123
-```
-
-To search for an existing ticket automatically:
-```bash
-python3 actions/on-demand/bench-ticket/bench_ticket.py search <slug>
+python3 actions/on-demand/bench-ticket/bench_ticket.py update <slug> --asana 1201234567890
 ```
 
 ---
@@ -201,16 +198,14 @@ This opens http://localhost:7391 in your browser automatically.
 
 ## Adding API integrations
 
-Edit `config/keys.env` (never commit this file):
+Edit `config/keys.env` (never commit this file) with the keys for the tool `PM_TOOL` names:
 
 ```
 JIRA_URL=https://your-workspace.atlassian.net
 JIRA_EMAIL=you@example.com
 JIRA_API_TOKEN=your-token
-JIRA_PROJECT_KEYS=PROJ
 
 ASANA_PAT=your-pat
-ASANA_WORKSPACE_GID=your-workspace-gid
 
 ANTHROPIC_API_KEY=your-key
 ```

@@ -79,10 +79,10 @@ After writing the file, show the user:
 
 ### 5. Post to ticket (if applicable)
 
-Look up the slug in `bench-index.csv` and post a brief comment:
+Only if `PM_TOOL` in `config/bench.env` is `jira` or `asana`. Look up the slug with `bench_ticket.py lookup <slug>`, confirm the target ticket with the user, then post a brief comment:
 
 ```bash
-python3 actions/on-demand/bench-ticket/bench_ticket.py post <slug> <bugs-file>
+python3 actions/on-demand/bench-ticket/bench_ticket.py post <slug> <bugs-file> --key <KEY>
 ```
 
-If no ticket is found, skip silently — this step is optional.
+If no ticket is linked, skip silently — this step is optional.

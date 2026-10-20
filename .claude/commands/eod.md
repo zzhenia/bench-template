@@ -20,7 +20,7 @@ The user is ending their working day. Perform these steps quickly and without as
 
 3. **Update memory.** If the session involved a significant project, update or create a memory file in the memory directory with the current status so the next conversation can pick up immediately.
 
-4. **Post to ticket.** Run `bench_ticket.py post` to push the note to the linked Jira/Asana ticket (if any).
+4. **Post to ticket.** Only if `PM_TOOL` in `config/bench.env` is `jira` or `asana` and the slug has a linked ticket: follow the `/note` ticket step. Confirming the target ticket is the one question this command still asks. Otherwise skip.
 
 5. **Commit and push.** Stage all changes, create a commit with a message summarising the session's work, and push to the remote. Use the `/push` workflow — auto-generate the commit message from the diff.
 

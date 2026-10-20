@@ -41,11 +41,11 @@ Write a session note for this conversation. Follow these steps:
 
 5. **Write the note content** — summarise what was actually discussed this session: key decisions, action items, open questions, references used.
 
-6. **Post to ticket — ALWAYS confirm the target ticket with the user first. NEVER post automatically, even when only one ticket is linked.** Many convos are broad topics that span many different tickets (catch-all convos), so a single linked key is NOT a safe default to post to.
-   - First read the linked key(s) with `python3 actions/on-demand/bench-ticket/bench_ticket.py lookup <slug>`. **Do NOT run a bare `post`** — for a single linked key it posts immediately with no confirmation.
+6. **Post to ticket** — only if `PM_TOOL` in `config/bench.env` is `jira` or `asana`; with `none` or empty, skip this step entirely. **ALWAYS confirm the target ticket with the user first. NEVER post automatically, even when only one ticket is linked.** Many convos are broad topics that span many different tickets (catch-all convos), so a single linked key is NOT a safe default to post to.
+   - First read the linked key(s) with `python3 actions/on-demand/bench-ticket/bench_ticket.py lookup <slug>`.
    - Present the linked ticket(s) **with their titles** plus a "Skip — don't post" option, and **wait for the user to choose** the ticket relevant to *this* session.
-   - Only after the user confirms, post with an explicit key: `python3 actions/on-demand/bench-ticket/bench_ticket.py post <slug> <note-file> --key <KEY>`. A `--key` not yet in the list is appended automatically.
-   - If the slug has no linked ticket at all, search for candidates and present them to the user — do not auto-link or auto-post.
+   - Only after the user confirms, post with an explicit key: `python3 actions/on-demand/bench-ticket/bench_ticket.py post <slug> <note-file> --key <KEY>`. It only posts to a key already linked to the slug.
+   - If the slug has no linked ticket, skip posting and say so — never search for or link a ticket.
 
 **Naming convention:** Always use `YYMMDD-short-description.md` — never a bare `YYMMDD.md`.
 **Memory files:** `_memory-index.md` and `_memory-master.md` inside convo folders are machine-maintained memory files (nightly convo-memory job). NEVER write session content into them, never edit them, and never count them as existing notes when checking for today's note.

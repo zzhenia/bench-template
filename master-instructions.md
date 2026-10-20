@@ -190,17 +190,18 @@ issue without losing its key: CLAUDE.md → "Jira Hierarchy".
 
 ### Linking external integrations (Jira, Asana, etc.)
 
-**Never add a Jira ticket, Asana task, or any other external integration to `bench-index.csv` without explicit user confirmation.** When a new action or convo is created, leave the `jira`, `asana`, and other integration columns empty. If `bench_ticket.py` proposes a match, relay the proposal to the user and wait for approval before writing it to the index. The same applies when updating existing rows with new ticket links.
+**Never add a Jira ticket, Asana task, or any other external integration to `bench-index.csv` yourself.** When a new action or convo is created, leave the `jira`, `asana`, and other integration columns empty. Links are added only by the user, or on their explicit instruction with `bench_ticket.py update <slug> --jira KEY` / `--asana GID`. Never search for matching tickets.
 
 ### Ticket workflow (run at every `/note` and `/push`)
 
+Only when `PM_TOOL` in `config/bench.env` is `jira` or `asana` (set during `setup.sh`). With `none` or empty, skip this section entirely.
+
 **Never post a comment to a ticket without asking the user first.** Even when a slug has a single linked ticket, present the target ticket (key + title) and a "Skip" option, then wait for the user's explicit pick before posting. A convo is often a broad topic spanning many tickets, so one linked key is not a safe default.
 
-1. **Look up the slug** in `bench-index.csv` for the active convo/action. Use `bench_ticket.py lookup <slug>` — never a bare `post`, which posts immediately for single-key slugs.
+1. **Look up the slug** in `bench-index.csv` for the active convo/action with `bench_ticket.py lookup <slug>`.
 2. **Present the linked ticket(s)** to the user — key + title for each, plus a "Skip" option. Wait for the user to choose.
-3. **If the user picks a ticket** — post a brief comment with `bench_ticket.py post <slug> <note-file> --key <KEY>` (title + date + file path only — never the full note body). Comments on external systems must be short pointers back to the bench, rendered in rich text (ADF for Jira, HTML for Asana), not Markdown. A `--key` not yet in the list is appended automatically.
-4. **If no ticket exists** — search Jira/Asana for candidate tickets and present them as a numbered list with a "Skip" option. **Do not auto-link** — wait for confirmation.
-5. Only update `bench-index.csv` with a new ticket key/GID after the user confirms the link.
+3. **If the user picks a ticket** — post a brief comment with `bench_ticket.py post <slug> <note-file> --key <KEY>` (title + date + file path only — never the full note body). Comments on external systems must be short pointers back to the bench, rendered in rich text (ADF for Jira, HTML for Asana), not Markdown. `post` refuses a key that isn't already linked to the slug.
+4. **If no ticket is linked** — skip posting and say so. Do not search for one.
 
 ---
 

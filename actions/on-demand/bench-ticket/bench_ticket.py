@@ -3,18 +3,18 @@
 bench_ticket.py — Bench Index ticket utility.
 
 Commands:
-  lookup <slug>               Print Jira/Asana refs for a slug.
-  post   <slug> <note-file> [--key KEY]
-                              Post note as a comment to ticket(s). Searches if
-                              no ticket found; proposes creation if still none.
-                              The slug's `jira` field may hold a comma-separated
-                              list of keys; use --key to choose which one to post
-                              to (and to add a new key to the list).
-  search <slug>               Search Jira+Asana for a ticket; update CSV if found.
+  lookup <slug>               Print the slug's linked ticket(s) for PM_TOOL.
+  post   <slug> <note-file> --key KEY
+                              Post a brief note comment to KEY. KEY must
+                              already be linked to the slug in bench-index.csv
+                              (the `jira` or `asana` column, comma-separated
+                              for several) — nothing is searched or auto-linked.
   update <slug> [--jira KEY] [--asana GID]
                               Manually write ticket refs into bench-index.csv.
 
-Silently skips any integration whose credentials are not configured in keys.env.
+The tool comes from PM_TOOL in config/bench.env (jira | asana | none, set by
+setup.sh). With none, there is no ticket step and every command is a no-op.
+Credentials come from config/keys.env.
 """
 
 import argparse
@@ -32,14 +32,15 @@ import requests
 BENCH_ROOT = Path(__file__).resolve().parents[3]
 INDEX_FILE = BENCH_ROOT / "bench-index.csv"
 KEYS_FILE  = BENCH_ROOT / "config" / "keys.env"
+BENCH_FILE = BENCH_ROOT / "config" / "bench.env"
 
 # ── Config loading ───────────────────────────────────────────────────────────
 
-def load_keys() -> dict:
+def load_keys(path: Path = KEYS_FILE) -> dict:
     keys = {}
-    if not KEYS_FILE.exists():
+    if not path.exists():
         return keys
-    with open(KEYS_FILE) as f:
+    with open(path) as f:
         for line in f:
             line = line.strip()
             if line and not line.startswith("#") and "=" in line:
@@ -51,41 +52,12 @@ def jira_configured(keys: dict) -> bool:
     return all(keys.get(k) for k in ("JIRA_EMAIL", "JIRA_API_TOKEN", "JIRA_URL"))
 
 def asana_configured(keys: dict) -> bool:
-    if not keys.get("ASANA_PAT"):
-        return False
-    if not keys.get("ASANA_WORKSPACE_GID"):
-        # Auto-fetch workspace GID from Asana API
-        gid = _auto_fetch_asana_workspace(keys)
-        if gid:
-            keys["ASANA_WORKSPACE_GID"] = gid
-            return True
-        return False
-    return True
+    return bool(keys.get("ASANA_PAT"))
 
-
-def _auto_fetch_asana_workspace(keys: dict) -> str | None:
-    """Fetch the first workspace GID using the Asana PAT and save it to keys.env."""
-    try:
-        r = requests.get(
-            "https://app.asana.com/api/1.0/workspaces",
-            headers={"Authorization": f"Bearer {keys['ASANA_PAT']}", "Accept": "application/json"},
-            params={"limit": 1},
-        )
-        r.raise_for_status()
-        workspaces = r.json().get("data", [])
-        if not workspaces:
-            print("  Asana: no workspaces found for this PAT")
-            return None
-        gid = workspaces[0]["gid"]
-        name = workspaces[0].get("name", "")
-        print(f"  Asana: auto-detected workspace {gid} ({name}) — saving to keys.env")
-        # Append to keys.env
-        with open(KEYS_FILE, "a") as f:
-            f.write(f"\nASANA_WORKSPACE_GID={gid}\n")
-        return gid
-    except Exception as e:
-        print(f"  Asana: could not auto-detect workspace ({e})")
-        return None
+def pm_tool() -> str:
+    """jira | asana | none — from config/bench.env. Empty or unknown means none."""
+    tool = load_keys(BENCH_FILE).get("PM_TOOL", "").strip().lower()
+    return tool if tool in ("jira", "asana") else "none"
 
 # ── CSV helpers ──────────────────────────────────────────────────────────────
 
@@ -168,27 +140,6 @@ def jira_post_comment(base_url: str, key: str, body: str, headers: dict):
     )
     r.raise_for_status()
 
-def jira_search(base_url: str, slug: str, headers: dict, keys: dict) -> str | None:
-    words = slug.replace("-", " ")
-    project_keys = keys.get("JIRA_PROJECT_KEYS", "").strip()
-    if project_keys:
-        projects = ", ".join(p.strip() for p in project_keys.split(","))
-        jql = f'project in ({projects}) AND summary ~ "{words}" ORDER BY created DESC'
-    else:
-        jql = f'summary ~ "{words}" ORDER BY created DESC'
-    r = requests.post(
-        f"{base_url}/rest/api/3/search/jql",
-        headers=headers,
-        json={"jql": jql, "maxResults": 5, "fields": ["summary"]},
-    )
-    issues = r.json().get("issues", [])
-    if issues:
-        key = issues[0]["key"]
-        summary = issues[0]["fields"]["summary"]
-        print(f"  Jira: found {key} — {summary}")
-        return key
-    return None
-
 # ── Asana helpers ────────────────────────────────────────────────────────────
 
 ASANA_API = "https://app.asana.com/api/1.0"
@@ -216,35 +167,6 @@ def asana_post_comment(task_gid: str, body: str, headers: dict):
     )
     r.raise_for_status()
 
-def asana_search(slug: str, headers: dict, workspace_gid: str) -> str | None:
-    words = slug.replace("-", " ")
-    r = requests.get(
-        f"{ASANA_API}/workspaces/{workspace_gid}/tasks/search",
-        headers=headers,
-        params={"text": words, "opt_fields": "gid,name", "limit": 5},
-    )
-    tasks = r.json().get("data", [])
-    if tasks:
-        gid = tasks[0]["gid"]
-        name = tasks[0]["name"]
-        print(f"  Asana: found {gid} — {name}")
-        return gid
-    return None
-
-def asana_create_task(name: str, notes: str, headers: dict, workspace_gid: str) -> str:
-    r = requests.post(
-        f"{ASANA_API}/tasks",
-        headers=headers,
-        json={"data": {
-            "name": name,
-            "notes": notes,
-            "workspace": workspace_gid,
-            "assignee": "me",
-        }},
-    )
-    r.raise_for_status()
-    return r.json()["data"]["gid"]
-
 # ── Commands ─────────────────────────────────────────────────────────────────
 
 def cmd_lookup(slug: str):
@@ -252,9 +174,17 @@ def cmd_lookup(slug: str):
     if not row:
         print(f"Slug '{slug}' not found in bench-index.csv")
         sys.exit(1)
+    tool = pm_tool()
+    if tool == "none":
+        print("PM_TOOL=none — no ticket step on this bench.")
+        return
+    refs = [k.strip() for k in row.get(tool, "").split(",") if k.strip()]
+    keys = load_keys()
+    if tool == "jira" and refs and jira_configured(keys):
+        jh = jira_headers(keys)
+        refs = [f"{k} — {jira_get_summary(keys['JIRA_URL'], k, jh)}".rstrip(" —") for k in refs]
     print(f"slug:   {row['slug']}")
-    print(f"jira:   {row['jira'] or '(none)'}")
-    print(f"asana:  {row['asana'] or '(none)'}")
+    print(f"{tool}:  {', '.join(refs) if refs else '(none linked)'}")
 
 
 def _build_brief_comment(note_path: Path) -> str:
@@ -330,124 +260,45 @@ def cmd_post(slug: str, note_file: str, key: str = ""):
         sys.exit(1)
     body = _build_brief_comment(note_path)
 
-    keys = load_keys()
-    has_jira  = jira_configured(keys)
-    has_asana = asana_configured(keys)
+    tool = pm_tool()
+    if tool == "none":
+        print("PM_TOOL=none — no ticket step on this bench.")
+        return
 
-    if not has_jira and not has_asana:
-        print("No ticket integrations configured — skipping ticket posting.")
-        sys.exit(0)
+    keys = load_keys()
+    if not (jira_configured(keys) if tool == "jira" else asana_configured(keys)):
+        print(f"PM_TOOL={tool} but its credentials are missing from config/keys.env — nothing posted.")
+        sys.exit(1)
 
     row = find_row(slug)
     if not row:
         print(f"Slug '{slug}' not found in bench-index.csv — add it first.")
         sys.exit(1)
 
-    jira_keys = [k.strip() for k in row.get("jira", "").split(",") if k.strip()]
-    asana_gid = row.get("asana", "").strip()
-    jira_key  = ""  # the single ticket we will actually post to
+    linked = [k.strip() for k in row.get(tool, "").split(",") if k.strip()]
+    if not linked:
+        print(f"No {tool} ticket linked to '{slug}' — nothing posted.")
+        return
+    if not key:
+        print(f"'{slug}' is linked to: {', '.join(linked)} — re-run with --key <KEY> once the user confirms.")
+        sys.exit(1)
+    key = key.strip()
+    if key not in linked:
+        print(f"{key} is not linked to '{slug}' in bench-index.csv — nothing posted.")
+        sys.exit(1)
 
-    if has_jira:
-        jh = jira_headers(keys)
-        base_url = keys["JIRA_URL"]
-
-        if key:
-            # Caller chose a specific ticket — post there and remember it on the slug.
-            jira_key = key.strip()
-            if jira_key not in jira_keys:
-                jira_keys.append(jira_key)
-                update_row(slug, jira=",".join(jira_keys))
-                print(f"  Added Jira {jira_key} to '{slug}' (now: {', '.join(jira_keys)})")
-        elif len(jira_keys) == 1:
-            jira_key = jira_keys[0]
-        elif len(jira_keys) > 1:
-            # Catch-all slug linked to several tickets — don't guess which one.
-            print(f"'{slug}' is linked to multiple Jira tickets — re-run with --key <KEY>:")
-            for k in jira_keys:
-                summary = jira_get_summary(base_url, k, jh)
-                print(f"  {k} — {summary}" if summary else f"  {k}")
+    try:
+        if tool == "jira":
+            jh = jira_headers(keys)
+            jira_post_comment(keys["JIRA_URL"], key, body, jh)
+            summary = jira_get_summary(keys["JIRA_URL"], key, jh)
+            print(f"Posted to Jira {key} — {summary}" if summary else f"Posted to Jira {key}")
         else:
-            print(f"No Jira ticket for '{slug}', searching...")
-            found = jira_search(base_url, slug, jh, keys)
-            if found:
-                jira_key = found
-                update_row(slug, jira=found)
-                print(f"  Updated bench-index.csv with Jira {found}")
-            else:
-                print(f"  No Jira match.")
-
-    if has_asana:
-        ah = asana_headers(keys)
-        asana_workspace = keys["ASANA_WORKSPACE_GID"]
-
-        if not asana_gid:
-            if not sys.stdin.isatty():
-                print(f"No Asana task for '{slug}' — skipping (non-interactive).")
-            else:
-                print(f"No Asana task for '{slug}', searching...")
-                found = asana_search(slug, ah, asana_workspace)
-                if found:
-                    confirm = input(f"  Link Asana {found} to '{slug}'? [y/N] ").strip().lower()
-                    if confirm == "y":
-                        asana_gid = found
-                        update_row(slug, asana=found)
-                        print(f"  Updated bench-index.csv with Asana {found}")
-                    else:
-                        print(f"  Skipped Asana link.")
-                else:
-                    print(f"  No Asana match.")
-
-    posted = False
-    if jira_key and has_jira:
-        try:
-            jira_post_comment(base_url, jira_key, body, jh)
-            summary = jira_get_summary(base_url, jira_key, jh)
-            label = f"Posted to Jira {jira_key} — {summary}" if summary else f"Posted to Jira {jira_key}"
-            print(label)
-            posted = True
-        except Exception as e:
-            print(f"Jira post failed: {e}")
-
-    if asana_gid and has_asana:
-        try:
-            asana_post_comment(asana_gid, body, ah)
-            print(f"Posted to Asana task {asana_gid}")
-            posted = True
-        except Exception as e:
-            print(f"Asana post failed: {e}")
-
-    if not posted:
-        print("No comment posted — no matching tickets found.")
-
-
-def cmd_search(slug: str):
-    keys = load_keys()
-    has_jira  = jira_configured(keys)
-    has_asana = asana_configured(keys)
-
-    if not has_jira and not has_asana:
-        print("No ticket integrations configured — nothing to search.")
-        sys.exit(0)
-
-    print(f"Searching for '{slug}'...")
-    jira_key  = None
-    asana_gid = None
-
-    if has_jira:
-        jira_key = jira_search(keys["JIRA_URL"], slug, jira_headers(keys), keys)
-    if has_asana:
-        asana_gid = asana_search(slug, asana_headers(keys), keys["ASANA_WORKSPACE_GID"])
-        if asana_gid:
-            confirm = input(f"  Link Asana {asana_gid} to '{slug}'? [y/N] ").strip().lower()
-            if confirm != "y":
-                print(f"  Skipped Asana link.")
-                asana_gid = None
-
-    if jira_key or asana_gid:
-        update_row(slug, jira=jira_key or "", asana=asana_gid or "")
-        print(f"bench-index.csv updated.")
-    else:
-        print(f"No matches found.")
+            asana_post_comment(key, body, asana_headers(keys))
+            print(f"Posted to Asana task {key}")
+    except Exception as e:
+        print(f"{tool.capitalize()} post failed: {e}")
+        sys.exit(1)
 
 
 def cmd_update(slug: str, jira: str, asana: str):
@@ -472,10 +323,7 @@ def main():
     p_post.add_argument("slug")
     p_post.add_argument("note_file")
     p_post.add_argument("--key", default="",
-                        help="Specific Jira key to post to (for slugs linked to several tickets)")
-
-    p_search = sub.add_parser("search")
-    p_search.add_argument("slug")
+                        help="Linked Jira key / Asana task GID to post to (required)")
 
     p_update = sub.add_parser("update")
     p_update.add_argument("slug")
@@ -488,8 +336,6 @@ def main():
         cmd_lookup(args.slug)
     elif args.cmd == "post":
         cmd_post(args.slug, args.note_file, args.key)
-    elif args.cmd == "search":
-        cmd_search(args.slug)
     elif args.cmd == "update":
         cmd_update(args.slug, args.jira, args.asana)
 
