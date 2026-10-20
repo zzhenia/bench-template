@@ -33,6 +33,12 @@ line. Open the note around a hit with `sed -n 'N,+40p' <file>`. Read the master 
 whole (`cat ~/ZV-Bench/convos/<topic>/_memory-master.md`, a page) when Zhenia starts on a
 topic you do not know.
 
+Pilot Institute convos (`pi`, `pi-website`, `pilot-institute`) no longer live in ZV-Bench; they
+are in the separate `pi-bench` repo (`~/pi-bench` on the box, `~/dev/pi-bench` on the Mac).
+`bench-recall.sh` searches both benches' `convos/` in one run, and `-c pilot-institute` finds the
+folder in whichever bench has it. Hits from pi-bench print with the full path, so read a master
+there with `cat ~/pi-bench/convos/<topic>/_memory-master.md`.
+
 ## How to use what you find
 
 - Say where it came from, once, in plain words: "the 260905 note on the SMKS landing page

@@ -22,7 +22,8 @@ Write a session note for this conversation. Follow these steps:
    **If a `>> <name>` marker was found:**
    - The convo name is decided. Do NOT ask the user to confirm, rename, or choose.
    - If `convos/<name>/` exists, use it.
-   - If it does NOT exist, **create it immediately**: `mkdir -p convos/<name>/`. Add a row to `bench-index.csv` with `slug` = the name, `type` = `convo`, `convo_folder` = `convos/<name>/`, and leave `jira`/`asana` empty.
+   - If it does NOT exist in ZV-Bench, **first check the PI bench**: `~/dev/pi-bench/convos/<name>/` (Mac) and `~/pi-bench/convos/<name>/` (box). If either exists, write the note there and create nothing — otherwise a pilot-institute session in ZV-Bench recreates the folder in ZV-Bench. `lib/benches.py` `convo_dir(name)` does this lookup: it returns the first existing `convos/<name>/` across ZV-Bench, `~/dev/pi-bench` and `~/pi-bench` (in that order, skipping a bench not checked out on this machine), and ZV-Bench's path when none has it. It never creates a folder; the `mkdir` below is yours. Use the folder it finds for every later step; the Templates file stays in ZV-Bench.
+   - Only when neither bench has it, **create it immediately**: `mkdir -p convos/<name>/`. Add a row to `bench-index.csv` with `slug` = the name, `type` = `convo`, `convo_folder` = `convos/<name>/`, and leave `jira`/`asana` empty.
    - Then proceed directly to step 2. No questions.
 
    **If NO `>>` marker was found anywhere in the conversation:**
