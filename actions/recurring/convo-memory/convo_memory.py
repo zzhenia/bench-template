@@ -7,8 +7,7 @@ Layers per convo folder:
   Layer 1 (index) : _memory-index.md — detailed evidence, append-heavy
   Layer 2 (wake)  : _memory-master.md — compact summary, ~60 line cap
 
-Two-phase update per folder (mirrors the retro pipeline in
-actions/on-demand/yt-autopilot/backend/retro_analysis.py):
+Two-phase update per folder:
   1. update_index      — Haiku appends new note content to the index (storage budget)
   2. regenerate_master — Haiku compresses the index into the master (reading budget)
 
@@ -187,9 +186,9 @@ def call_haiku(prompt: str, max_tokens: int) -> str:
     length is governed by the prompts themselves.
     """
     env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
-    # A bench on its own Anthropic account names that login's config dir in
-    # config/claude-login; without it the default login is used.
-    login = BENCH_ROOT / "config" / "claude-login"
+    # A bench on its own Anthropic account puts that login's CLAUDE_CONFIG_DIR
+    # path in .claude-login at the bench root; without it the default login is used.
+    login = BENCH_ROOT / ".claude-login"
     if login.is_file() and login.read_text().strip():
         env["CLAUDE_CONFIG_DIR"] = str(Path(login.read_text().strip()).expanduser())
     cmd = [CLAUDE_BIN, "-p", "--model", CLAUDE_HAIKU, "--output-format", "text"]

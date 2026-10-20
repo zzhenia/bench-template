@@ -1,0 +1,11 @@
+---
+# Canonical copy: <bench>/config/warp/keybindings.yaml
+#
+# Flat map of "<action>": <keys>. One binding per action — Warp takes a single
+# value here, not a list, so ctrl-1 is a swap rather than an addition.
+# Action names come out of the Warp binary:
+#   strings -a /Applications/Warp.app/Contents/MacOS/stable | grep toggle_
+# Full default set: github.com/warpdotdev/keysets/default-warp-keybindings.yaml
+
+# Show/hide the Project Explorer (file tree). Cmd+Shift+E still works.
+"workspace:toggle_project_explorer": cmd-/

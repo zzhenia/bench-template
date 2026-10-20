@@ -21,7 +21,7 @@ The `>>` topic convention reads `_memory-master.md` + only the notes newer than 
 
 - Top-level folders in `convos/` with ≥5 notes matching `YYMMDD-*.md` (override with `--min-notes`)
 - Excluded: `Templates`, `~archive`, `~empty`, `daily-log` (machine-generated, has its own rollups)
-- Subfolders are ignored (`formula/retros/` has its own dedicated system in the yt-autopilot retro pipeline)
+- Subfolders are ignored — only top-level convo folders are processed
 
 ## Safety rules
 

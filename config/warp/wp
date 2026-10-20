@@ -1,0 +1,126 @@
+#!/usr/bin/env zsh
+# ---------------------------------------------------------------------------
+# wp — open a project in a NEW Warp window, Project Explorer rooted there.
+# Canonical copy: <bench>/config/warp/wp   Install to: ~/.local/bin/wp
+#
+# Why Warp needs this at all:
+#   The file-tree root is not a setting. Warp walks up from the active pane's
+#   cwd to the nearest git toplevel and snaps there (making it selectable is
+#   open request #12511). So the only way to control the root is to control
+#   the directory the window is born in — which is what the warp:// URI does.
+#   Cmd+T and the `+` dropdown are Warp's own UI and always make a TAB in the
+#   current window, which re-roots that window's tree instead of adding one.
+#   `?new_window=true` is the only way to force a window, and Warp's
+#   keybindings.yaml accepts only Warp's own action names, so it cannot be
+#   bound to a hotkey.
+#
+# Why a script and not a .zshrc function (same reason as `img` next to it):
+#   a function only exists at an interactive shell prompt, so `!wp example`
+#   from inside Claude Code's TUI would fail. On $PATH it works everywhere.
+#
+#   wp             menu of every repo under ~/dev, plus dev itself
+#   wp 2           by number
+#   wp ex          substring match on a folder name
+#   wp dev         ~/dev — not a git repo, so the tree shows every repo at once
+#   wp ~/some/dir  any directory
+#
+# A project with a Warp tab config of the same name opens through it, so it
+# keeps its tab colour and auto-launches Claude (see tab_configs/*.toml).
+# Anything else opens as a plain shell window at that path.
+# ---------------------------------------------------------------------------
+emulate -L zsh
+setopt no_nomatch
+
+typeset -g WP_DEV=${WP_DEV:-$HOME/dev}
+
+# Every git repo two levels under ~/dev, sorted by folder name. Discovered
+# rather than listed so a new clone needs no edit here.
+typeset -a projects
+projects=( $WP_DEV/*/*/.git(N/:h) )
+projects=( ${(f)"$(print -rl -- $projects | sort -f -t/ -k1)"} )
+
+# Percent-encode for a warp:// URI. Everything here is ASCII; the character
+# that actually matters is the space in "my project".
+wp_urlenc() {
+  local s=$1 out= c i
+  for (( i = 1; i <= ${#s}; i++ )); do
+    c=${s[i]}
+    case $c in
+      [A-Za-z0-9._~/-]) out+=$c ;;
+      *)                out+=$(printf '%%%02X' "'$c") ;;
+    esac
+  done
+  print -r -- $out
+}
+
+# Echo the tab config whose `name` matches $1, else fail. Matches the name
+# inside the .toml, not the filename — the URI wants the name and they differ
+# (example-project.toml could hold name = "Example-Project"). Compared case- and
+# separator-insensitively, because a tab config `name` must be URI-safe:
+# warp://tab_config/<name> silently opens nothing when the name holds a space,
+# even percent-encoded — so "my-project" has to match the folder
+# "my project". No `--` on sed: BSD sed reads it as a filename.
+wp_tab_config_for() {
+  local want=${${1:l}// /-} f n
+  for f in ~/.warp/tab_configs/*.toml(N); do
+    n=$(sed -n 's/^name[[:space:]]*=[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' "$f" | head -1)
+    [[ -n $n && ${${n:l}// /-} == $want ]] && { print -r -- $n; return 0 }
+  done
+  return 1
+}
+
+arg=$1
+
+if [[ -z $arg ]]; then
+  if [[ ! -t 0 ]]; then
+    print -r -- "wp: needs a project name when not run from a terminal" >&2
+    print -r -- "usage: wp <name|number|dev|path>" >&2
+    return 1 2>/dev/null || exit 1
+  fi
+  print -r -- ""
+  print -r -- "  new Warp window:"
+  for (( i = 1; i <= ${#projects[@]}; i++ )); do
+    print -r -- "  $i  ${projects[$i]:t}"
+  done
+  print -r -- "  d  dev  (every repo in one tree)"
+  print -r -- ""
+  print -n -- "  pick: "
+  read -k 1 arg
+  print -r -- ""
+  [[ $arg == [dD] ]] && arg=dev
+  [[ -z ${arg//[[:space:]]/} ]] && exit 0
+fi
+
+typeset dir=
+if [[ -d $arg ]]; then
+  dir=${arg:A}
+elif [[ ${arg:l} == dev ]]; then
+  dir=$WP_DEV
+elif [[ $arg == <-> ]] && (( arg >= 1 && arg <= ${#projects[@]} )); then
+  dir=${projects[$arg]}
+else
+  # Spaces normalised to hyphens on both sides, so the hyphenated tab-config
+  # name a user sees in the `+` dropdown ("my-project") finds the folder it
+  # belongs to ("my project"). Exact match first, so `wp other-project` is
+  # never ambiguous with a longer name that contains it; substring as fallback.
+  local want=${${arg:l}// /-} slug
+  for p in $projects; do
+    [[ ${${p:t:l}// /-} == $want ]] && { dir=$p; break }
+  done
+  if [[ -z $dir ]]; then
+    for p in $projects; do
+      [[ ${${p:t:l}// /-} == *${want}* ]] && { dir=$p; break }
+    done
+  fi
+fi
+
+if [[ -z $dir ]]; then
+  print -r -- "wp: no project or directory matching '$arg'" >&2
+  exit 1
+fi
+
+if tc=$(wp_tab_config_for ${dir:t}); then
+  open "warp://tab_config/$(wp_urlenc $tc)?new_window=true"
+else
+  open "warp://action/new_window?path=$(wp_urlenc $dir)"
+fi

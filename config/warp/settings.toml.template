@@ -1,0 +1,59 @@
+# Warp settings — canonical subset
+#
+# This is NOT a full settings.toml — it is the deliberate, portable keys only.
+# Merge these into ~/.warp/settings.toml on the target machine; do not replace
+# the whole file. Replace {{PROJECT_DIR}} with the machine's main working
+# folder before applying.
+#
+# Apply notes (learned the hard way):
+# - Warp hot-reloads most [terminal]/[general] keys on save; default_session_mode
+#   needs a full Cmd+Q relaunch.
+# - Settings sync (account.is_settings_sync_enabled) can re-serialise the file
+#   over hand edits — quit Warp fully before editing, re-read after.
+# - Back up first: settings.toml_oldNN (glob for existing _old* and increment).
+# - working_directory_config REQUIRES all four sub-tables even when
+#   advanced_mode = false; a partial table is silently ignored with a banner.
+
+[appearance.vertical_tabs]
+enabled = true
+display_granularity = "panes"
+view_mode = "compact"
+primary_info = "command"
+compact_subtitle = "branch"
+show_details_on_hover = true
+
+[terminal]
+# write_only: programs may copy to clipboard via OSC 52, never read it
+osc52_clipboard_access = "write_only"
+# true = full-screen TUIs (Claude Code, vim, ranger) get mouse events; costs
+# the Warp right-click menu inside those panes. Per-session escape hatch:
+# Command Palette -> Toggle mouse reporting.
+mouse_reporting_enabled = true
+
+[terminal.input]
+input_box_type_setting = "universal"
+
+[general]
+# "terminal" = plain shell on new sessions. The bench machine currently uses
+# "tab_config" + default_tab_config_path to open a saved tab config instead —
+# optional, needs a config saved under ~/.warp/tab_configs/ first.
+default_session_mode = "terminal"
+
+[session.working_directory_config]
+advanced_mode = false
+
+[session.working_directory_config.global]
+mode = "custom_dir"
+custom_dir = "{{PROJECT_DIR}}"
+
+[session.working_directory_config.new_tab]
+mode = "custom_dir"
+custom_dir = "{{PROJECT_DIR}}"
+
+[session.working_directory_config.new_window]
+mode = "custom_dir"
+custom_dir = "{{PROJECT_DIR}}"
+
+[session.working_directory_config.split_pane]
+mode = "custom_dir"
+custom_dir = "{{PROJECT_DIR}}"

@@ -72,8 +72,8 @@ done
 ```
 
 A leading run of `default` means that session opened in manual mode. This
-only works for bare Claude Code CLI sessions — OpenClaw's agent runtime
-writes a `mode` field instead of `permissionMode`, so the audit returns empty
+only works for bare Claude Code CLI sessions — an agent runtime that wraps
+Claude Code may write a `mode` field instead of `permissionMode`, so the audit returns empty
 arrays there. On those machines `~/.claude.json` is the authoritative source
 for the auto-mode opt-in state.
 
@@ -98,7 +98,7 @@ plain shell without it), `expect` (ships with macOS).
 - **Readiness and acks: match the header, never word-painted text.** Claude
   paints footer and ack lines word-by-word with cursor moves between them, so
   a literal like `"color set"` never matches and the wait silently runs to its
-  timeout (this cost 16s per launch until 260824). Wait for the `Claude Code`
+  timeout (this once cost 16s per launch). Wait for the `Claude Code`
   header, settle 0.5s, and match acks with a regex that spans escapes
   (`-re {set.{0,40}to:}`). Timeouts are a fallback, never the path. Tested in
   Cursor; Warp pending.
@@ -175,7 +175,7 @@ whole port is one dispatch on `$TERM_PROGRAM`:
 | New terminal opens in | `working_directory_config` in `settings.toml` | the worktree root, always (Zed default) |
 | Wait before the menu | `$WARP_BOOTSTRAPPED` — integration loads after rcfiles | none needed; plain login shell |
 | Bench terminal | project picker | project picker |
-| Other project roots | coloured tab config from the **+** dropdown | auto-launch `zv_claude_named`, 2s any-key bail |
+| Other project roots | coloured tab config from the **+** dropdown | auto-launch `bench_claude_named`, 2s any-key bail |
 | Tab colour | tab config `color` | **not available** — Zed has no terminal tab colours |
 
 **Match on `TERM_PROGRAM`, never on `ZED_TERM`.** Zed exports `ZED_TERM=true`
@@ -207,16 +207,16 @@ them in Preview.
 
 Cursor behaves exactly like Zed — same `~/.zshrc` block, no Cursor setting to
 change, terminals always open at the workspace root, so the `$PWD` gate does
-all the work. Bench workspace gets the picker; the other `ZV_PROJECTS` roots
-auto-launch `zv_claude_named` with the 2s any-key bail. No tab colours.
+all the work. Bench workspace gets the picker; the other `BENCH_PROJECTS` roots
+auto-launch `bench_claude_named` with the 2s any-key bail. No tab colours.
 
 **A pick opens a new window, because the file tree belongs to the window.**
 `cd` moves the shell, not Cursor's Explorer — pick another project from a
 bench window and Claude starts in the right folder while the tree still
 shows the bench. So in Cursor (only) `bench()` hands the pick to
 `cursor -n <repo>`: the new window is rooted at that repo, its terminal opens
-at a project root, and `zv_menu_once` there auto-launches Claude renamed to the
-project. The picking shell drops to a plain shell. `ZV_WORKSPACE_ROOT`, cap-
+at a project root, and `bench_menu_once` there auto-launches Claude renamed to the
+project. The picking shell drops to a plain shell. `BENCH_WORKSPACE_ROOT`, cap-
 tured at hook time from the first prompt's cwd, suppresses this when the window
 is already rooted at the pick — that would only duplicate the window.
 
@@ -247,7 +247,7 @@ terminal, the menu renders and takes a keypress in the bench, and a
 `--model opus --permission-mode auto` and sends `/rename bench-template`.
 
 Screenshot paste into Claude Code is **Ctrl+V** in Cursor's terminal too —
-Cmd+V is an editor-level text paste, same failure as Warp (260808).
+Cmd+V is an editor-level text paste, same failure as Warp.
 
 ## Opening a project in its own window (`wp`)
 
@@ -257,22 +257,22 @@ a *tab*, which re-roots the window you're already in — so the only lever is th
 directory a window is born in. `wp` pulls that lever:
 
 - A repo with a matching tab config opens via `warp://tab_config/<name>?new_window=true`
-  — keeps its colour, runs `zv_claude_named` itself.
+  — keeps its colour, runs `bench_claude_named` itself.
 - Anything else opens via `warp://action/new_window?path=…` as a plain window,
-  and the `zv_menu_once` precmd hook starts Claude there (see below).
+  and the `bench_menu_once` precmd hook starts Claude there (see below).
 - `wp dev` opens `~/dev`, which is not a git repo, so the tree shows every
   project at once. Deliberately left as a plain shell — it's a browse window.
 
 **A tab config `name` must be URI-safe.** `warp://tab_config/<name>` silently
 opens nothing when the name contains a space, even percent-encoded — which is
 why the config for the folder `my project` is `name = "my-project"`.
-`wp` and `zv_warp_tab_config_here` both compare with spaces normalised to
+`wp` and `bench_warp_tab_config_here` both compare with spaces normalised to
 hyphens so the config still matches its folder.
 
-**Which windows auto-launch Claude.** `zv_should_hook`'s warp arm registers on
+**Which windows auto-launch Claude.** `bench_should_hook`'s warp arm registers on
 the bench cwd (picker, as always) *or* on a git toplevel under `~/dev` that no
 tab config covers. Tab-config windows are excluded on purpose: they already run
-`zv_claude_named`, and registering would launch Claude twice.
+`bench_claude_named`, and registering would launch Claude twice.
 
 ## Per-project tab colours
 
@@ -297,30 +297,30 @@ per project, opened from the dropdown next to **+**.
 The split that follows: **the bench keeps the number picker** (it is where
 ordinary new tabs land), and **every other project gets a coloured tab
 config**. They coexist because the picker menu is gated on
-`$PWD == $ZV_BENCH_DIR` — ordinary new tabs open in the bench and get the
+`$PWD == $BENCH_DIR` — ordinary new tabs open in the bench and get the
 menu; tab configs open elsewhere and don't. Tab configs cannot set environment
-variables, so the existing `ZV_NO_MENU=1` escape hatch is unavailable to them
+variables, so the existing `BENCH_NO_MENU=1` escape hatch is unavailable to them
 and the `$PWD` gate is what makes this work. `bench` still summons the menu by
 hand anywhere.
 
-**Set `ZV_BENCH_DIR` correctly or the menu will not appear.** The gate keys off
+**Set `BENCH_DIR` correctly or the menu will not appear.** The gate keys off
 it, so a value that doesn't match the machine's actual checkout disables the
 picker everywhere and reads as "the picker broke". The gate therefore also
-fires when `ZV_BENCH_DIR` does not exist at all — a wrong path shows the menu
+fires when `BENCH_DIR` does not exist at all — a wrong path shows the menu
 in every tab (annoying, visible, fixable) rather than in none (silent). This
-bit the OpenClaw machine on first apply, where the template's
-`$HOME/dev/my-org/my-bench` didn't match its real `~/my-bench` clone.
+bites on first apply whenever the template's `$HOME/dev/my-org/my-bench`
+doesn't match the real clone (e.g. `~/my-bench`).
 
-Each config calls `zv_claude_named '<project>'` via the pane's `commands`.
+Each config calls `bench_claude_named '<project>'` via the pane's `commands`.
 **The tab config's `title` is not what names the tab** — Claude Code takes
 ownership of the tab title the instant its TUI starts, so that title lasts
-milliseconds. `zv_claude_named` launches Claude under `expect` and sends
+milliseconds. `bench_claude_named` launches Claude under `expect` and sends
 `/rename <project>` inside it, which Warp then inherits; same mechanism as
 `convo()`, minus the colour (the config's `color` covers that) and minus the
 staged `>>` message. It falls back to a plain launch when `expect` is missing
 or no name is passed. If a tab ever comes up with dead paste or no Project Explorer,
 that command is the first thing to remove (`commands = []`) — see the
-handshake failure mode in `260808-warp-setup.md`.
+handshake failure mode under *Design decisions* above.
 
 ## Warp facts that keep coming up
 

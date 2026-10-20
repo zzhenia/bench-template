@@ -1,6 +1,7 @@
 ---
 name: status
 description: Show the current status of all scheduled bench automations.
+model: haiku
 ---
 
 Run the automation status script and display the result.

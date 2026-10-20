@@ -1,0 +1,108 @@
+#!/usr/bin/env zsh
+# ---------------------------------------------------------------------------
+# cw — open a project in a Cursor window, file tree rooted there.
+# Canonical copy: <bench>/config/cursor/cw   Install to: ~/.local/bin/cw
+#
+# The Cursor counterpart of `wp` (config/warp/wp), same menu and same matching
+# rules, so the muscle memory carries over. What is NOT needed here is the
+# whole reason `wp` exists: Cursor's explorer root IS the folder you opened, so
+# a plain `cursor <dir>` already does what `warp://action/new_window?path=`
+# had to be reverse-engineered for. No URI, no tab configs, no percent-
+# encoding, and a folder name with a space is fine.
+#
+# NOT named `cp` — ~/.local/bin sits ahead of /bin on $PATH, so a script called
+# `cp` would shadow the real copy command for every shell and every script on
+# the machine.
+#
+# Why a script and not a .zshrc function (same reason as `wp` and `img`):
+#   a function only exists at an interactive shell prompt, so `!cw example`
+#   from inside Claude Code's TUI would fail. On $PATH it works everywhere.
+#
+#   cw             menu of every repo under ~/dev, plus dev itself
+#   cw 2           by number
+#   cw ex          substring match on a folder name
+#   cw dev         ~/dev — the tree shows every repo at once (browse window)
+#   cw ~/some/dir  any directory
+#   cw -n <name>   force a brand-new window even if the folder is already open
+#
+# Per-project window colour and the Claude auto-launch are not this script's
+# job — they live in each repo's .vscode/ (written by config/cursor/sync-projects.sh),
+# which is the Cursor equivalent of Warp's tab configs.
+# ---------------------------------------------------------------------------
+emulate -L zsh
+setopt no_nomatch
+
+typeset -g CW_DEV=${CW_DEV:-$HOME/dev}
+typeset -g CW_BIN=${CW_BIN:-cursor}
+
+if ! command -v $CW_BIN >/dev/null 2>&1; then
+  print -r -- "cw: '$CW_BIN' is not on \$PATH." >&2
+  print -r -- "    Install it from Cursor: Cmd+Shift+P → \"Shell Command: Install 'cursor' command\"" >&2
+  exit 1
+fi
+
+# Every git repo two levels under ~/dev, sorted by folder name. Discovered
+# rather than listed so a new clone needs no edit here — same rule as `wp`,
+# and deliberately not $BENCH_PROJECTS, which is a hand-maintained list.
+typeset -a projects
+projects=( $CW_DEV/*/*/.git(N/:h) )
+projects=( ${(f)"$(print -rl -- $projects | sort -f -t/ -k1)"} )
+
+typeset -a cursor_flags
+if [[ $1 == -n || $1 == --new-window ]]; then
+  cursor_flags=( -n )
+  shift
+fi
+
+arg=$1
+
+if [[ -z $arg ]]; then
+  if [[ ! -t 0 ]]; then
+    print -r -- "cw: needs a project name when not run from a terminal" >&2
+    print -r -- "usage: cw [-n] <name|number|dev|path>" >&2
+    exit 1
+  fi
+  print -r -- ""
+  print -r -- "  Cursor window:"
+  for (( i = 1; i <= ${#projects[@]}; i++ )); do
+    print -r -- "  $i  ${projects[$i]:t}"
+  done
+  print -r -- "  d  dev  (every repo in one tree)"
+  print -r -- ""
+  print -n -- "  pick: "
+  read -k 1 arg
+  print -r -- ""
+  [[ $arg == [dD] ]] && arg=dev
+  [[ -z ${arg//[[:space:]]/} ]] && exit 0
+fi
+
+typeset dir=
+if [[ -d $arg ]]; then
+  dir=${arg:A}
+elif [[ ${arg:l} == dev ]]; then
+  dir=$CW_DEV
+elif [[ $arg == <-> ]] && (( arg >= 1 && arg <= ${#projects[@]} )); then
+  dir=${projects[$arg]}
+else
+  # Spaces normalised to hyphens on both sides, so "my-project" finds a folder
+  # named "my project". Exact match first, so a short name is never ambiguous
+  # with a longer one containing it; substring as the fallback.
+  local want=${${arg:l}// /-} p
+  for p in $projects; do
+    [[ ${${p:t:l}// /-} == $want ]] && { dir=$p; break }
+  done
+  if [[ -z $dir ]]; then
+    for p in $projects; do
+      [[ ${${p:t:l}// /-} == *${want}* ]] && { dir=$p; break }
+    done
+  fi
+fi
+
+if [[ -z $dir ]]; then
+  print -r -- "cw: no project or directory matching '$arg'" >&2
+  exit 1
+fi
+
+# Without -n, Cursor focuses the existing window for this folder instead of
+# opening a duplicate. That is the wanted default; -n overrides it.
+exec $CW_BIN $cursor_flags "$dir"

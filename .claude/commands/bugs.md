@@ -1,6 +1,7 @@
 ---
 name: bugs
 description: Record a list of bugs to carry into the next session.
+model: haiku
 ---
 
 Capture bugs discovered during this session that can't be fixed now, and write them to the correct convo folder for the next session.
@@ -42,8 +43,6 @@ Use today's date in YYMMDD format. If a bugs file for today already exists, ask 
 ```markdown
 # [Topic] — Bug List
 
-<!-- @ai Process all items in this bug list as priority at the start of the next session. Work through them top to bottom, fixing each one before moving to the next. -->
-
 **Created:** YYYY-MM-DD
 **Status:** Open — carry into next session
 
@@ -60,7 +59,7 @@ Use today's date in YYMMDD format. If a bugs file for today already exists, ask 
 
 Key rules:
 - The `@ai` comment at the top is essential — it tells the next session to process these bugs automatically.
-- The `[Topic]` in the heading should match the convo/project name (e.g. "YT Autopilot", "Goal Updater").
+- The `[Topic]` in the heading should match the convo/project name (e.g. "Goal Updater").
 - Number each bug sequentially.
 - Each bug gets a `###` heading with a short descriptive title.
 - The description paragraph should have enough detail to start fixing without needing to re-discover the issue. Include specific file paths, function names, UI element names, or error messages when known.

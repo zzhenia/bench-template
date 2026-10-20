@@ -1,0 +1,10 @@
+{
+  "_comment": "Portable subset of ~/.claude/settings.json — merge these keys, do not replace the file. defaultMode 'auto' is what makes every picker-launched window come up in auto mode; the --permission-mode auto flag in zshrc-picker.zsh is the belt-and-braces second half. statusLine prints the cwd in blue under the input box.",
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "printf '\\033[34m%s\\033[0m' \"$(cat | jq -r '\"\\(.workspace.current_dir // .cwd)\"')\""
+  }
+}

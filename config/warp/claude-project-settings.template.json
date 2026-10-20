@@ -1,0 +1,29 @@
+{
+  "_comment": "Portable subset of <project>/.claude/settings.json. SessionStart picks a random session colour from the same 8-colour list the convo picker mirrors; UserPromptSubmit sets the terminal title from a '>>topic' prompt. Merge into the project's hooks block — do not replace the file.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "colors=(red blue green yellow purple orange pink cyan); idx=$((RANDOM % 8)); color=${colors[$idx]}; printf '{\"systemMessage\":\"Random color: %s — type /color %s\"}' \"$color\" \"$color\"",
+            "timeout": 5,
+            "statusMessage": "Picking session color..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "topic=$(jq -r '.prompt // .message // .content // empty' | head -1 | sed -n 's/.*>>[[:space:]]*\\([a-zA-Z0-9_-]*\\).*/\\1/p' | tr '[:upper:]' '[:lower:]'); if [ -n \"$topic\" ]; then printf '\\033]0;%s \\033\\\\' \"$topic\" > /dev/tty 2>/dev/null || true; printf '{\"suppressOutput\":true}'; else printf '{\"suppressOutput\":true}'; fi",
+            "timeout": 5,
+            "statusMessage": "Checking for >> topic..."
+          }
+        ]
+      }
+    ]
+  }
+}

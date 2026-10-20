@@ -22,7 +22,7 @@ Pass/fail checks for the memory compression pipeline.
 - PASS: processing continues from the state.json watermark; no duplicate batches processed.
 
 ## 6. Safety: raw notes untouched
-- PASS: after any run, `git status` shows no modification to any `YYMMDD-*.md` file; `Templates`, `~archive`, `~empty`, `daily-log`, and `formula/retros/` contain no `_memory-*.md` files.
+- PASS: after any run, `git status` shows no modification to any `YYMMDD-*.md` file; `Templates`, `~archive`, `~empty`, `daily-log`, and any convo subfolder contain no `_memory-*.md` files.
 
 ## 7. Lock
 - Start two runs simultaneously.

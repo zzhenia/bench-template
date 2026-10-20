@@ -1,13 +1,13 @@
 ---
 name: eod
 description: End-of-day wrap-up — save progress, create session note, document next steps, and stop any running services.
+model: haiku
 ---
 
 The user is ending their working day. Perform these steps quickly and without asking questions:
 
 1. **Stop running services.** Kill any app servers started during this session:
    ```bash
-   kill $(lsof -ti:8001) 2>/dev/null   # YT Autopilot
    kill $(lsof -ti:7391) 2>/dev/null   # Actions Dashboard
    ```
 

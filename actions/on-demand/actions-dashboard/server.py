@@ -341,7 +341,7 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path in ("/", "/index.html"):
             actions = discover_actions()
             keys = load_keys()
-            jira_url = keys.get("JIRA_URL", keys.get("ZV_JIRA_URL", ""))
+            jira_url = keys.get("JIRA_URL", "")
             owner = keys.get("BENCH_OWNER", "").strip()
             title = f"{owner}\u2019s Actions Dashboard" if owner else "Actions Dashboard"
             actions_json = json.dumps(actions)

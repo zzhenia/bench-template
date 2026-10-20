@@ -9,12 +9,20 @@ Each team member runs their own bench — a private repo where Claude Code has p
 ## Prerequisites
 
 - [Claude Code](https://claude.ai/code) (CLI)
+- **[Warp](https://warp.dev)** or **[Cursor](https://cursor.com)** — the two
+  supported hosts. Pick either; you can run both.
 - [Obsidian](https://obsidian.md) (optional — for note linking and search)
-- [VS Code](https://code.visualstudio.com) (optional)
 - Python 3.10+
 - A GitHub account
 
 API integrations (Jira, Asana, Toggl) are optional — the bench works without them.
+
+> **On supported environments.** The bench runs in any terminal — Terminal.app,
+> iTerm, ssh — and every action works there. What Warp and Cursor add is the
+> environment layer: a project picker, a Claude session that starts named and
+> coloured, and a one-word command to open a project in its own window. Those
+> two are the only hosts with a setup kit and the only ones we fix bugs for.
+> VS Code, Zed and JetBrains are unsupported.
 
 ---
 
@@ -24,30 +32,24 @@ API integrations (Jira, Asana, Toggl) are optional — the bench works without t
 
 Click **"Use this template"** on GitHub → name it (e.g. `my-bench`) → set it to Private → click **Create repository**.
 
-**2. Clone and open in VS Code**
-
-**Option A — VS Code UI:**
-
-1. Open VS Code → click **Clone Git Repository** on the Welcome tab
-2. Your GitHub repos appear in the dropdown — click your new bench repo
-3. Pick a folder to save it in, then click **Open** when VS Code asks
-
-**Option B — Terminal:**
-
-Open a terminal and navigate to where you want the repo to live, then clone:
+**2. Clone it**
 
 ```bash
-cd ~/dev
+mkdir -p ~/dev && cd ~/dev
 git clone https://github.com/your-username/my-bench.git
 ```
 
-Then open VS Code → **File → Open Folder** → select the `my-bench` folder.
+Then open the folder in your host:
 
-Either way, you should see the bench files (`.claude`, `actions`, `config`, `convos`, etc.) at the root of the sidebar — not nested inside a subfolder.
+- **Cursor** — `cursor ~/dev/my-bench`, or **File → Open Folder**. You should
+  see the bench files (`.claude`, `actions`, `config`, `convos`, …) at the root
+  of the sidebar, not nested inside a subfolder.
+- **Warp** — `cd ~/dev/my-bench`. The Project Explorer roots itself at the
+  nearest git toplevel, so it follows automatically.
 
 **3. Run setup**
 
-In the VS Code integrated terminal (`Ctrl+`` ` or `Cmd+`` `):
+In a terminal at the repo root (in Cursor: ``Ctrl+` ``):
 
 ```bash
 chmod +x setup.sh && ./setup.sh
@@ -61,13 +63,26 @@ During setup you'll be asked: *"Hello! How shall I call you?"* — your name is 
 
 **5. Open in Claude Code**
 
-Install the **Claude Code** extension from the VS Code Extensions panel (search "Claude Code" by Anthropic). Once installed, open the integrated terminal and run:
+In Cursor, install the **Claude Code** extension from the Extensions panel
+(search "Claude Code" by Anthropic). In Warp, nothing to install. Either way:
 
 ```bash
 claude .
 ```
 
-Claude will read `master-instructions.md` at the start of each session. Your commands (`/note`, `/push`, `/status`, `/ai`) are ready immediately.
+Claude reads `CLAUDE.md` and `master-instructions.md` at the start of each
+session. Your commands (`/note`, `/push`, `/status`, `/ai`) are ready immediately.
+
+**6. Optional — install the environment layer**
+
+This is what makes a bench feel like a bench rather than a folder: a project
+picker on every new tab, `wp` / `cw` to open a project in its own window, and a
+Claude session that starts already named after the project.
+
+- Warp: `config/warp/README.md` → *Apply on a new machine*
+- Cursor: `config/cursor/README.md` → *Apply on a new machine*
+
+Both install the same `~/.zshrc` block, so doing one first makes the other short.
 
 ---
 
@@ -90,8 +105,12 @@ Once setup is complete, work through these to get familiar with your bench:
 your-bench/
 ├── master-instructions.md   ← Claude's operating guide for this bench
 ├── bench-index.csv          ← index of all actions and convos + ticket links
+├── CLAUDE.md                ← always-loaded operating rules
 ├── config/
-│   └── keys.env.template    ← copy to keys.env and fill in your API keys
+│   ├── keys.env.template    ← copy to keys.env and fill in your API keys
+│   ├── warp/                ← Warp setup kit (zshrc block, wp, tab configs)
+│   └── cursor/              ← Cursor setup kit (cw, per-project folderOpen tasks)
+├── scripts/                 ← shared utilities (jira.sh, …)
 ├── actions/
 │   ├── on-demand/           ← manually triggered actions
 │   │   ├── actions-dashboard/  ← local web dashboard (http://localhost:7391)
@@ -106,7 +125,8 @@ your-bench/
 │   ├── Templates/           ← Convo Template.md for new conversations
 │   └── ~archive/
 └── .claude/
-    ├── commands/            ← /note  /push  /status  /ai
+    ├── commands/            ← /note  /push  /status  /ai  /eod  /bugs  /dashboard  /nb
+    ├── hooks/               ← response-length budget (600 chars of prose)
     ├── scripts/
     └── skills/
 ```
@@ -147,6 +167,9 @@ To continue an existing convo, use the same `>> name` to restore context from pr
 | `/dashboard` | Opens the Actions Dashboard in your browser (starts it if not running) |
 | `/dashboard stop` | Stops the dashboard |
 | `/dashboard restart` | Restarts the dashboard |
+| `/eod` | End-of-day wrap-up — note, commit, push, stop services |
+| `/bugs` | Records bugs to carry into the next session |
+| `/nb` | Unwraps hard-wrapped text (clipboard, inline text, or a file) |
 
 ### Bench Index (`bench-index.csv`)
 
@@ -194,6 +217,8 @@ ANTHROPIC_API_KEY=your-key
 
 Get a Jira API token at: https://id.atlassian.com/manage-profile/security/api-tokens  
 Get an Asana PAT at: https://app.asana.com/0/my-apps
+
+If this bench runs on its own Anthropic account, put that login's `CLAUDE_CONFIG_DIR` path (e.g. `~/.claude-work`) in a `.claude-login` file at the bench root. Background jobs like `convo-memory` then use that login; without the file they use your default one.
 
 ---
 

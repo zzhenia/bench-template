@@ -13,10 +13,34 @@ Your name is stored in `config/keys.env` under `BENCH_OWNER`. Read this value at
 ## What This Workspace Is
 
 Your bench is a unified personal knowledge workspace that combines:
-- **Claude Code** (terminal AI with persistent context)
-- **VS Code** (editing environment)
+- **Claude Code** (AI with persistent context)
+- **Warp** (terminal) or **Cursor** (editor) — the two supported hosts
 - **Obsidian** (visual note-linking and search across the entire folder)
 - **GitHub** (private version control)
+
+---
+
+## Supported Environments
+
+The bench is supported in **Warp** and **Cursor**, and nowhere else.
+
+| | Warp | Cursor |
+|---|---|---|
+| Setup kit | `config/warp/` | `config/cursor/` |
+| Open a project in its own window | `wp <name>` | `cw <name>` |
+| Run on window open | `~/.warp/tab_configs/*.toml` → `commands` | `<repo>/.vscode/tasks.json` → `runOn: folderOpen` |
+| Toggle the file tree | `Cmd+/` | `Cmd+B` |
+
+Both share one shell layer in `~/.zshrc` (canonical copy:
+`config/warp/zshrc-picker.zsh`) providing `bench`, `convo` and
+`bench_claude_named`. The per-host rules genuinely differ — read the kit README
+for the host you are working in rather than assuming the other one's rule
+applies. Each kit's README has a new-machine install section.
+
+A **plain terminal** (Terminal.app, iTerm, ssh) runs Claude Code and every
+action perfectly well; it just gets no project picker, no auto-launched named
+session, and no `wp`/`cw`. That is expected. **VS Code, Zed and JetBrains are
+unsupported** — don't build environment features for them.
 
 ---
 
@@ -25,10 +49,12 @@ Your bench is a unified personal knowledge workspace that combines:
 ```
 your-bench/
 ├── master-instructions.md   ← this file (master guide)
+├── CLAUDE.md                ← always-loaded operating rules (read this first)
 ├── bench-index.csv          ← single source of truth for actions, convos, and tickets
 ├── setup.sh                 ← first-run setup script
 ├── actions/                 ← repeatable tasks Claude executes
-├── config/                  ← API keys and environment config
+├── config/                  ← API keys, env config, Warp + Cursor setup kits
+├── scripts/                 ← shared utilities (jira.sh, …)
 └── convos/                  ← ongoing topics and session notes
 ```
 
@@ -146,16 +172,35 @@ If creating a new convo:
 
 Items where `type = both` share a single row.
 
+### Jira issue hierarchy — Epic → Task → Sub-task
+
+A child's work type is decided by its parent's type, never chosen freely, and a
+child never skips a level:
+
+| Parent type | Child must be |
+|---|---|
+| Epic | **Task** (never a Sub-task) |
+| Task / Story | Sub-task |
+| Sub-task | *nothing* — refused |
+
+Use `scripts/jira.sh create-child <PARENT_KEY> "<summary>" ["<desc>"]`, which reads
+the parent and picks the type for you. `jira.sh create` is for parentless issues
+only and refuses `Sub-task`. Full detail, including how to re-type an existing
+issue without losing its key: CLAUDE.md → "Jira Hierarchy".
+
 ### Linking external integrations (Jira, Asana, etc.)
 
 **Never add a Jira ticket, Asana task, or any other external integration to `bench-index.csv` without explicit user confirmation.** When a new action or convo is created, leave the `jira`, `asana`, and other integration columns empty. If `bench_ticket.py` proposes a match, relay the proposal to the user and wait for approval before writing it to the index. The same applies when updating existing rows with new ticket links.
 
 ### Ticket workflow (run at every `/note` and `/push`)
 
-1. **Look up the slug** in `bench-index.csv` for the active convo/action.
-2. **If a ticket exists** — post a brief comment using `bench_ticket.py` (title + date + file path only — never the full note body). Comments on external systems (Jira/Asana) must be short pointers back to the bench, rendered in rich text (ADF for Jira, HTML for Asana), not Markdown.
-3. **If no ticket exists** — the script searches Jira+Asana automatically; if still none, it proposes creation. **Do not auto-link** — relay the proposal to the user and wait for confirmation.
-4. Only update `bench-index.csv` with a new ticket key/GID after the user confirms the link.
+**Never post a comment to a ticket without asking the user first.** Even when a slug has a single linked ticket, present the target ticket (key + title) and a "Skip" option, then wait for the user's explicit pick before posting. A convo is often a broad topic spanning many tickets, so one linked key is not a safe default.
+
+1. **Look up the slug** in `bench-index.csv` for the active convo/action. Use `bench_ticket.py lookup <slug>` — never a bare `post`, which posts immediately for single-key slugs.
+2. **Present the linked ticket(s)** to the user — key + title for each, plus a "Skip" option. Wait for the user to choose.
+3. **If the user picks a ticket** — post a brief comment with `bench_ticket.py post <slug> <note-file> --key <KEY>` (title + date + file path only — never the full note body). Comments on external systems must be short pointers back to the bench, rendered in rich text (ADF for Jira, HTML for Asana), not Markdown. A `--key` not yet in the list is appended automatically.
+4. **If no ticket exists** — search Jira/Asana for candidate tickets and present them as a numbered list with a "Skip" option. **Do not auto-link** — wait for confirmation.
+5. Only update `bench-index.csv` with a new ticket key/GID after the user confirms the link.
 
 ---
 

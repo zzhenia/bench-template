@@ -1,0 +1,133 @@
+#!/usr/bin/env python3
+"""Open a Claude Code [Image #N] attachment.
+
+Claude Code renders attachments as a bare "[Image #N]" placeholder. Warp
+implements no terminal graphics protocol at all (no sixel, no kitty graphics,
+no iTerm2 inline images), so nothing can draw them in-pane. What does exist is
+the cached file: ~/.claude/image-cache/<session-id>/<N>.png, numbered to match
+the placeholder. This opens it.
+
+This is a standalone executable rather than a shell function on purpose, so it
+works from a plain shell AND from inside Claude Code's TUI via `!img 23`.
+
+Canonical copy: <bench>/config/warp/img
+"""
+
+import argparse
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+CACHE = Path.home() / ".claude" / "image-cache"
+
+
+def die(msg, code=1):
+    print(f"img: {msg}", file=sys.stderr)
+    sys.exit(code)
+
+
+def sessions():
+    """Cached session dirs, newest mtime first."""
+    if not CACHE.is_dir():
+        die(f"no image cache at {CACHE}")
+    dirs = [d for d in CACHE.iterdir() if d.is_dir()]
+    if not dirs:
+        die("no cached images yet")
+    return sorted(dirs, key=lambda d: d.stat().st_mtime, reverse=True)
+
+
+def images(d):
+    """PNGs in a session dir, sorted by image number."""
+    out = []
+    for f in d.glob("*.png"):
+        if f.stem.isdigit():
+            out.append((int(f.stem), f))
+    return sorted(out)
+
+
+def main():
+    ap = argparse.ArgumentParser(
+        prog="img",
+        description="Open a Claude Code [Image #N] attachment.",
+        epilog="examples: img · img 23 · img '[Image #23]' · img -l · img -s c60088da 23",
+    )
+    ap.add_argument("n", nargs="?", help="image number; non-digits are stripped "
+                                        "so a pasted '[Image #23]' works")
+    ap.add_argument("-l", "--list", action="store_true",
+                    help="list cached sessions and their images")
+    ap.add_argument("-s", "--session", metavar="ID",
+                    help="pick a session explicitly (a prefix of the id is enough)")
+    ap.add_argument("-p", "--path", action="store_true",
+                    help="print the path instead of opening it")
+    args = ap.parse_args()
+
+    dirs = sessions()
+
+    if args.list:
+        for d in dirs:
+            nums = [str(n) for n, _ in images(d)]
+            print(d.name)
+            print(f"    {', '.join(nums) if nums else '(none)'}")
+        return
+
+    if args.session:
+        match = [d for d in dirs if d.name.startswith(args.session)]
+        if not match:
+            die(f"no session matching '{args.session}' — try: img -l")
+        d = match[0]
+    else:
+        d = dirs[0]
+
+    if args.n:
+        digits = re.sub(r"\D", "", args.n)
+        if not digits:
+            die(f"'{args.n}' has no image number in it", 2)
+        target = d / f"{digits}.png"
+        if not target.is_file():
+            # Image numbers restart per session, so the number you can see in
+            # one Claude window often is not in the newest-by-mtime session.
+            # Fall back to searching every session before giving up.
+            if args.session:
+                have = [str(n) for n, _ in images(d)]
+                print(f"img: no image {digits} in {d.name}", file=sys.stderr)
+                if have:
+                    print(f"     have: {', '.join(have)}", file=sys.stderr)
+                sys.exit(1)
+
+            elsewhere = [s for s in dirs if (s / f"{digits}.png").is_file()]
+            if not elsewhere:
+                print(f"img: no image {digits} in any cached session", file=sys.stderr)
+                print("     try: img -l", file=sys.stderr)
+                sys.exit(1)
+            if len(elsewhere) > 1:
+                print(f"img: image {digits} exists in {len(elsewhere)} sessions:",
+                      file=sys.stderr)
+                for s in elsewhere:
+                    f = s / f"{digits}.png"
+                    when = subprocess.run(
+                        ["stat", "-f", "%Sm", "-t", "%b %e %H:%M", str(f)],
+                        capture_output=True, text=True).stdout.strip()
+                    print(f"     {s.name[:8]}  {when}", file=sys.stderr)
+                print(f"     pick one: img -s <id> {digits}", file=sys.stderr)
+                sys.exit(1)
+            d = elsewhere[0]
+            target = d / f"{digits}.png"
+    else:
+        imgs = images(d)
+        if not imgs:
+            die(f"no images in {d.name}")
+        # newest by mtime, not highest number — they can differ
+        target = max((f for _, f in imgs), key=lambda f: f.stat().st_mtime)
+
+    if args.path:
+        print(target)
+        return
+
+    subprocess.run(["open", "--", str(target)], check=True)
+    print(f"opened {target.name} from {d.name}")
+
+
+if __name__ == "__main__":
+    main()

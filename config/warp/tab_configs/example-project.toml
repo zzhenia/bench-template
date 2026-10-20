@@ -1,0 +1,26 @@
+# Warp tab config — example. Copy per project into ~/.warp/tab_configs/.
+#
+# Opens from the dropdown next to + . Gives the tab a colour, which the number
+# picker in ~/.zshrc cannot do: Warp tab colour is not scriptable on stable
+# (warpctrl is feature-flagged off, and appearance.tabs.directory_tab_colors is
+# not writable from settings.toml). `color` here is the one supported route.
+#
+# `name` MUST be URI-safe — hyphens, never spaces. `warp://tab_config/<name>`
+# silently opens nothing when the name contains a space, even percent-encoded,
+# which is how `wp` resolves a tab config. The folder on disk may still have a
+# space; `wp` normalises both sides.
+#
+# The picker menu deliberately does NOT fire in this tab — it is gated on
+# $PWD == $BENCH_DIR, and this config opens elsewhere.
+#
+# PER-MACHINE: edit `name`, `title`, `color` and `directory` per project.
+
+name  = "example-project"
+title = "example-project"
+color = "yellow"
+
+[[panes]]
+id        = "main"
+type      = "terminal"
+directory = "$HOME/dev/my-org/example-project"
+commands  = ["bench_claude_named 'example-project'"]
