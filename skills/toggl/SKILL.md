@@ -120,5 +120,5 @@ mark everything else. Everything in the project is billable.
 
 Full playbook with worked call budgets and the classification regexes:
 `tools/on-demand/toggl-bulk-edit.md`. Working implementations:
-`tools/on-demand/toggl-pi-consolidate.py` (has `--rollback`),
-`tools/recurring/pi-toggl-fill/fill_entries.py`.
+`~/dev/pi-bench/tools/on-demand/toggl-pi-consolidate.py` (has `--rollback`),
+`~/dev/pi-bench/tools/recurring/pi-toggl-fill/fill_entries.py`.
