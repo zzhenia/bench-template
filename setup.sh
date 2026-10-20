@@ -18,7 +18,11 @@ if [ -z "$CURRENT_NAME" ]; then
   echo ""
   read -rp "Hello! How shall I call you? " BENCH_NAME
   if [ -n "$BENCH_NAME" ]; then
-    sed -i '' "s/^BENCH_OWNER=.*/BENCH_OWNER=$BENCH_NAME/" config/keys.env
+    if grep -q '^BENCH_OWNER=' config/keys.env; then
+      sed -i '' "s/^BENCH_OWNER=.*/BENCH_OWNER=$BENCH_NAME/" config/keys.env
+    else
+      echo "BENCH_OWNER=$BENCH_NAME" >> config/keys.env
+    fi
     echo "✓ Welcome, $BENCH_NAME!"
   fi
 fi
