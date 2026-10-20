@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+cd "$(dirname "$0")"
 
 echo ""
 echo "Setting up your bench..."
@@ -31,6 +32,39 @@ if [ -z "$CURRENT_PM" ]; then
   case "$PM" in jira|asana|none) ;; *) echo "  '$PM' not recognised — using none."; PM=none ;; esac
   sed -i '' "s/^PM_TOOL=.*/PM_TOOL=$PM/" config/bench.env
   echo "✓ PM tool: $PM (change it in config/bench.env)"
+fi
+
+# Auto-note + auto-close of idle convo windows (launchd, macOS only)
+echo ""
+if [ "$(uname)" = "Darwin" ]; then
+  BENCH_PATH=$(pwd -P)
+  BENCH_NAME_SLUG=$(basename "$BENCH_PATH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+  LABEL="com.bench.$BENCH_NAME_SLUG.auto-note"
+  AGENTS_DIR="$HOME/Library/LaunchAgents"
+  PLIST="$AGENTS_DIR/$LABEL.plist"
+  PYTHON_BIN=$(command -v python3 || echo /usr/bin/python3)
+  mkdir -p "$AGENTS_DIR"
+  NEW_PLIST=$(sed -e "s|__LABEL__|$LABEL|g" -e "s|__BENCH_PATH__|$BENCH_PATH|g" \
+                  -e "s|__PYTHON__|$PYTHON_BIN|g" -e "s|__HOME__|$HOME|g" \
+                  actions/recurring/auto-note/com.bench.auto-note.plist)
+  if [ -f "$PLIST" ] && [ "$(cat "$PLIST")" = "$NEW_PLIST" ] \
+     && launchctl list "$LABEL" >/dev/null 2>&1; then
+    echo "  Auto-note already installed ($LABEL), skipping."
+  else
+    launchctl unload "$PLIST" >/dev/null 2>&1 || true
+    printf '%s\n' "$NEW_PLIST" > "$PLIST"
+    if launchctl load "$PLIST"; then
+      echo "✓ Auto-note on: idle convo windows get a session note after 15 min and"
+      echo "  close after 60 min ($LABEL, every 5 min). Settings and how to turn it"
+      echo "  off: actions/recurring/auto-note/instructions.md"
+    else
+      echo "  Could not load $PLIST. Load it by hand: launchctl load \"$PLIST\""
+    fi
+  fi
+  [ -x "$HOME/.local/bin/claude" ] || echo "  Note: auto-note expects the claude CLI at ~/.local/bin/claude."
+  command -v jq >/dev/null 2>&1 || echo "  Note: install jq (brew install jq) - the session hook needs it."
+else
+  echo "  Auto-note skipped: it runs on launchd, which needs macOS."
 fi
 
 echo ""

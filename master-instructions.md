@@ -112,6 +112,10 @@ Convo folders with 5+ notes get OptMem-style three-layer memory, maintained by t
 
 Rules: never hand-edit `_memory-*.md` files; never write session content into them. Details: `actions/recurring/convo-memory/instructions.md`.
 
+### Auto-note and auto-close
+
+A convo window idle for 15 min gets its session note written automatically, and is closed once it has stayed finished for 60 min, by the `auto-note` job (`actions/recurring/auto-note/`, Claude Haiku, every 5 min via launchd, installed by `setup.sh`). It never commits or posts to a ticket; `claude --resume <id>` reopens a closed session. If a notice says a note was written, append to it with `/note` rather than starting a second one. Details: `actions/recurring/auto-note/instructions.md`.
+
 **Session note naming convention:** `YYMMDD-short-description.md` — date followed by one or two kebab-case words describing the session topic (e.g. `260405-csv-fix.md`, `260403-folder-structure.md`)
 
 **Current convos:** See `bench-index.csv` (rows where `type = convo` or `type = both`).

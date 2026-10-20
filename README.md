@@ -119,6 +119,7 @@ your-bench/
 │   │   ├── automation-status/  ← snapshot of scheduled automations
 │   │   └── meeting-minutes/ ← example action (copy to create your own)
 │   ├── recurring/           ← scheduled actions (launchd / cron)
+│   │   ├── auto-note/       ← notes idle convo windows, closes them after 60 min
 │   │   ├── convo-memory/    ← nightly memory compression (three-layer OptMem)
 │   │   └── weekly-check-ins/
 │   └── ~archive/
@@ -213,7 +214,7 @@ ANTHROPIC_API_KEY=your-key
 Get a Jira API token at: https://id.atlassian.com/manage-profile/security/api-tokens  
 Get an Asana PAT at: https://app.asana.com/0/my-apps
 
-If this bench runs on its own Anthropic account, put that login's `CLAUDE_CONFIG_DIR` path (e.g. `~/.claude-work`) in a `.claude-login` file at the bench root. Background jobs like `convo-memory` then use that login; without the file they use your default one.
+If this bench runs on its own Anthropic account, put that login's `CLAUDE_CONFIG_DIR` path (e.g. `~/.claude-work`) in a `.claude-login` file at the bench root. Background jobs like `convo-memory` and `auto-note` then use that login; without the file they use your default one.
 
 ---
 

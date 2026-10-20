@@ -5,3 +5,8 @@ config/keys.env
 __pycache__/
 *.pyc
 .vscode/
+# auto-note runtime files
+actions/recurring/auto-note/state.json
+actions/recurring/auto-note/auto-note.log
+actions/recurring/auto-note/.last-run
+actions/recurring/auto-note/.auto-note.lock

@@ -1,3 +1,4 @@
 slug,type,convo_folder,action_folder,jira,asana
 weekly-check-ins,both,convos/weekly-check-ins,actions/recurring/weekly-check-ins,,
 convo-memory,action,,actions/recurring/convo-memory/,,
+auto-note,action,,actions/recurring/auto-note/,,
