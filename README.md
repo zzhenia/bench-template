@@ -92,6 +92,7 @@ Once setup is complete, work through these to get familiar with your bench:
 
 - [ ] **Review the Getting Started checklist** — you're reading it now!
 - [ ] **Enter your name** — run `./setup.sh` and answer the welcome prompt (or edit `BENCH_OWNER` in `config/keys.env` directly)
+- [ ] **Pick a bench colour** — `./setup.sh` asks (red, blue, green, yellow, purple, orange, pink, cyan). It colours the Cursor window, with a dark and a light variant that follow the system, and the Claude session. Switch later with `python3 scripts/bench-colour.py <colour>`
 - [ ] **Create your first note** — start a conversation with Claude, then run `/note` to save a session note to a convo folder
 - [ ] **Create your first action** — copy `actions/on-demand/meeting-minutes/` to a new folder, rename it, and edit `instructions.md`
 - [ ] **Open the Actions Dashboard** — run `bash actions/on-demand/actions-dashboard/run.sh` and visit http://localhost:7391 to see your actions listed
@@ -107,7 +108,7 @@ your-bench/
 ├── bench-index.csv          ← index of all actions and convos + ticket links
 ├── CLAUDE.md                ← always-loaded operating rules
 ├── config/
-│   ├── bench.env            ← non-secret settings (PM_TOOL)
+│   ├── bench.env            ← non-secret settings (PM_TOOL, BENCH_COLOR)
 │   ├── keys.env.template    ← copy to keys.env and fill in your API keys
 │   ├── warp/                ← Warp setup kit (zshrc block, wp, tab configs)
 │   └── cursor/              ← Cursor setup kit (cw, per-project folderOpen tasks)

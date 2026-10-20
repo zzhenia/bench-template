@@ -5,9 +5,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "colors=(red blue green yellow purple orange pink cyan); idx=$((RANDOM % 8)); color=${colors[$idx]}; printf '{\"systemMessage\":\"Random color: %s — type /color %s\"}' \"$color\" \"$color\"",
+            "command": "color=$(grep '^BENCH_COLOR=' \"$CLAUDE_PROJECT_DIR/config/bench.env\" 2>/dev/null | cut -d= -f2-); [ -n \"$color\" ] || { colors=(red blue green yellow purple orange pink cyan); color=${colors[$((RANDOM % 8))]}; }; printf '{\"systemMessage\":\"Bench colour: %s — type /color %s\"}' \"$color\" \"$color\"",
             "timeout": 5,
-            "statusMessage": "Picking session color..."
+            "statusMessage": "Bench colour..."
           }
         ]
       }

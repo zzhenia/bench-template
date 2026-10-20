@@ -27,6 +27,21 @@ if [ -z "$CURRENT_NAME" ]; then
   fi
 fi
 
+# Bench colour: the Cursor window and the Claude session colour (config/bench.env)
+CURRENT_COLOR=$(grep '^BENCH_COLOR=' config/bench.env 2>/dev/null | cut -d= -f2-)
+if [ -z "$CURRENT_COLOR" ]; then
+  echo ""
+  read -rp "Bench colour — red, blue, green, yellow, purple, orange, pink or cyan? [blue] " COLOR
+  COLOR=$(echo "${COLOR:-blue}" | tr '[:upper:]' '[:lower:]')
+  case "$COLOR" in red|blue|green|yellow|purple|orange|pink|cyan) ;; *) echo "  '$COLOR' not recognised — using blue."; COLOR=blue ;; esac
+  python3 scripts/bench-colour.py "$COLOR"
+  CURSOR_USER="$HOME/Library/Application Support/Cursor/User/settings.json"
+  if [ -f "$CURSOR_USER" ] && ! grep -q '"window.autoDetectColorScheme": *true' "$CURSOR_USER"; then
+    echo "  To follow the system's light/dark switch, turn on Cursor's"
+    echo "  Window: Auto Detect Color Scheme setting."
+  fi
+fi
+
 # Project-management tool for ticket comments (stored in config/bench.env)
 CURRENT_PM=$(grep '^PM_TOOL=' config/bench.env | cut -d= -f2-)
 if [ -z "$CURRENT_PM" ]; then
