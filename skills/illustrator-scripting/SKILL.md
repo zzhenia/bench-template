@@ -268,6 +268,27 @@ This is Rule 1 and Rule 2 territory too: run `aiGuard` first like any other
 script that touches the file, and this rule governs color only — it's not
 license to make any other change while in there.
 
+**Check the swatches on every PI file the routine opens.** Before any color
+work, read the document's swatch groups: they must be exactly `PI-primary`
+(25) and `PI-secondary` (30). If they are not, split the swatches per the
+CSV sections (below) and add the missing colors; report what was added.
+
+**Rule 3 also removes every swatch outside `PI-primary` / `PI-secondary`** —
+default swatches, default groups, gradients, patterns — so the panel holds
+only the two folders. Steps, in this order:
+
+1. Relink every fill, stroke and gradient stop to the PI swatches: exact
+   matches, and logo near-misses per "Logo colors" below.
+2. Keep any gradient swatch still used by objects. Deleting an in-use
+   gradient swatch strips the gradient and the object goes black;
+   `app.undo` does not restore it.
+3. Delete the rest.
+4. Diff a before/after render (export per the Exports section, hide the
+   `safe zone` layer first).
+
+Hidden layers can't be edited by script, so relink cannot reach them:
+unhide them, or report them.
+
 ### Exactly two swatch groups, matching the .ase file
 
 `pilot-institute-colors.ase` ships exactly two folders — never one group
@@ -429,7 +450,13 @@ first step**, not a background assumption — follow it in order:
 3. **Reproduce them** in the new file:
    - **Layer order (top to bottom):** `bleed` (hidden by default, locked),
      `trash` (hidden by default, unlocked, black layer color), `Content`,
-     `BG` (locked).
+     `BG` (locked). A Vistaprint A-frame file adds `safe zone` on top of
+     `bleed`.
+   - **Safe zone layer (Vistaprint A-frame only):** non-printing, locked,
+     one rectangle stroked 1 pt PI Cool Gray, 50% opacity, 4/4 pt dashes,
+     74.5 pt in from the bleed edge. Hide it before any export — it renders
+     in PNG exports. All guides share one color, so a guide in a different
+     color is a stroked path on this layer, not a guide.
    - **Bleed layer:** grey strips covering the bleed outside the trim,
      filled with the pasteboard grey CMYK `57.40/47.02/46.31/36.15`; hidden
      by default — Zhenia toggles it on to preview the trim.
@@ -517,6 +544,19 @@ export failed. A failed export is never reported as done.
 - **Illustrator's own PDF color conversion throws MRAP.** Asking
   Illustrator to export a PDF directly converted to RGB fails this way
   rather than producing a usable file (see Exports).
+- **Illustrator 30.7 crashes (SIGSEGV in `LiveObjectProperty::get`) on
+  text-attribute reads.** Two crashes came from scripts reading
+  `characterAttributes`, `paragraphAttributes`, `leading`, or `size`. Avoid
+  every text-attribute read. Safe: `lines.length`, `contents`, `anchor`,
+  `textPath.pathPoints`, `duplicate().createOutline()`. To copy a text
+  style, duplicate a styled frame, set its `contents`, and translate it to
+  the original's `anchor`.
+- **Test a new approach on a scratch copy opened as its own document,
+  then apply it once to Zhenia's doc.** Never trial-and-error on the live
+  file (Rule 1).
+- **No chained ternaries.** `a ? 4 : b ? 6 : 0` misbehaved in ExtendScript;
+  write plain `if` statements.
+- **Illustrator's y axis is up-positive.** Moving up is `+dy`.
 - `tools/on-demand/yt-autopilot/illustrator-placement-brief.md` has more
   ExtendScript caveats worth reading before a larger placement script: no
   `JSON` object in ExtendScript (ES3), AppleEvent timeout defaults to 120s
@@ -524,6 +564,21 @@ export failed. A failed export is never reported as done.
   each file path individually rather than a blanket "anything placed?"
   check, and `var` has function-level scope only (watch loop variable
   collisions).
+
+### Area type: fit the frame to its last baseline
+
+To resize an area-type frame so it ends on the text's last baseline:
+
+1. **Measure from an outlined duplicate** (`duplicate().createOutline()`),
+   never the live frame. Take the bottom of each glyph on the last line,
+   bucket the values within ±0.75 pt, take the most common bucket, and use
+   its highest value as the last baseline.
+2. **Don't swap the last line for "H" to measure it.** The swap reflows the
+   text onto the previous line.
+3. **Resize by moving the bottom `textPath.pathPoints`.** After each move,
+   check `lines.length` is unchanged; if not, step +0.25 pt up, to a
+   maximum of 1 pt, and if it still differs, revert the move.
+4. **A one-line area frame becomes point type** instead of being fitted.
 
 ## Related
 
