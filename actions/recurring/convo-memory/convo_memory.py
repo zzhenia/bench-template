@@ -54,6 +54,9 @@ if _config_path.exists():
 
 CONVOS = BENCH_ROOT / "convos"
 CLAUDE_HAIKU = "claude-haiku-4-5-20251001"
+# launchd gives this job a minimal PATH, so `claude` must be absolute.
+CLAUDE_BIN = str(Path.home() / ".local" / "bin" / "claude")
+CLAUDE_TIMEOUT = 300      # seconds per call
 NOTE_RE = re.compile(r"^\d{6}-.+\.md$")
 BULLET_RE = re.compile(r"^\s*- \[\d{6}\]", re.MULTILINE)
 EXCLUDE = {"Templates", "~archive", "~empty", "daily-log"}
@@ -170,17 +173,41 @@ def count_bullets(text: str) -> int:
 
 
 def call_haiku(prompt: str, max_tokens: int) -> str:
-    import anthropic
-    client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    """Run the prompt through the Claude Code CLI, billed to the Max subscription.
+
+    Previously this used the anthropic SDK with ANTHROPIC_API_KEY, which billed
+    pay-per-token on top of the subscription. `claude -p` reuses the Keychain
+    OAuth credentials instead, so nightly runs cost nothing extra.
+
+    ANTHROPIC_API_KEY is stripped from the child environment on purpose: if the
+    CLI sees one it may bill the API instead of the subscription, silently
+    undoing the whole point of this change.
+
+    max_tokens is advisory now — the CLI exposes no equivalent flag, so output
+    length is governed by the prompts themselves.
+    """
+    env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
+    # A bench on its own Anthropic account names that login's config dir in
+    # config/claude-login; without it the default login is used.
+    login = BENCH_ROOT / "config" / "claude-login"
+    if login.is_file() and login.read_text().strip():
+        env["CLAUDE_CONFIG_DIR"] = str(Path(login.read_text().strip()).expanduser())
+    cmd = [CLAUDE_BIN, "-p", "--model", CLAUDE_HAIKU, "--output-format", "text"]
+
     last_err = None
     for attempt in range(2):
         try:
-            response = client.messages.create(
-                model=CLAUDE_HAIKU,
-                max_tokens=max_tokens,
-                messages=[{"role": "user", "content": prompt}],
+            proc = subprocess.run(
+                cmd, input=prompt, env=env, capture_output=True,
+                text=True, timeout=CLAUDE_TIMEOUT,
             )
-            return response.content[0].text.strip()
+            if proc.returncode != 0:
+                raise RuntimeError(
+                    f"claude exited {proc.returncode}: {proc.stderr.strip()[:300]}")
+            out = proc.stdout.strip()
+            if not out:
+                raise RuntimeError("claude returned empty output")
+            return out
         except Exception as e:
             last_err = e
             log(f"WARNING: Haiku call failed (attempt {attempt + 1}): {e}")
