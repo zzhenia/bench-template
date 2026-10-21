@@ -21,21 +21,37 @@ No eval is written for:
 - Single ticket comments
 Kitty reads those herself.
 
+## The `Done when:` Opener
+
+Every eval starts with `Done when: <one checkable gate>` (line 1; line 2 after the shebang in `.sh` evals). It is the eval itself, simplified to one line: the target, the number it expects, how it is read. It is the final qualifier; anything else the eval needs (checks, fixtures, safety notes) goes below it.
+
+- Markdown evals: `Done when:` is line 1 of the file.
+- Shell evals: the shebang must stay line 1, so `# Done when:` is the first line after it.
+- The gate is derived from the eval's own pass condition. If you cannot state it in one line, the eval is not ready.
+- The gate is checkable: a reader can tell true from false without judgement. "Works" is not a gate; "exit 0 with 30 rows, none empty" is.
+- The same line goes into the work order's `Done when:` (below), so the order and the eval cannot drift apart.
+- Model: the official `skill-creator` skill, where every step ends with a checkable gate ("**Done when:** frontmatter matches how the skill will actually be reached").
+
+Start from `TEMPLATE.md` or `TEMPLATE.sh` in this folder.
+
 ## Eval Format and Naming
 
 **Shell script evals:**
 - Filename: `evals/<TICKET-KEY>.sh`
+- Opens with `# Done when:` (line 2, after the shebang)
 - One shell line that proves the result
 - Exit 0 = pass, Exit 1 = fail
 - Can verify against live target
 
 **Markdown evals:**
 - Filename: `evals/<TICKET-KEY>.md` (when no shell line can prove it)
+- Opens with `Done when:` on line 1
 - Rubric with test cases, steps, and pass/fail criteria
 - Example: `jira-ticket-quality.md` (10 scored fields, per-field filled criteria)
 
 **Action evals:**
 - Filename: `tools/<type>/<name>/eval.md`
+- Opens with `Done when:` on line 1
 - Test cases with steps and pass/fail criteria
 - Separate from `instructions.md`
 - Kept by Evalbot, run by Kitty before accepting an order that changed the action
@@ -43,7 +59,7 @@ Kitty reads those herself.
 ## The Work Order Process
 
 1. **Kitty orders the eval first**, before work starts
-2. Evalbot writes the eval and provides the `Done when:` line for the order
+2. Evalbot writes the eval and provides the `Done when:` line for the order (the eval's own line 1)
 3. The work order includes:
    ```
    Work order <TICKET-KEY> — <title>
@@ -78,6 +94,7 @@ Kitty reads those herself.
 ### Shell script eval format
 ```bash
 #!/usr/bin/env bash
+# Done when: <one checkable gate>
 # Single exit 0/1 check against the real target
 exit 0  # pass
 # or
