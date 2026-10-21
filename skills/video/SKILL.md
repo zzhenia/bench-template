@@ -13,6 +13,7 @@ Every video task starts here. Pick the branch for your format, then follow it en
 |---|---|---|
 | YouTube Shorts — FD and SMKS | `skills/video/shorts.md` | Active |
 | Shorts publishing (API metadata & scheduling) | `skills/video/publishing.md` | Active |
+| Cutlist edit — one take to a finished vertical ad, any length, from a TSV | `skills/video/cutlist-edit.md` | Active |
 | Long form YouTube | — | Not yet written |
 | Instagram Reels | — | Not yet written |
 | Other social channels | — | Not yet written |
