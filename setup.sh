@@ -80,11 +80,67 @@ if [ "$(uname)" = "Darwin" ]; then
       echo "  Could not load $PLIST. Load it by hand: launchctl load \"$PLIST\""
     fi
   fi
+  # Python repin: one instance per Mac (LaunchAgents are machine-wide)
+  REPIN_LABEL="com.bench.python-repin"
+  REPIN_PLIST="$AGENTS_DIR/$REPIN_LABEL.plist"
+  OTHER_REPIN=$(grep -l "python-repin/repin.py" "$AGENTS_DIR"/*.plist 2>/dev/null \
+                | grep -v "^$REPIN_PLIST\$" | head -1 || true)
+  if [ -z "$OTHER_REPIN" ] && [ -f "$REPIN_PLIST" ] && ! grep -q "$BENCH_PATH/" "$REPIN_PLIST"; then
+    OTHER_REPIN="$REPIN_PLIST"
+  fi
+  NEW_REPIN=$(sed -e "s|__LABEL__|$REPIN_LABEL|g" -e "s|__BENCH_PATH__|$BENCH_PATH|g" \
+                  actions/recurring/python-repin/com.bench.python-repin.plist)
+  if [ -n "$OTHER_REPIN" ]; then
+    echo "  Python repin already runs for another bench ($OTHER_REPIN). Add"
+    echo "  $BENCH_PATH to other_benches in that bench's python-repin/config.json."
+  elif [ -f "$REPIN_PLIST" ] && [ "$(cat "$REPIN_PLIST")" = "$NEW_REPIN" ] \
+       && launchctl list "$REPIN_LABEL" >/dev/null 2>&1; then
+    echo "  Python repin already installed ($REPIN_LABEL), skipping."
+  else
+    launchctl unload "$REPIN_PLIST" >/dev/null 2>&1 || true
+    printf '%s\n' "$NEW_REPIN" > "$REPIN_PLIST"
+    if launchctl load "$REPIN_PLIST"; then
+      echo "✓ Python repin on: after every Homebrew Python update, jobs move to the new"
+      echo "  version only once their libraries work there ($REPIN_LABEL). Details:"
+      echo "  actions/recurring/python-repin/instructions.md"
+    else
+      echo "  Could not load $REPIN_PLIST. Load it by hand: launchctl load \"$REPIN_PLIST\""
+    fi
+  fi
+
   [ -x "$HOME/.local/bin/claude" ] || echo "  Note: auto-note expects the claude CLI at ~/.local/bin/claude."
   command -v jq >/dev/null 2>&1 || echo "  Note: install jq (brew install jq) - the session hook needs it."
 else
   echo "  Auto-note skipped: it runs on launchd, which needs macOS."
 fi
+
+# Context trim: Claude Code mod that offers a note + clean restart past a token
+# limit. Loaded from ~/.claude/settings.json (and this bench's own login, if any).
+TRIM_DIR="$(pwd -P)/actions/recurring/context-trim"
+LOGIN_DIR=$(sed -n 1p .claude-login 2>/dev/null | sed "s|^~|$HOME|")
+for CFG in "$HOME/.claude" ${LOGIN_DIR:+"$LOGIN_DIR"}; do
+  python3 - "$CFG/settings.json" "$TRIM_DIR" <<'PY'
+import json, os, sys
+path, trim = sys.argv[1], sys.argv[2]
+try:
+    with open(path) as f:
+        cfg = json.load(f)
+except FileNotFoundError:
+    cfg = {}
+env = cfg.setdefault("env", {})
+dirs = [d for d in env.get("CLAUDE_CODE_PLUGIN_DIRS", "").split(":") if d]
+if trim in dirs or any(os.path.expanduser(d) == trim for d in dirs):
+    print(f"  Context trim already loaded in {path}, skipping.")
+    sys.exit(0)
+env["CLAUDE_CODE_PLUGIN_DIRS"] = ":".join(dirs + [trim])
+os.makedirs(os.path.dirname(path), exist_ok=True)
+with open(path, "w") as f:
+    json.dump(cfg, f, indent=2)
+    f.write("\n")
+print(f"✓ Context trim on in {path}: past 100K tokens a band offers to write the")
+print("  note and restart clean. Settings: actions/recurring/context-trim/config.json")
+PY
+done
 
 echo ""
 echo "✓ Bench ready."

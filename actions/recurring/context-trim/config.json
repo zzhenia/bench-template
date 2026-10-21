@@ -1,0 +1,6 @@
+{
+  "threshold_tokens": 100000,
+  "snooze_tokens": 25000,
+  "max_attempts": 3,
+  "retry_seconds": 30
+}

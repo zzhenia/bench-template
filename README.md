@@ -121,7 +121,9 @@ your-bench/
 │   │   └── meeting-minutes/ ← example action (copy to create your own)
 │   ├── recurring/           ← scheduled actions (launchd / cron)
 │   │   ├── auto-note/       ← notes idle convo windows, closes them after 60 min
+│   │   ├── context-trim/    ← past a token limit, offers a note + clean restart
 │   │   ├── convo-memory/    ← nightly memory compression (three-layer OptMem)
+│   │   ├── python-repin/    ← keeps jobs on a Homebrew Python that has their libraries
 │   │   └── weekly-check-ins/
 │   └── ~archive/
 ├── convos/

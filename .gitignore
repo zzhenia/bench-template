@@ -10,3 +10,8 @@ actions/recurring/auto-note/state.json
 actions/recurring/auto-note/auto-note.log
 actions/recurring/auto-note/.last-run
 actions/recurring/auto-note/.auto-note.lock
+# python-repin runtime files
+actions/recurring/python-repin/state.json
+actions/recurring/python-repin/.lock
+# context-trim generated types
+actions/recurring/context-trim/.claude-plugin/types/

@@ -1,0 +1,1 @@
+{ "name": "context-trim", "version": "0.1.0", "description": "When a bench conversation passes its token limit, offers to write the session note and restart it clean.", "types": "./types/index.d.ts" }
