@@ -277,7 +277,7 @@ On "pub", after `schedule` succeeds for the Ghost post:
    (and latest YT tab if `--yt` was given). It is idempotent — safe to re-run if only
    `--li` was used the first time.
 4. Reddit-origin Dailies only: once step 3 succeeds, save Zhenia's original comment to the
-   Scripts doc (tab "Reddit <Mon> <YYYY>", same FD ID):
+   Scripts doc (tab "<Month> <YY> RD", e.g. "October 26 RD", same FD ID):
    ```
    python3 tools/on-demand/ghost-blog/scripts/fd_reddit_archive.py \
      --fd FD26-NNN --url <comment permalink>
@@ -288,6 +288,7 @@ On "pub", after `schedule` succeeds for the Ghost post:
    Ghost (07:00 ET): [preview_url] [edit_url]
    Scripts: FD26-NNN added to [tab title]
    ```
+   `[tab title]` is that RD tab name, e.g. "October 26 RD".
 
 When Writer redrafts a LinkedIn post or Short for an existing FD ID, the brief uses that FD ID's Reddit entry in the Scripts doc as the source, not the Ghost post.
 

@@ -74,10 +74,34 @@ volume=1.2
 ```
 
 ### Music bed
-- Volume relative to raw voice: **0.024**
-- `amix normalize=0` (limiter at 0.95 is the clipping guard instead of amix normalize)
+See "### Music bed and mix" below: ducked bed, -14 LUFS, -1.5 dBTP.
 
 ---
+
+## Audio, QA and retention (ZHEN-7361, 2026-10-21)
+
+### Music bed and mix
+- The bed ducks **5 dB** under the voice and comes back up in pauses (0.043 open, 0.024 under
+  voice); `render_fd.py` prints the dip it measured on the cut.
+- The mix is normalised to **-14 LUFS** with a **-1.5 dBTP** ceiling.
+- Playback speed stays 1.3x for the next batch; Zhenia checks retention after it.
+
+### QA step after render
+After every `render_fd.py` run, before upload:
+`python3 tools/on-demand/fd-shorts/qa.py <short.mp4> --plan plan.json --fd <id>`.
+1. The script must exit 0: 1080x1920 at 30 fps, audio present, audio and video within 1 frame,
+   -15..-13 LUFS, true peak <= -1.0 dBFS, no black gap (blackdetect d=0.03 pix_th=0.08).
+2. Open `opening.jpg`, the `sheet_NN.jpg` contact sheets and every `join_NN_*.jpg`. Look for a
+   frozen frame, a black frame, a word clipped at a join. Fix and re-render; never hand off on
+   the script alone. Tick the last line of the `_qa.txt` report.
+
+### Retention rules
+- Put the hook in the first 3 s of every short.
+- Make the opening readable with sound off (title band and caption carry it).
+- Answer the hook's question by the end of the short.
+- Keep the speaker on screen for at least half of the short.
+- Keep full-screen B-roll no longer than about 3.5 s.
+- Change the shot every few seconds.
 
 ## SF Types templates (October 2026)
 
