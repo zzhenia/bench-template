@@ -14,9 +14,11 @@ Every video task starts here. Pick the branch for your format, then follow it en
 | YouTube Shorts — FD and SMKS | `skills/video/shorts.md` | Active |
 | Shorts publishing (API metadata & scheduling) | `skills/video/publishing.md` | Active |
 | Cutlist edit — one take to a finished vertical ad, any length, from a TSV | `skills/video/cutlist-edit.md` | Active |
-| Long form YouTube | — | Not yet written |
+| Long form YouTube | `tools/on-demand/lf-edit/instructions.md`, `tools/on-demand/lf-edit/style.md` | Active |
 | Instagram Reels | — | Not yet written |
 | Other social channels | — | Not yet written |
+
+`style.md` (LF house style: LFnn templates = artboards of YT_video_assets.ai, layering rules, cuts) is read before any LF edit and grows with every round of review comments.
 
 ## Where tools run
 
