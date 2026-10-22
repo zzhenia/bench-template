@@ -276,11 +276,20 @@ On "pub", after `schedule` succeeds for the Ghost post:
    — backs up the doc, and appends one entry above the grey divider of the latest LI tab
    (and latest YT tab if `--yt` was given). It is idempotent — safe to re-run if only
    `--li` was used the first time.
-4. Reply in the same thread with the Ghost links only:
+4. Reddit-origin Dailies only: once step 3 succeeds, save Zhenia's original comment to the
+   Scripts doc (tab "Reddit <Mon> <YYYY>", same FD ID):
+   ```
+   python3 tools/on-demand/ghost-blog/scripts/fd_reddit_archive.py \
+     --fd FD26-NNN --url <comment permalink>
+   ```
+   Skip it for LinkedIn-origin and no-origin Dailies. The 03:30 Bogota cron archives any miss.
+5. Reply in the same thread with the Ghost links only:
    ```
    Ghost (07:00 ET): [preview_url] [edit_url]
    Scripts: FD26-NNN added to [tab title]
    ```
+
+When Writer redrafts a LinkedIn post or Short for an existing FD ID, the brief uses that FD ID's Reddit entry in the Scripts doc as the source, not the Ghost post.
 
 **pub NEVER schedules or drafts a post in any external tool.** `tools/recurring/fd-queue/run.py`
 runs nightly and picks up ticked LI posts. Teleprompter 'Filmed' checkboxes are handled
