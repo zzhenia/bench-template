@@ -6,12 +6,12 @@
 # sections below.
 #
 # What it does on every new Warp tab / Zed or Cursor terminal opened in the bench:
-#   - shows a one-keystroke project menu, cds to the pick, launches Claude
-#     Code with --model opus --permission-mode auto
-#   - `c` opens the convo picker (needs a bench checkout): pick or type a
-#     convo name once and it fans out to `-n <name>`, /color <random>, and
-#     a staged-but-unsent ">>name" first message (zero tokens until Enter)
-#   - `s`, Enter, any other key, or 30s of silence -> plain shell
+#   - opens straight on the convo picker (needs a bench checkout): pick or
+#     type a convo name once and it fans out to `-n <name>`, /color <random>,
+#     and a staged-but-unsent ">>name" first message (zero tokens until Enter)
+#   - `r` there opens a one-keystroke project menu, cds to the pick, launches
+#     Claude Code with --model opus --permission-mode auto
+#   - `s`, a blank line, or 30s of silence -> plain shell
 #   - `bench` reopens the menu any time; `convo <name>` jumps straight in
 #
 # In **Zed and Cursor only**, a terminal opened at one of the other BENCH_PROJECTS
@@ -77,11 +77,30 @@ convo() {
     done
     (( ${#recent[@]} % 3 )) && print
     print -r -- ""
-    print -n -- "  number or name + Enter (blank = shell): "
-    read -r line || return 0
-    if [[ -z $line ]]; then
-      print -r -- "  shell"
+    print -r -- "   r  other repo…              s  just a shell"
+    print -r -- ""
+    local prompt="  pick (number, or type a name + Enter): " key
+    print -n -- "$prompt"
+    if ! read -s -k 1 -t 30 key; then
+      print -r -- "— no pick, plain shell (run \`bench\` for the menu)"
       return 0
+    fi
+    case $key in
+      [rR]) print -r -- "other repo"; bench_repo_menu; return $? ;;
+      [sS]|$'\n'|$'\r'|' ') print -r -- "shell"; return 0 ;;
+    esac
+    line=$key
+    if [[ $key == <-> ]]; then
+      # A digit launches at once, unless it could still start a listed
+      # two-digit number (1 -> 1x with 10+ convos): then 0.7s for a second one.
+      if (( key * 10 <= ${#recent[@]} )) && read -s -k 1 -t 0.7 key \
+         && [[ $key == <-> ]]; then
+        line+=$key
+      fi
+    else
+      # Any other key starts a convo name: finish it in a line editor.
+      print -n -- "\r"
+      vared -p "$prompt" line || return 0
     fi
     if [[ $line == <-> ]] && (( line >= 1 && line <= ${#recent[@]} )); then
       name=${recent[$line]:t}
@@ -158,13 +177,21 @@ EXPECT_EOF
   return $rc
 }
 
+# The new-tab picker: bench convos first (`r` there opens the repo menu below).
 bench() {
+  if [[ -d $BENCH_DIR/convos ]]; then
+    convo
+  else
+    bench_repo_menu
+  fi
+}
+
+bench_repo_menu() {
   local i key dir
   print -r -- ""
   for (( i = 1; i <= ${#BENCH_PROJECTS[@]}; i++ )); do
     print -r -- "  $i  ${BENCH_PROJECTS[$i]:t}"
   done
-  [[ -d $BENCH_DIR/convos ]] && print -r -- "  c  bench convo…"
   print -r -- "  s  just a shell"
   print -r -- ""
   print -n -- "  pick: "
@@ -172,12 +199,6 @@ bench() {
   if ! read -s -k 1 -t 30 key; then
     print -r -- "— no pick, plain shell (run \`bench\` for the menu)"
     return 0
-  fi
-
-  if [[ $key == [cC] && -d $BENCH_DIR/convos ]]; then
-    print -r -- "convo"
-    convo
-    return $?
   fi
 
   # A digit in range picks a project; anything else (s, Enter, …) is a shell.

@@ -6,6 +6,8 @@ conversation's token count. Past `threshold_tokens` a band appears above the pro
 - `1` writes the session note (auto-note, same writer as the idle sweep), clears the
   conversation in the same window and resumes with `>><topic>`.
 - `2` asks again `snooze_tokens` later.
+- `3` queues the restart: it runs `1` once the turn has ended and no background
+  command or subagent is still running. While queued, `1` restarts now, `2` cancels.
 
 A failed note is retried `max_attempts` times, `retry_seconds` apart, then the band
 shows one red line with the log path; `1` restarts without a note, `2` keeps going.

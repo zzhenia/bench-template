@@ -95,3 +95,29 @@ test('silent outside the bench', async ($, on) => {
   expect(await ui.find({ type: 'Text', text: /token limit/ })).toBe(undefined)
   await ui.unmount()
 })
+
+test('3 waits for background work, then writes the note and restarts', async ($, on) => {
+  const calls: string[] = []
+  const agents = [{ id: 'a1', description: 'render', type: 'general-purpose', status: 'running' }]
+  engine(on, { n: 150000 }, { json: '{"noted":{}}' }, calls)
+  on('agent.list', () => ({ value: agents }))
+  on('tool.call', () => ({ result: { backgroundTaskId: 'b1' } }))
+  await $.session.start({ cwd: CWD, surface: 'terminal', isInteractive: true })
+  await $.tool.call({ tool: 'Bash', input: { command: 'render', run_in_background: true } } as any)
+  await $.turn.complete({ turnId: 't1', answer: '' } as any)
+
+  const ui = await $.ui.mount(BAND as any)
+  await ui.press({ key: 'idle' })
+  expect((await ui.find({ type: 'Text', text: /queued/ }))?.text).toBe(
+    'Restart queued: waiting for 1 background command, 1 agent to finish (150K).')
+  expect(calls).toEqual([])
+
+  agents[0].status = 'completed'
+  await $.prompt.submit({ text: '<task-notification><task-id>b1</task-id></task-notification>' } as any)
+  calls.length = 0
+  await $.turn.complete({ turnId: 't2', answer: '' } as any)
+  for (let i = 0; i < 50 && calls.length < 3; i++) await new Promise(r => setTimeout(r, 1))
+  expect(calls).toEqual(['note', '/clear',
+    '>>general Context trimmed; continue from convos/general/261020-x.md.'])
+  await ui.unmount()
+})

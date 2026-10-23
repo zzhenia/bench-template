@@ -76,6 +76,33 @@ async function writeNote($: EngineInterface) {
   await update($, trim, (t): Trim => ({ ...t, phase: 'failed' }))
 }
 
+// A restart clears the conversation, which kills this session's background
+// shells and subagents. "When idle" waits for the main turn to end with none
+// of them left running.
+let turnActive = false
+const shells = new Set<string>()
+const BUSY = ['pending', 'running', 'waiting']
+
+async function idle($: EngineInterface) {
+  if (turnActive || shells.size) return false
+  return !(await $.agent.list()).some(a => BUSY.includes(a.status))
+}
+
+async function busyLabel($: EngineInterface) {
+  const agents = (await $.agent.list()).filter(a => BUSY.includes(a.status)).length
+  const parts = [
+    turnActive ? 'this turn' : '',
+    shells.size ? `${shells.size} background command${shells.size > 1 ? 's' : ''}` : '',
+    agents ? `${agents} agent${agents > 1 ? 's' : ''}` : '',
+  ].filter(Boolean)
+  return parts.join(', ') || 'the next turn'
+}
+
+async function whenIdle($: EngineInterface) {
+  if (await idle($)) return writeNote($)
+  await update($, trim, (t): Trim => ({ ...t, phase: 'queued' }))
+}
+
 function snooze($: EngineInterface) {
   return update($, trim, (t): Trim => ({ ...IDLE, tokens: t.tokens, limit: t.tokens + cfg.snooze_tokens }))
 }
@@ -97,8 +124,28 @@ export const register: Register = on => {
     return result
   })
 
+  on('turn.start', ($, e, next) => {
+    if (e.agentId === undefined) turnActive = true
+    return next(e)
+  })
+
+  on('tool.call', async ($, e, next) => {
+    const r = await next(e)
+    const out = (r as { result?: { backgroundTaskId?: string; task_id?: string } }).result
+    if (e.tool === 'Bash' && out?.backgroundTaskId) shells.add(out.backgroundTaskId)
+    if (e.tool === 'TaskStop' && out?.task_id) shells.delete(out.task_id)
+    return r
+  })
+
+  // A background command's end arrives as a task notification naming its id.
+  on('prompt.submit', ($, e, next) => {
+    for (const m of e.text.matchAll(/<task-id>([^<]+)<\/task-id>/g)) shells.delete(m[1])
+    return next(e)
+  })
+
   on('turn.complete', async ($, e, next) => {
     const result = await next(e)
+    if (e.agentId === undefined) turnActive = false
     if (!isBench || e.agentId !== undefined) return result
 
     const { context } = await $.session.usage()
@@ -107,6 +154,7 @@ export const register: Register = on => {
       if (t.phase !== 'idle') return { ...t, tokens }
       return tokens >= t.limit ? { ...t, phase: 'warn', tokens } : t
     })
+    if ((await read($, trim)).phase === 'queued' && (await idle($))) void writeNote($)
     return result
   })
 
@@ -122,6 +170,19 @@ export const register: Register = on => {
           <Text dimColor>
             Writing the session note before restarting{t.attempt > 1 ? ` (try ${t.attempt} of ${cfg.max_attempts})` : ''}…
           </Text>
+        </Box>
+      )
+    }
+
+    if (t.phase === 'queued') {
+      const label = await busyLabel($)
+      return (
+        <Box flexDirection="column">
+          <Text color="yellow">Restart queued: waiting for {label} to finish ({k(t.tokens)}).</Text>
+          <Box gap={3}>
+            <Button key="restart" hotkey="1" plain onPress={() => void writeNote($)}>Restart now</Button>
+            <Button key="later" hotkey="2" plain onPress={() => snooze($)}>Cancel (ask again at {k(t.tokens + cfg.snooze_tokens)})</Button>
+          </Box>
         </Box>
       )
     }
@@ -148,6 +209,7 @@ export const register: Register = on => {
         <Box gap={3}>
           <Button key="restart" hotkey="1" plain onPress={() => void writeNote($)}>Write note and restart</Button>
           <Button key="later" hotkey="2" plain onPress={() => snooze($)}>Not now (ask again at {k(t.tokens + cfg.snooze_tokens)})</Button>
+          <Button key="idle" hotkey="3" plain onPress={() => void whenIdle($)}>Restart when idle</Button>
         </Box>
       </Box>
     )

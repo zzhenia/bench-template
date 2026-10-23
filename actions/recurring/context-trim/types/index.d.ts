@@ -1,5 +1,5 @@
 export type Trim = {
-  phase: 'idle' | 'warn' | 'working' | 'failed'
+  phase: 'idle' | 'warn' | 'queued' | 'working' | 'failed'
   tokens: number
   limit: number
   attempt: number
