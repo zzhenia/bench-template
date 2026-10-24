@@ -17,7 +17,7 @@ BOX='ssh -i ~/.ssh/formula-server openclaw@100.96.0.28'
 
 ### (no argument) — open the app
 
-`~/dev/dev-ZV/ZV-Bench/tools/arc-tabs.sh open https://ytautopilot.formulacommons.com` (or tell
+`~/dev/dev-ZV/ZV-Bench/tools/on-demand/arc-tabs/arc-tabs.sh open https://ytautopilot.formulacommons.com` (or tell
 Zhenia the URL).
 
 ### deploy (after any code change)
