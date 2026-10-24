@@ -8,9 +8,9 @@ YT Autopilot runs on the box (openclaw-1) at **https://ytautopilot.formulacommon
 the only address to give Zhenia; never mention localhost. Full spec:
 `convos/openclaw/specs/network.md`, section "YT Autopilot service".
 
-Nothing runs on the Mac. The old Mac helper (launchd `com.zvi.yt-autopilot`, Illustrator /
-Photoshop actions) is switched off; bring it back only when Zhenia asks:
-`launchctl load -w ~/Library/LaunchAgents/com.zvi.yt-autopilot.plist`.
+The Mac runs only the helper (launchd `com.zvi.yt-autopilot`): it opens files and folders in
+Finder and runs Illustrator / Photoshop actions for the site. Keep it loaded; if clicks say
+"Needs the Mac" while the Mac is on: `launchctl load -w ~/Library/LaunchAgents/com.zvi.yt-autopilot.plist`.
 
 ```bash
 BOX='ssh -i ~/.ssh/formula-server openclaw@100.96.0.28'
