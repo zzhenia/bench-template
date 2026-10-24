@@ -59,7 +59,7 @@ https://tally.so/r/eqOy7e
 
 **Tags:** Empty array. No tags.
 
-**Default Language:** `en-GB` (British English)
+**Default Language:** `en-US`
 
 **Default Audio Language:** `en-US` (US English)
 
@@ -103,7 +103,7 @@ After publishing via API:
 
 1. Verify the video appears in YouTube Studio as private, with publish time 4 PM NY.
 2. Check the description: exact hook, CTA text + URL, hashtag line.
-3. Check metadata: category 26, en-GB / en-US, no tags, madeForKids False.
+3. Check metadata: category 26, en-US / en-US, no tags, madeForKids False, AI use No, paid promotion No.
 4. At the scheduled time, YouTube will auto-publish the video (status changes to public).
 
 If metadata does not match exactly, stop and investigate before the scheduled publish time — do not leave incorrect metadata live.
