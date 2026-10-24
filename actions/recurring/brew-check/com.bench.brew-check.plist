@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>__LABEL__</string>
+
+    <!-- System Python on purpose: a Homebrew upgrade can't break this job -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>__BENCH_PATH__/actions/recurring/brew-check/check.py</string>
+    </array>
+
+    <!-- Runs whenever Homebrew links or unlinks anything -->
+    <key>WatchPaths</key>
+    <array>
+        <string>/opt/homebrew/bin</string>
+    </array>
+
+    <!-- Daily backstop at 10:27, in case a run was missed (offline, asleep) -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>10</integer>
+        <key>Minute</key>
+        <integer>27</integer>
+    </dict>
+
+    <key>ThrottleInterval</key>
+    <integer>60</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/__LABEL__.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/__LABEL__.err</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin</string>
+    </dict>
+</dict>
+</plist>

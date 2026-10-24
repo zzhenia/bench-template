@@ -124,6 +124,7 @@ your-bench/
 │   │   ├── context-trim/    ← past a token limit, offers a note + clean restart
 │   │   ├── convo-memory/    ← nightly memory compression (three-layer OptMem)
 │   │   ├── python-repin/    ← keeps jobs on a Homebrew Python that has their libraries
+│   │   ├── brew-check/      ← tests and repairs the Homebrew tools jobs call
 │   │   └── weekly-check-ins/
 │   └── ~archive/
 ├── convos/

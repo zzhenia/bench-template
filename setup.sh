@@ -108,6 +108,34 @@ if [ "$(uname)" = "Darwin" ]; then
     fi
   fi
 
+  # Homebrew check: one instance per Mac, like python-repin
+  BREWCHK_LABEL="com.bench.brew-check"
+  BREWCHK_PLIST="$AGENTS_DIR/$BREWCHK_LABEL.plist"
+  OTHER_BREWCHK=$(grep -l "brew-check/check.py" "$AGENTS_DIR"/*.plist 2>/dev/null \
+                  | grep -v "^$BREWCHK_PLIST\$" | head -1 || true)
+  if [ -z "$OTHER_BREWCHK" ] && [ -f "$BREWCHK_PLIST" ] && ! grep -q "$BENCH_PATH/" "$BREWCHK_PLIST"; then
+    OTHER_BREWCHK="$BREWCHK_PLIST"
+  fi
+  NEW_BREWCHK=$(sed -e "s|__LABEL__|$BREWCHK_LABEL|g" -e "s|__BENCH_PATH__|$BENCH_PATH|g" \
+                    actions/recurring/brew-check/com.bench.brew-check.plist)
+  if [ -n "$OTHER_BREWCHK" ]; then
+    echo "  Homebrew check already runs for another bench ($OTHER_BREWCHK). Add"
+    echo "  $BENCH_PATH to other_benches in that bench's brew-check/config.json."
+  elif [ -f "$BREWCHK_PLIST" ] && [ "$(cat "$BREWCHK_PLIST")" = "$NEW_BREWCHK" ] \
+       && launchctl list "$BREWCHK_LABEL" >/dev/null 2>&1; then
+    echo "  Homebrew check already installed ($BREWCHK_LABEL), skipping."
+  else
+    launchctl unload "$BREWCHK_PLIST" >/dev/null 2>&1 || true
+    printf '%s\n' "$NEW_BREWCHK" > "$BREWCHK_PLIST"
+    if launchctl load "$BREWCHK_PLIST"; then
+      echo "✓ Homebrew check on: after every Homebrew change, the tools your jobs call are"
+      echo "  tested and repaired; you hear only when a repair fails ($BREWCHK_LABEL). Details:"
+      echo "  actions/recurring/brew-check/instructions.md"
+    else
+      echo "  Could not load $BREWCHK_PLIST. Load it by hand: launchctl load \"$BREWCHK_PLIST\""
+    fi
+  fi
+
   [ -x "$HOME/.local/bin/claude" ] || echo "  Note: auto-note expects the claude CLI at ~/.local/bin/claude."
   command -v jq >/dev/null 2>&1 || echo "  Note: install jq (brew install jq) - the session hook needs it."
 else
