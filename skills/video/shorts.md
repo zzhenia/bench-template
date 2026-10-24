@@ -52,11 +52,11 @@ lands on origin/main; report any mismatch to Kitty before rendering.
 ### Title card
 - Duration: **5 seconds**
 - Background band: mint **#6CFFB1**, full width, height auto-fit to text
-- Title text: **3 balanced lines**, Archivo Bold, title case, black **#000C28**
-- Lines are split to minimise the spread between the longest and shortest (character
-  count); font size auto-scales down from 220 to a floor of 36 to keep every line within
-  960 px
-- Line height: render_fd's pitch **× 1.05**
+- Title text: **up to 3 lines**, Archivo Bold, title case, black **#000C28**
+- Greedy wrap: a word stays on its line whenever it fits within 960 px; never push a
+  word down to balance line lengths. Font size is the largest (220 down to 36) whose
+  wrap fits in 3 lines
+- Line height: render_fd's pitch **× 1.1025** (1.05 × 1.05)
 - The text block sits in the vertical middle of the band: the gap above the first line's
   cap tops equals the gap below the last line's descenders. Measure ink with PIL
   (`getbbox(anchor="ls")`) and place lines with drawtext `y_align=baseline`; never pad
