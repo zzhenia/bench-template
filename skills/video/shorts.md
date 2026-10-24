@@ -56,6 +56,26 @@ lands on origin/main; report any mismatch to Kitty before rendering.
 - Lines are split to minimise the spread between the longest and shortest (character
   count); font size auto-scales down from 220 to a floor of 36 to keep every line within
   960 px
+- Line height: render_fd's pitch **× 1.05**
+- The text block sits in the vertical middle of the band: the gap above the first line's
+  cap tops equals the gap below the last line's descenders. Measure ink with PIL
+  (`getbbox(anchor="ls")`) and place lines with drawtext `y_align=baseline`; never pad
+  with font ascent/descent, which leaves the text sitting high.
+
+### Talking head placement
+- **Split screen / head in the top half:** the head (hat top to chin), not the Vision
+  face box, is centred vertically in the top half. Vision's face rectangle sits about a
+  quarter of its height below the head centre, so centre the window on `cy − 0.25·h`.
+  Face never taller than 75% of the block.
+- **Screen share with preview (SF-04):** the screenshot fills the frame; the head sits in
+  a small rounded square in the top-right corner, the whole head in view (hat top to
+  chin, a bit of shoulders), face centred, filling most of the square. Cut it from the
+  centred head track, not from the main cut. Position so it never covers text in the
+  screenshot or animation; covering a box corner or window chrome is fine.
+- **Screen share without preview:** when the feedback says "full screenshot", the
+  screenshot fills the frame and there is no head square.
+- **Animation:** the animation occupies the full 1080 × 1920 frame on its own brand
+  background. Never scale it down over a blurred or stretched background.
 
 ### Captions
 - Style: **boxed white** — BorderStyle 3 (opaque box), box padding (Outline field) = 14
@@ -105,7 +125,10 @@ After every `render_fd.py` run, before upload:
 
 ## SF Types templates (October 2026)
 
-Active templates: **Pop up, Split screen, Overlay, Animation**
+Active templates: **Pop up, Split screen, Overlay, Animation**. Numbered left to right
+in the reference JPEG: SF-01 Pop-up, SF-02 Animation, SF-03 Title, SF-04 Screen Share
+(head square top right), SF-05 Overlay, SF-06 Full Screen, SF-07/08 Split Screen,
+SF-09/10 Screen Share (head top, screenshot bottom).
 
 Reference JPEG:
 `My Drive / 2026/ZV/~ brand assets/Adobe templates/261008_261008 SF Types.jpg`
