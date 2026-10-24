@@ -8,8 +8,9 @@ YT Autopilot runs on the box (openclaw-1) at **https://ytautopilot.formulacommon
 the only address to give Zhenia; never mention localhost. Full spec:
 `convos/openclaw/specs/network.md`, section "YT Autopilot service".
 
-The Mac runs the same code only as a `helper` (launchd `com.zvi.yt-autopilot`) for Illustrator,
-Photoshop and other Mac-only work. It is not the app Zhenia uses.
+Nothing runs on the Mac. The old Mac helper (launchd `com.zvi.yt-autopilot`, Illustrator /
+Photoshop actions) is switched off; bring it back only when Zhenia asks:
+`launchctl load -w ~/Library/LaunchAgents/com.zvi.yt-autopilot.plist`.
 
 ```bash
 BOX='ssh -i ~/.ssh/formula-server openclaw@100.96.0.28'
@@ -26,12 +27,10 @@ Code changes are not live until the box has them.
 
 1. Commit and push the changed files from the bench (`git pull --rebase` first if rejected).
 2. `$BOX 'cd ~/ZV-Bench && git pull -q && systemctl --user restart yt-autopilot.service && sleep 4 && systemctl --user is-active yt-autopilot.service'`
-3. If the change touches Mac-only work, also restart the helper (below).
 
 ### restart
 
-- Box: `$BOX 'systemctl --user restart yt-autopilot.service && sleep 4 && systemctl --user is-active yt-autopilot.service'`
-- Mac helper: `launchctl kickstart -k gui/$(id -u)/com.zvi.yt-autopilot`
+`$BOX 'systemctl --user restart yt-autopilot.service && sleep 4 && systemctl --user is-active yt-autopilot.service'`
 
 ### stop / start
 
