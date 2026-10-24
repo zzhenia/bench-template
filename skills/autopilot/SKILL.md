@@ -1,74 +1,40 @@
 ---
 name: autopilot
-description: Start, stop, or restart the YT Autopilot app (http://localhost:8001).
+description: Open, deploy to, or restart the YT Autopilot app (https://ytautopilot.formulacommons.com, served from the box).
 model: haiku
 ---
 
-Manage the YT Autopilot server via launchd (`com.zvi.yt-autopilot`). The argument can be `start`, `stop`, `restart`, or `reset`. If no argument is given, open the app in the browser — starting it first if it's not already running.
+YT Autopilot runs on the box (openclaw-1) at **https://ytautopilot.formulacommons.com**. That is
+the only address to give Zhenia; never mention localhost. Full spec:
+`convos/openclaw/specs/network.md`, section "YT Autopilot service".
 
-The plist lives at `~/Library/LaunchAgents/com.zvi.yt-autopilot.plist`.
-
-**Port check (run for ALL commands including bare `/autopilot`):**
-
-```bash
-lsof -ti:8001
-```
-
-If a process is found, check whether it belongs to THIS repo:
+The Mac runs the same code only as a `helper` (launchd `com.zvi.yt-autopilot`) for Illustrator,
+Photoshop and other Mac-only work. It is not the app Zhenia uses.
 
 ```bash
-lsof -i:8001 | grep LISTEN
+BOX='ssh -i ~/.ssh/formula-server openclaw@100.96.0.28'
 ```
-
-If the server.py path does NOT contain `yt-autopilot`, tell the user and ask before stopping it.
-
----
-
-**Commands:**
 
 ### (no argument) — open the app
 
-1. Run the port check above.
-2. If the app is already running, just open the browser: `open http://localhost:8001`
-3. If nothing is running on 8001, run start, then open the browser.
+`~/dev/dev-ZV/ZV-Bench/tools/arc-tabs.sh open https://ytautopilot.formulacommons.com` (or tell
+Zhenia the URL).
 
-### start
+### deploy (after any code change)
 
-1. Run the port check above.
-2. If already running, say "YT Autopilot is already running" and open the browser.
-3. Otherwise, start via launchd:
+Code changes are not live until the box has them.
 
-```bash
-launchctl load -w ~/Library/LaunchAgents/com.zvi.yt-autopilot.plist 2>/dev/null
-launchctl kickstart gui/$(id -u)/com.zvi.yt-autopilot
-```
-
-4. Wait 2 seconds, then verify it started (`lsof -ti:8001`).
-5. Open the browser: `open http://localhost:8001`
-
-### stop
-
-1. Run the port check above.
-2. Stop via launchd (prevents auto-restart):
-
-```bash
-launchctl unload -w ~/Library/LaunchAgents/com.zvi.yt-autopilot.plist 2>/dev/null
-```
-
-3. If port 8001 is still occupied (orphan process), kill it: `kill $(lsof -ti:8001) 2>/dev/null`
-4. Confirm it stopped.
+1. Commit and push the changed files from the bench (`git pull --rebase` first if rejected).
+2. `$BOX 'cd ~/ZV-Bench && git pull -q && systemctl --user restart yt-autopilot.service && sleep 4 && systemctl --user is-active yt-autopilot.service'`
+3. If the change touches Mac-only work, also restart the helper (below).
 
 ### restart
 
-1. Run stop.
-2. Then run start.
+- Box: `$BOX 'systemctl --user restart yt-autopilot.service && sleep 4 && systemctl --user is-active yt-autopilot.service'`
+- Mac helper: `launchctl kickstart -k gui/$(id -u)/com.zvi.yt-autopilot`
 
-### reset
+### stop / start
 
-1. Run stop.
-2. Delete the state file: `rm -f tools/on-demand/yt-autopilot/app/state.json`
-3. Then run start. This will regenerate the default state with the sample project.
+`$BOX 'systemctl --user stop|start yt-autopilot.service'`. Stopping takes the site down for Zhenia.
 
----
-
-After running, report what happened (e.g. "YT Autopilot started at http://localhost:8001", "Stopped", "Restarted", "Reset and restarted").
+Report: what restarted and "live at https://ytautopilot.formulacommons.com".
