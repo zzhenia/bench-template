@@ -82,6 +82,10 @@ Start from `TEMPLATE.md` or `TEMPLATE.sh` in this folder.
 
 **Evals run read-only against the live target and never repair anything.** If the eval's target is broken, the eval reports the breakage; it does not fix it.
 
+## Model Calls Inside an Eval
+
+Every `claude -p` call in an eval passes `--model "$(python3 "$BENCH/scripts/bench-profile" model smart)"` (`fast` for a plain yes/no judge). Without `--model` the call runs on the CLI default, the most expensive model, and each sample and judge is a separate session. Run the workdir as `mktemp -d /tmp/<ticket-key-lowercase-no-dash>-eval.XXXXXX` (e.g. `/tmp/oc97-eval.XXXXXX`) so the token audit files the cost under Evalbot and the ticket.
+
 ## Eval Examples
 
 ### jira-ticket-quality.md (rubric format)
