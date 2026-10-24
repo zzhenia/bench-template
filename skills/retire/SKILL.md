@@ -13,7 +13,7 @@ steps with no questions.
    tools/on-demand/retire/retire.sh
    ```
 
-   It moves the active Cursor tab into the first (left) tab group.
+   It moves this session's Cursor tab into the first (left) tab group.
 
 2. Reply with one line and nothing else:
    - Success: `Retired: note after 15 min idle, tab closes after 3 h.`
