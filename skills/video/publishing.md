@@ -7,7 +7,7 @@ description: YouTube Shorts publishing — metadata, scheduling, and API workflo
 
 Publishing YouTube Shorts requires careful metadata configuration. This guide covers the complete API workflow for Formula Daily (FD) and SMKS (Self-Maintaining Knowledge System) shorts.
 
-**Use the publishing API only** — never manual YouTube Studio scheduling. Videos schedule at **16:00 America/New_York time** (4 PM ET). One short a day. A job short (from YT Autopilot) keeps its date; a Formula Daily short on that day moves to the next free day, and its YT date moves in the tracker's Formula Daily tab.
+**Use the publishing API only** — never manual YouTube Studio scheduling. Videos schedule at **16:00 America/New_York time** (4 PM ET). One short a day. A job short (from YT Autopilot) keeps its date; YT Autopilot's upload moves every Formula Daily short from that date on to the next free day, on YouTube and in the tracker's Formula Daily tab (`backend/daily_shift.py`).
 
 ---
 
