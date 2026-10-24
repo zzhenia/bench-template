@@ -7,7 +7,7 @@ description: YouTube Shorts publishing — metadata, scheduling, and API workflo
 
 Publishing YouTube Shorts requires careful metadata configuration. This guide covers the complete API workflow for Formula Daily (FD) and SMKS (Self-Maintaining Knowledge System) shorts.
 
-**Use the publishing API only** — never manual YouTube Studio scheduling. Videos schedule at **16:00 America/New_York time** (4 PM ET).
+**Use the publishing API only** — never manual YouTube Studio scheduling. Videos schedule at **16:00 America/New_York time** (4 PM ET). A job short (from YT Autopilot) on a day that already has a short goes at **13:00 UTC** (9 AM ET in October); the daily Formula short keeps the evening.
 
 ---
 
