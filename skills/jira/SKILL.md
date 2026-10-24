@@ -60,6 +60,20 @@ Every ticket needs all ten scored fields (`evals/jira-ticket-quality.md`):
      work, what happens after (who verifies and closes). Context goes underneath, at most
      two lines, under "Why". Never an open decision like "Olga to say where" (ZHEN-7270,
      context only, no steps) — decide first, then write the steps.
+   - Zhenia opens these tickets cold, with no context. Write every step as if for someone who
+     has never seen the system: one action per step, starting from the Mac in front of them.
+     - Name the app and the place: "open Warp on your Mac", "in Chrome, go to <full URL>",
+       "click Zero Trust in the left sidebar". Never just "on the box" or "in the console".
+     - Anything on the box starts with how to get there, as its own step: "In Warp on your
+       Mac, run `ssh -i ~/.ssh/formula-server openclaw@100.96.0.28`; the prompt changes to
+       `openclaw@openclaw-1`." Then the command, then "type `exit` to leave the box" when done.
+     - Every command is complete and copy-pasteable on one line, with full paths, in a code
+       span. Say where to paste it and what it prints when it works (quote the exact text).
+     - Name what to copy from where, and where to paste it (never Slack text for a secret).
+     - Every internal term (box, tunnel, gateway, profile) gets a few-word gloss the first time.
+     - A step that waits (a login URL, a browser approval) says what to do while it waits and
+       how to get back.
+     - Test: could Zhenia do step 1 with only this ticket and their Mac? If not, add steps.
      ```
      What to do:
      1. Where to open it
