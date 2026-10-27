@@ -326,7 +326,8 @@ if (nameCol === -1 || colorCol === -1 || sectionCol === -1) {
 ### Creating the swatches (skip duplicates on re-run)
 
 A script creates each color as `doc.spots` with
-`colorType = ColorModel.PROCESS` (global process), named `PI <name>`, in
+`colorType = ColorModel.PROCESS` (global process), named exactly as the CSV
+`Name` column (`Sky Blue`, the same names the `.ase` ships), in
 whichever of the two groups its CSV section maps to — but only if that name
 doesn't already exist, so re-running the script never creates duplicates.
 Look up by name with `getByName` first (the real Illustrator API throws if
@@ -366,7 +367,7 @@ if (groupName === null) {
         + "don't guess which swatch group it belongs in");
 }
 var group = getOrAddGroup(groupName);
-var swatchName = "PI " + rowName;             // e.g. "PI Teal"
+var swatchName = rowName;                     // e.g. "Sky Blue" -- the CSV name, as in the .ase
 var spot;
 try {
     spot = doc.spots.getByName(swatchName);   // already exists -- skip re-creating it
@@ -523,6 +524,29 @@ export failed. A failed export is never reported as done.
 
 ## Known ExtendScript / osascript gotchas
 
+- **`translate()` / `duplicate()` + move drops opacity masks.** Objects moved
+  by script keep their mask attached to the old position, so masked images
+  render blank (261026 course cards). Copy/paste in place keeps masks; a manual
+  move in the UI does too. To duplicate an artboard's content by script:
+  `selectObjectsOnActiveArtboard` → `app.copy()` → activate the new artboard →
+  `executeMenuCommand("pasteInPlace")`, no translate afterwards.
+- **`executeMenuCommand("pasteInPlace")` pastes a copy on every artboard**
+  (observed in Illustrator 30: one copy per artboard, including a copy stacked
+  on the source). Remove the other artboards before the paste and re-add them
+  at their saved `artboardRect`, then delete the stray copy that lands back on
+  the source by z-order (pasted items are the top N of the layer) and position.
+- **`app.copy()` / paste need Illustrator frontmost** (error 9002). Run
+  `tell application "System Events" to set frontmost of process "Adobe
+  Illustrator" to true` and wait 2 s before the script; `activate` alone was
+  not enough.
+- **Canvas limit:** `artboardRect` or `artboards.add` beyond roughly ±8191 pt
+  from the document's original centre throws `CoOA` (1095724867). Parking an
+  artboard "far away" is not an option.
+- **`selectObjectsOnActiveArtboard` can select more than copy/paste carries**
+  (3149 selected, 3145 pasted on a saved-clean doc); compare pasted counts
+  with a tolerance, not equality.
+- **`doc.save()` on an .ai with linked PNGs grew the file 31 → 150 MB** (PDF
+  compatible stream renders the links); expect it, and mention the size.
 - **Cross-document `duplicate()` of blend PluginItems throws MRAP.** Use
   `app.copy()` then `app.paste()` into the target document instead — it goes
   through the clipboard rather than the object model and doesn't hit the
@@ -579,6 +603,15 @@ To resize an area-type frame so it ends on the text's last baseline:
    check `lines.length` is unchanged; if not, step +0.25 pt up, to a
    maximum of 1 pt, and if it still differs, revert the move.
 4. **A one-line area frame becomes point type** instead of being fitted.
+
+## Templates
+
+Creating or updating a file in the design system's `templates/` folder, or
+setting up any new PI Illustrator or InDesign file, starts with
+`tools/PI-design-system/templates/CREATING-TEMPLATES.md` (pi-bench): the
+five-layer structure (`bleed`, `ref`, `trash`, `Content`, `BG`), the two
+swatch folders, and the fix scripts in `templates/_scripts/`. Rules 1 to 4
+above still govern how a script touches the file.
 
 ## Related
 
