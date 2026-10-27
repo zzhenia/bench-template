@@ -1,12 +1,12 @@
 ---
 name: writing
-description: Apply writing style rules for clear, engaging, human-sounding content. Use when drafting or editing articles, blog posts, SOPs, educational content, scripts, emails, or any long-form writing. Triggers on requests to write, edit, review, or improve written content.
+description: Apply writing style rules for clear, engaging, human-sounding content. Use when drafting or editing articles, blog posts, SOPs, academic papers and conference talks, educational content, scripts, emails, or any long-form writing. Triggers on requests to write, edit, review, or improve written content.
 model: sonnet
 ---
 
 Follow every rule below when drafting or editing content. The request is: $ARGUMENTS
 
-Rules are **universal** (always apply) or **format-specific** (articles, SOPs). Two
+Rules are **universal** (always apply) or **format-specific** (articles, SOPs, academic). Two
 files sit beside this one and apply on top of it:
 
 - `VOICE.md` — anything published under Zhenia's name (Reddit, LinkedIn, Formula
@@ -272,3 +272,64 @@ Apply these **in addition to** universal rules when writing SOPs, process docs, 
 6. Roles are named consistently (same term every time).
 7. No conversational or persuasive language.
 8. Template structure is followed exactly.
+
+---
+
+# Format: Academic Writing
+
+Apply these **in addition to** universal rules when writing papers, chapters,
+conference talks or abstracts under Zhenia's name. Two presets; the request names
+one with its keyword.
+
+## Style activation
+
+- **"Publication style"** – Preset 1, for rigorous, specialist media scholars.
+- **"Conference style"** – Preset 2, for engaging and accessible presentations.
+
+## Academic Writing Preset 1: Publications (Specialist Media Scholars)
+
+**Tone and Voice**
+- Rigorous, analytical, and nuanced.
+- Comfortable with abstract theoretical reasoning and in-depth conceptual engagement.
+- Presumes familiarity with media theory, software studies, and critical infrastructure theory.
+
+**Vocabulary and Jargon**
+- Employs specialised terminology consistently (e.g., epistemic infrastructure, problem space, complexity spikes, software capitalism, distributed governance, traction, momentum, reverse salient).
+- Freely references foundational scholars (e.g., Marx, Brooks, Hughes, Beniger, Conway, Barad) without explanatory footnotes beyond standard academic referencing.
+
+**Structure and Framing**
+- Defining key conceptual elements upfront.
+- Systematically structured arguments, frequently referencing previous sections to reinforce internal consistency.
+- Deliberate transitions, often restating or summarising previous arguments before moving forward.
+- Emphasis on critical theoretical contributions; robust engagement with relevant literature; assumes an audience interested in conceptual implications.
+
+**Typical Sentence Example**
+"Acknowledging software complexity as inherently epistemic—a persistent opacity of relations between its constituent components—I foreground the epistemic infrastructure as code, which, mobilised through distributed governance, dynamically negotiates tensions between organisational control and market-driven complexity spikes."
+
+## Academic Writing Preset 2: Conference Presentations (Design Practitioners and Smart Non-specialists)
+
+**Tone and Voice**
+- Engaging, approachable, reflective, slightly conversational.
+- Translates complex theoretical concepts into accessible ideas, often using analogies or illustrative examples.
+- Personal insights, reflections, or anecdotes encouraged, maintaining intellectual rigour without overwhelming the audience with jargon.
+
+**Vocabulary and Jargon**
+- Specialised terms used judiciously and clearly defined when introduced (e.g., briefly explaining terms like "reverse salient," "distributed governance," or "complexity spike" in context).
+- Leverages more everyday metaphors and language to clarify complex ideas.
+
+**Structure and Framing**
+- Opens with a relatable problem or scenario (e.g., personal anecdote, everyday experience, familiar design issue).
+- Clearly outlines key points early on and returns frequently to summarise and reinforce main arguments.
+- Concludes with practical takeaways or implications relevant to practitioners or non-academic stakeholders.
+
+**Typical Sentence Example**
+"Let's think of software complexity as a kind of 'fog' in a landscape. It's not simply bad design; it's actually essential for how software evolves. But sometimes organisations create more fog than they can navigate. Today, I'll share how thinking about software as infrastructure helps clear some paths through this complexity."
+
+## Creating a new preset
+
+The prompt that produced the two presets above, reusable for a new audience:
+
+> Can you analyse my PhD and create two academic writing presets:
+> 1. 'Paper writing style'. One for writing papers for publication. Target audience: media scholars, okay to follow my PhD closely in the use of specialised jargon.
+> 2. 'Conference writing style'. A lighter, more colloquial version for writing the conference presentations. Target: smart audience which is not specialised in media theory. Design and other practitioners.
+> The two presets should be ready for me to use, when I say 'Publication style' and 'Conference style'.
