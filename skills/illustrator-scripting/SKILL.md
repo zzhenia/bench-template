@@ -1,6 +1,6 @@
 ---
 name: illustrator-scripting
-description: Safe Adobe Illustrator scripting from bench sessions — ExtendScript via osascript, .ai files, ArtLayer/placedItem edits, PI brand files. Triggers on Illustrator, ExtendScript, osascript, .ai file work. Rule 1 (never discard Zhenia's manual work), Rule 2 (apply only the requested changes), Rule 3 (PI palette as global swatches), and Rule 4 (every PI file copies the BR-0027 reference setup) are mandatory for every script that touches a .ai file.
+description: Safe Adobe Illustrator scripting from bench sessions — ExtendScript via osascript, .ai files, ArtLayer/placedItem edits, PI brand files. Triggers on Illustrator, ExtendScript, osascript, .ai file work. Rule 1 (never discard Zhenia's manual work), Rule 2 (apply only the requested changes), Rule 3 (PI palette as global swatches), Rule 4 (every PI file copies the BR-0027 reference setup), and Rule 5 (one five-layer stack in every .ai file, grids as guides on `ref`) are mandatory for every script that touches a .ai file.
 ---
 
 # Illustrator Scripting — Safety Rules and Gotchas
@@ -449,10 +449,11 @@ first step**, not a background assumption — follow it in order:
 2. **Read its setup.** The layer stack and each layer's hidden/locked/color
    state, the artboard and bleed, the swatches, and the grid.
 3. **Reproduce them** in the new file:
-   - **Layer order (top to bottom):** `bleed` (hidden by default, locked),
-     `trash` (hidden by default, unlocked, black layer color), `Content`,
-     `BG` (locked). A Vistaprint A-frame file adds `safe zone` on top of
-     `bleed`.
+   - **Layer order (top to bottom):** `ref` (guides and references,
+     visible, unlocked), `bleed` (hidden by default, locked), `trash`
+     (hidden by default, unlocked, black layer color), `Content`, `BG`
+     (locked) — Rule 5 below. A Vistaprint A-frame file adds `safe zone`
+     between `ref` and `bleed`.
    - **Safe zone layer (Vistaprint A-frame only):** non-printing, locked,
      one rectangle stroked 1 pt PI Cool Gray, 50% opacity, 4/4 pt dashes,
      74.5 pt in from the bleed edge. Hide it before any export — it renders
@@ -474,6 +475,35 @@ first step**, not a background assumption — follow it in order:
 
 The reference is the only source of truth for file setup, not a design
 instinct or a guideline.
+
+## Rule 5 — one five-layer stack in every Illustrator file; grids are guides on `ref`
+
+Zhenia's rule (2026-10-28): every Illustrator file, print or digital, uses
+the same layer structure as the brochure files. A script never adds a
+main layer of its own (`grid`, `Layer 1`, `boxes` …) and never draws
+grids or column lines as filled or stroked rectangles.
+
+Top to bottom, exact names (case included), nothing outside them:
+
+| Layer | Holds | Default state |
+|---|---|---|
+| `ref` | Every guide and reference object, on top of everything: column grids, content margins, trim / safety / fold guides, printer marks. Named guide sets go in sub-layers of `ref` | Visible, unlocked |
+| `bleed` | Grey shapes that block off every area not visible in the final work (pasteboard grey, Rule 4). **Print:** the artboard is the bleed box and the grey blocks sit inside it, covering what is cut off after printing. **Digital:** grey frames around the artboard, outside it, so nothing that falls past the screen edge shows | Hidden by default, locked; Zhenia toggles it to preview |
+| `trash` | Holding place for objects pulled out of the design, never deletion | Hidden, unlocked, black layer colour |
+| `Content` | The typography and the images that sit on top of the background | Visible, unlocked |
+| `BG` | What sets the tone of the background: solid-colour shapes and solid-colour display text | Locked |
+
+- **Grids and column lines are Illustrator guides** (`pathItem.guides =
+  true`) on `ref`, never rectangles with a fill or stroke, and never on a
+  new layer. Draw the path on `ref`, then set `guides = true`; a snapping
+  tab outside the artboard is a guide too.
+- A file that lacks one of the five gets that exact layer added in its
+  place. A stray layer is merged into the layer its content belongs to
+  (`templates/CREATING-TEMPLATES.md` in PI-design-system has the merge
+  script) — but only when Zhenia asks for the restructure (Rule 2).
+- Record: on 2026-10-28 a session put the course-page column grid on a new
+  `grid` layer as 12 % cyan rectangles in `261027_course-pages-3.ai`. That
+  is the wrong shape; it is to become guides on `ref` on Zhenia's signal.
 
 ## Exports — approval PDFs, test PDFs, and verifying the output
 
