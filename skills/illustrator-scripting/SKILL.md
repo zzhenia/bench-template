@@ -608,6 +608,11 @@ export failed. A failed export is never reported as done.
 - **Test a new approach on a scratch copy opened as its own document,
   then apply it once to Zhenia's doc.** Never trial-and-error on the live
   file (Rule 1).
+- **`layer.move()` throws 9024 "Cannot modify a layer that is locked" when
+  the moved layer or the reference layer is hidden**, not only when locked
+  (261028, `trash` and `bleed`). Unhide both for the move, then re-hide and
+  re-lock; and re-check every lock state afterwards, since a failed run
+  leaves whatever it had already unlocked.
 - **No chained ternaries.** `a ? 4 : b ? 6 : 0` misbehaved in ExtendScript;
   write plain `if` statements.
 - **Illustrator's y axis is up-positive.** Moving up is `+dy`.
