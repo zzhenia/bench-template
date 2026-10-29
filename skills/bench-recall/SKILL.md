@@ -39,6 +39,27 @@ are in the separate `pi-bench` repo (`~/pi-bench` on the box, `~/dev/pi-bench` o
 folder in whichever bench has it. Hits from pi-bench print with the full path, so read a master
 there with `cat ~/pi-bench/convos/<topic>/_memory-master.md`.
 
+## A question about a book or a reference → all-pdfs, never your memory
+
+Zhenia's library is `ref-db-main/all-pdfs`. When they ask what a book, author or reference
+says ("what's Cooper's definition of aerobics in the book?"), they want **the reference's
+words**, not yours (Zhenia, 261028). Before answering:
+
+```sh
+~/.openclaw/tools/find_quote_page --list '<author or title word>'   # is it in all-pdfs?
+```
+
+On the box the files are readable at
+`~/Library/CloudStorage/GoogleDrive-zzhenia@gmail.com/My Drive/ref-db-main/all-pdfs/`; open
+them with `~/.openclaw/tools/pdf-venv/bin/python -I` (pymupdf; `page.get_label()` is the
+printed page). Find the passage and answer with the quote and its page, nothing else: no
+paraphrase, no "the point is…", no comment of your own unless asked. Not in all-pdfs → say so,
+and only then answer from what you know, marked as such.
+
+The general rule behind this one: **when a skill or tool covers the question, use it before
+you answer.** Answering from memory while the tool sits unused is the failure (Cooper, 261028:
+a quote from memory that is not in the book).
+
 ## How to use what you find
 
 - Say where it came from, once, in plain words: "the 260905 note on the SMKS landing page

@@ -497,6 +497,14 @@ Top to bottom, exact names (case included), nothing outside them:
   true`) on `ref`, never rectangles with a fill or stroke, and never on a
   new layer. Draw the path on `ref`, then set `guides = true`; a snapping
   tab outside the artboard is a guide too.
+- **Column snapping tabs sit above *and* below every artboard**, one per
+  column, column-width (197 px on the 1302 px web grid), 8 px tall, named
+  `col n tab` / `col n tab bottom`. Keep a **48 px clear gap** between the
+  tab and the artboard edge (tab bottom 48 px above the top edge, tab top
+  48 px below the bottom edge): Illustrator draws the artboard name label
+  just above the top edge, and tabs closer than that cover it (Zhenia,
+  2026-10-28; 16 px overlapped the label). Position with `item.top`, not
+  `translate()`.
 - A file that lacks one of the five gets that exact layer added in its
   place. A stray layer is merged into the layer its content belongs to
   (`templates/CREATING-TEMPLATES.md` in PI-design-system has the merge
