@@ -14,6 +14,7 @@ usage: ow.sh <command> [args]
   tag <ID> <file>...          add ID to the frontmatter tags of each file
   ids                         list research-piece IDs found in the vault
   draft <ID|new> <slug> [--folder <dir>]   new "(ID) YYMMDD_slug.md", tagged, opened in the writing pane
+                                           (new: in its own "(ID) slug" project folder)
   vault                       print the vault root
 USAGE
 }
@@ -49,7 +50,7 @@ conf() { [ -f "$CONF" ] && $PY -c 'import json,sys;print(json.load(open(sys.argv
 PREFIX=$(conf idPrefix); PREFIX=${PREFIX:-RS}
 
 list_ids() {  # "ID<TAB>relative path" sorted by ID
-  find "$VAULT" -name "($PREFIX-[0-9][0-9][0-9])*" -not -path '*/.obsidian/*' -not -path '*/.git/*' \
+  find "$VAULT" -type f -name "($PREFIX-[0-9][0-9][0-9])*" -not -path '*/.obsidian/*' -not -path '*/.git/*' \
     | sed -E "s|^$VAULT/||" | $PY -c '
 import re,sys
 rows=[(re.search(r"\(([A-Z]+-\d{3})\)",l).group(1),l.rstrip("\n")) for l in sys.stdin if re.search(r"\(([A-Z]+-\d{3})\)",l)]
@@ -107,7 +108,8 @@ PYEOF
     if [ "$id" = "new" ]; then
       last=$(list_ids | tail -1 | cut -f1 | sed -E 's/.*-//'); last=${last:-0}
       id=$(printf '%s-%03d' "$PREFIX" $((10#$last + 1)))
-      [ -n "$folder" ] || folder=$(conf draftDir)
+      # A new piece is a new project: its own "(ID) slug" folder in the draft folder.
+      [ -n "$folder" ] || folder="$(conf draftDir)/($id) $slug"; folder=${folder#/}
     else
       [ -n "$folder" ] || folder=$(dirname "$(list_ids | awk -F'\t' -v i="$id" '$1==i{print $2; exit}')")
       [ -n "$folder" ] && [ "$folder" != "." ] || folder=$(conf draftDir)

@@ -18,7 +18,7 @@ ow.sh focus writing|reference|terminal
 ow.sh tag RS-006 <file>...                 add the ID to each file's frontmatter tags
 ow.sh ids                                  every "(RS-nnn)" file in the vault, by ID
 ow.sh draft RS-006 <slug>                  "(RS-006) YYMMDD_<slug>.md" beside the other RS-006 files
-ow.sh draft new <slug> [--folder <dir>]    next free ID, in the draft folder from the plugin settings
+ow.sh draft new <slug> [--folder <dir>]    next free ID, in a new "(ID) slug" project folder
 ```
 
 ## Rules
