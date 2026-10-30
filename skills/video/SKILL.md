@@ -22,10 +22,9 @@ Every video task starts here. Pick the branch for your format, then follow it en
 
 ## Where tools run
 
-**Always the box (openclaw-1), never the Mac.** The Mac's ffmpeg build lacks `drawtext`
-and ASS subtitle support. Every render, subtitle burn, and audio chain runs on the box.
-
-Rendering agent: Videobot (`agent:videobot:main`). Route all render and upload tasks there.
+**Video renders run on the Mac, never on the box (openclaw-1).** This covers every render,
+re-render, subtitle burn and audio chain. The Mac's ffmpeg has `drawtext` and `ass`, and the
+footage, cuts and music are already there. Never copy a job to the box to render it.
 
 ## Picture quality
 
