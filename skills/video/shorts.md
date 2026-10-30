@@ -24,6 +24,7 @@ Read `skills/video/SKILL.md` first (one line: always the box, never the Mac).
   the start ("Number N, …"). File order determines which is last: file 1 < 2 < 3.
 - Trim the spoken take announcement from the output — it never appears on screen.
 - Flag any repeated lines visible mid-short for Zhenia's review before publishing.
+- Formula shorts end on the closing line Zhenia shot with the cold opens ("Full breakdown's linked."), after the short has paid off.
 
 ---
 
