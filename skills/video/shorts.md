@@ -67,6 +67,9 @@ lands on origin/main; report any mismatch to Kitty before rendering.
   face box, is centred vertically in the top half. Vision's face rectangle sits about a
   quarter of its height below the head centre, so centre the window on `cy − 0.25·h`.
   Face never taller than 75% of the block.
+- **Never split while the title card is up.** The title band covers the top half, so the
+  head disappears. Hold the full-frame head until the title ends (5 s), or remove the
+  title before switching to a split screen.
 - **Screen share with preview (SF-04):** the screenshot fills the frame; the head sits in
   a small rounded square in the top-right corner, the whole head in view (hat top to
   chin, a bit of shoulders), face centred, filling most of the square. Cut it from the
