@@ -9,9 +9,9 @@
 #   - opens straight on the convo picker (needs a bench checkout): pick or
 #     type a convo name once and it fans out to `-n <name>`, /color <random>,
 #     and a staged-but-unsent ">>name" first message (zero tokens until Enter)
-#   - `r` there opens a one-keystroke project menu, cds to the pick, launches
+#   - `r` + Enter there opens a one-keystroke project menu, cds to the pick, launches
 #     Claude Code with --model opus --permission-mode auto
-#   - `s`, a blank line, or 30s of silence -> plain shell
+#   - `s` + Enter, a blank line, or 30s of silence -> plain shell
 #   - `bench` reopens the menu any time; `convo <name>` jumps straight in
 #
 # In **Zed and Cursor only**, a terminal opened at one of the other BENCH_PROJECTS
@@ -77,7 +77,9 @@ convo() {
     done
     (( ${#recent[@]} % 3 )) && print
     print -r -- ""
-    print -r -- "   r  other repo…              s  just a shell"
+    print -r -- "   r⏎ other repo…              s⏎ just a shell"
+    [[ -f $BENCH_DIR/tools/on-demand/catchup/catchup.py ]] \
+      && print -r -- "   c⏎ catch up (convos since last run)"
     print -r -- ""
     local prompt="  pick (number, or type a name + Enter): " key
     print -n -- "$prompt"
@@ -86,8 +88,7 @@ convo() {
       return 0
     fi
     case $key in
-      [rR]) print -r -- "other repo"; bench_repo_menu; return $? ;;
-      [sS]|$'\n'|$'\r'|' ') print -r -- "shell"; return 0 ;;
+      $'\n'|$'\r'|' ') print -r -- "shell"; return 0 ;;
     esac
     line=$key
     if [[ $key == <-> ]]; then
@@ -101,6 +102,17 @@ convo() {
       # Any other key starts a convo name: finish it in a line editor.
       print -n -- "\r"
       vared -p "$prompt" line || return 0
+      # A lone r / s / c + Enter is a menu action; anything longer is a convo
+      # name, so convos starting with those letters can still be typed.
+      case $line in
+        [rR]) bench_repo_menu; return $? ;;
+        [sS]|'') print -r -- "  shell"; return 0 ;;
+        [cC]) if [[ -f $BENCH_DIR/tools/on-demand/catchup/catchup.py ]]; then
+                cd -- "$BENCH_DIR" || return 1
+                bench_claude -n "Catchup" "catchup"
+                return $?
+              fi ;;
+      esac
     fi
     if [[ $line == <-> ]] && (( line >= 1 && line <= ${#recent[@]} )); then
       name=${recent[$line]:t}
