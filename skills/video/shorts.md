@@ -5,7 +5,7 @@ description: End-to-end process for YouTube Shorts — FD (Formula Daily) and SM
 
 # YouTube Shorts — Edit Process
 
-Read `skills/video/SKILL.md` first (one line: renders run on the Mac, never on the box).
+Read `skills/video/SKILL.md` first (one line: renders prefer the Mac and never wait for it).
 
 ---
 

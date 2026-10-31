@@ -22,9 +22,10 @@ Every video task starts here. Pick the branch for your format, then follow it en
 
 ## Where tools run
 
-**Video renders run on the Mac, never on the box (openclaw-1).** This covers every render,
-re-render, subtitle burn and audio chain. The Mac's ffmpeg has `drawtext` and `ass`, and the
-footage, cuts and music are already there. Never copy a job to the box to render it.
+**Video renders prefer the Mac and never wait for it.** This covers every render, re-render,
+subtitle burn and audio chain. The Mac is faster and already has the footage, cuts and music.
+When it is offline, render on the box (openclaw-1), however long that takes, and go back to the
+Mac as soon as it is online. The blurb pipeline's queue does this by itself.
 
 ## Picture quality
 
