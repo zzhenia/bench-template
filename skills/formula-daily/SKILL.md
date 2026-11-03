@@ -271,7 +271,7 @@ On "pub", after `schedule` succeeds for the Ghost post:
    python3 tools/on-demand/ghost-blog/scripts/fd_scripts_append.py \
      --li <li_file> [--yt <yt_file>]
    ```
-   The script reads the next free FD26 ID from the **tracker** (Formula Daily tab, ID
+   Tracker rows go on top (row 2, newest first). The script reads the next free FD26 ID from the **tracker** (Formula Daily tab, ID
    column, sheet `1zaFnxMkVRwRSE2pF3j0IU7Y2MIzOl48jNlOMkik9vC0`) — not a running count
    — backs up the doc, and appends one entry above the grey divider of the latest LI tab
    (and latest YT tab if `--yt` was given). It is idempotent — safe to re-run if only
