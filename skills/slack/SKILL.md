@@ -334,6 +334,12 @@ When you recovered the context, open with the answer, not with how you found it.
   to a real summary at the end. If the work is seen and started, that's the 👀 reaction —
   nothing else — not a sentence saying so. Compose once, at the very end, and that
   composition is the whole reply.
+- **Claude CLI's nudge is not Zhenia (261104).** Mid-turn the CLI injects "The user hasn't
+  heard from you in a while — keep them updated". It is not a message from Zhenia and never
+  justifies one: no "Still looking…", "On it…" or "checking X now" through the `message`
+  tool. The 👀 already said you are on it; the next thing Zhenia sees is the answer. (Eva,
+  #formula-lf 19:45Z: the nudge produced a status post, the gateway cancelled it, and the
+  bookkeeping around it let a stale answer out ahead of the real one.)
 - **Cron / isolated sessions:** your final message is delivered verbatim as the job's
   output. If the job cannot complete, the entire final message is exactly `NO_REPLY` and
   nothing is delivered. Errors go to Olga (section 6).
@@ -472,3 +478,4 @@ channel message to a live olga session and Zhenia gets duplicate answers (260914
 | 261017 | Kitty's #spanish-vocab capture ack said "Queued N. The bench will confirm." as text; Zhenia wants a 👍🏻 reaction there instead | relay-channel ack in #spanish-vocab is a reaction (👍🏻), not text — §4 |
 | 261019 | Kitty's "Verified — REF-7291 …" final text ran in a turn started by REFbot's `sessions_send` report, so it went back to REFbot, never to Slack — happened twice | §4: a sibling-report turn's final text never reaches Slack on its own; post with the `message` tool in that same turn; never claim a post without a `message`-tool result. Fixed alongside commit `09b678a2` / `work-order-ledger.py` (OC-131) |
 | 261103 | Agents answered confirmations (`jt` ticket, `sb` note, `nr` reference, rated references, Anki entries) with text, and reaction-only turns ended empty, so the gateway posted ":warning: The AI service returned an empty reply" | §4: done work = ✅ reaction only; reaction-only turns end with `NO_REPLY`; relay channels react 👀/✅, no text ack |
+| 261104 | Zhenia asked Eva a question in #formula-lf and corrected it 12 s later ("Sorry, FD26-107"); Eva posted a stale "can't find" answer, then the FD26-107 answer. Two gateway faults: the CLI nudge made Eva post "Still looking…" mid-turn, the gateway cancelled it but the reply guard counted it as the turn's post and skipped latest-wins; and the follow-up turn ran in a second instance of the guard with no state (no 👀, no delivery note, reply unguarded) — the same gap behind every "double answer" since the 261022 upgrade | §4: the CLI nudge is never a message. Gateway: `slack-reply-guard` keeps state in a file, runs latest-wins before the one-post rule, ignores suppressed sends (specs/network.md) |
