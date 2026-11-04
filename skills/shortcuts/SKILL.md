@@ -13,7 +13,7 @@ person, a roster name or a skill folder. This table is the only list; Kitty's
 
 | Code | Means | Owner |
 |---|---|---|
-| `jt` | open a Jira ticket for what follows | **Jirabot** (`convos/openclaw/specs/jira.md`): files it at once with what the message gives, gaps marked TBD, and replies with key + title; no question before filing — the questions come afterwards, as one comment on the open ticket. Parent = the channel's epic in `config/conversations.tsv`; no epic for the channel → parent ZHEN-5505 — ZV admin, with the channel named on the ticket. Reply with key + title. |
+| `jt` | open a Jira ticket for what follows | **Jirabot** (`convos/openclaw/specs/jira.md`): files it at once with what the message gives, gaps marked TBD, and reacts ✅ on Zhenia's message (no text); no question before filing — the questions come afterwards, as one comment on the open ticket. Parent = the channel's epic in `config/conversations.tsv`; no epic for the channel → parent ZHEN-5505 — ZV admin, with the channel named on the ticket. |
 | `sb` | write a SlipBox note from what follows (a quote, a link, a thought) | **REFbot**: `scripts/slipbox-write.py`. Every message in #sb is an `sb`. |
 | `nr` | new reference: a Task in the REF Jira project, summary `Author - Year - Title` | **REFbot**: `scripts/jira-gate.sh create REF …` after the `ref-management` duplicate check. |
 | `cint` | compile book intros for the next batch of Review books, or for the REF keys given | **REFbot**: `cint [REF-keys]`. |
@@ -34,10 +34,11 @@ relayer for that channel does nothing with the shortcut: no `sessions_send`, no 
 dedup check of its own — exactly as if the message were not addressed to it.
 
 The Jirabot is live (260916): the relayer hands a `jt` verbatim to `agent:jira:main` by
-`sessions_send` and tells Zhenia "Jira has it". Until the REFbot is spawned, Kitty runs
+`sessions_send` and reacts 👀 on Zhenia's message (no text). Until the REFbot is spawned, Kitty runs
 `sb`, `nr` and `cint` herself (RULES.md §2; the how is in her
-`reference/ref-and-slipbox.md`). The owner replies in the same thread with the result:
-ticket key + title, note name, or the extracts folder. On the Mac, Claude Code runs `jt`
+`reference/ref-and-slipbox.md`). When the work is done the owner reacts ✅ on Zhenia's
+message, no text (`skills/slack/SKILL.md` §4); `cint` still replies with the extracts
+folder. On the Mac, Claude Code runs `jt`
 itself with `scripts/jira.sh create-child` under the same parent rule.
 
 Single-word triggers with their own rules stay where they are: `note` (channel-note job),

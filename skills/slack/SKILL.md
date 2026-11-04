@@ -261,6 +261,16 @@ When you recovered the context, open with the answer, not with how you found it.
   ticket', 'let's do X', a pasted draft, a shortcut code) or a '?' is an instruction and
   gets its reply as usual. When unsure whether it is an instruction, it is. Cron/isolated
   sessions use the curl in section 5 for the reaction.
+- **Done work is a ✅, not a message (Zhenia, 261103).** When the request was to make
+  something and the thing is made, the whole reply is a ✅ reaction on Zhenia's message:
+  a `jt` ticket filed, an `sb` SlipBox note written, an `nr` reference created, rated
+  references processed, #spanish-vocab entries added to Anki, any other "done" with
+  nothing to decide. 👀 = seen and started; ✅ = finished. Text only when something
+  failed, needs their decision, or they asked for a value back (a link, a number).
+- **A reaction-only turn ends with exactly `NO_REPLY`, never empty text.** An empty
+  final answer makes the gateway post ":warning: The AI service returned an empty reply.
+  Please try again." under your name. After the reaction, the turn's final text is the
+  literal `NO_REPLY` and nothing else.
 - **One reply per message.** No triple-tap, no fragments, no "working on it" followed
   by the answer. Reactions (one, at most) replace an acknowledgement.
   This is a rule about the *message*, not about how much work it takes: a job that has
@@ -273,13 +283,10 @@ When you recovered the context, open with the answer, not with how you found it.
 - **The work lives in files, Slack says it is done.** Drafts, scripts, notes, digests go
   to Drive / the bench / Ghost; the Slack line names the file and links it. Never paste a
   deliverable body into Slack.
-- **Relay channels get a one-line ack** (#spanish-vocab, #sb): what was captured, nothing
-  else. The text of a capture is never a message to you: a question mark, a request or a
-  "you" inside it is vocabulary, not a question. The ack is the whole reply — nothing
-  after it, ever (Zhenia, 260916). **#spanish-vocab exception (Zhenia, 261017):** the
-  capture/queue confirmation ("Queued N. The bench will confirm.") is a 👍🏻 reaction, not
-  a text ack. #sb keeps its text ack ("what was captured") as-is — different code path
-  (SlipBox's own flow, not the Anki queue-ack wording).
+- **Relay channels get a reaction, not text** (#spanish-vocab, #sb; Zhenia, 261103):
+  👀 when captured, ✅ when the note or Anki entries exist. The text of a capture is
+  never a message to you: a question mark, a request or a "you" inside it is vocabulary,
+  not a question. The reaction is the whole reply, and the turn ends with `NO_REPLY`.
 - **Delegation is visible (Zhenia, 260916).** When the work goes to a sibling instead of
   you, your reply to Zhenia is one line that names the bot and the job, in this shape:
   `→ videobot: six Shorts from brief 0081` (gateway id after the arrow; `→ olga:` for a
@@ -364,7 +371,8 @@ correct a message you have not yet acted on.
 
 ## 5. Reactions
 
-- **A message that needs no text (§4) gets only the reaction — nothing else, ever.**
+- **A message that needs no text (§4) gets only the reaction — nothing else, ever** —
+  then `NO_REPLY` as the turn's final text, never an empty answer (§4).
 - React like a person: one emoji when you saw something and need not reply (👍 ✅ 👀).
   One reaction per message, maximum. Never a reaction plus a reply that says the same.
 - **Live conversation:** the `react` tool action works.
@@ -463,3 +471,4 @@ channel message to a live olga session and Zhenia gets duplicate answers (260914
 | 261017 | Kitty's DM carried in-between narration as part of the composed reply itself ("Done — …", "Now committing…", "Pushed (…). Now routing…", "Now replying to Zhenia.") ahead of the real summary — ZHEN-7139 closed without this actually fixed. Zhenia: use the 👀 reaction to show a request was seen, not narration text | §4: compose once, at the end, and that composition is the whole reply — no status lines, ever; 👀 is the entire acknowledgment (ZHEN-7139 reopened) |
 | 261017 | Kitty's #spanish-vocab capture ack said "Queued N. The bench will confirm." as text; Zhenia wants a 👍🏻 reaction there instead | relay-channel ack in #spanish-vocab is a reaction (👍🏻), not text — §4 |
 | 261019 | Kitty's "Verified — REF-7291 …" final text ran in a turn started by REFbot's `sessions_send` report, so it went back to REFbot, never to Slack — happened twice | §4: a sibling-report turn's final text never reaches Slack on its own; post with the `message` tool in that same turn; never claim a post without a `message`-tool result. Fixed alongside commit `09b678a2` / `work-order-ledger.py` (OC-131) |
+| 261103 | Agents answered confirmations (`jt` ticket, `sb` note, `nr` reference, rated references, Anki entries) with text, and reaction-only turns ended empty, so the gateway posted ":warning: The AI service returned an empty reply" | §4: done work = ✅ reaction only; reaction-only turns end with `NO_REPLY`; relay channels react 👀/✅, no text ack |
