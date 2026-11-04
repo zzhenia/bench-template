@@ -164,7 +164,7 @@ Captions must equal script/teleprompter text, corrected against the actual clip 
 
 ## Output naming and Drive folders
 
-- **Filename:** `YYMMDD_<id>_Luma.mp4` — date is the **render date** (always today, never
+- **Filename:** `YYMMDD_<id>_bot.mp4` — date is the **render date** (always today, never
   the footage date); `<id>` is the FD26-0NN short id.
 - **Same-day re-render (every short type):** a new version rendered on a day that already has
   one gets `_02`, `_03`… before the extension (`261022_0093_SF1_ai_02.mp4`). Never overwrite
