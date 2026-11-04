@@ -64,6 +64,13 @@ lands on origin/main; report any mismatch to Kitty before rendering.
   with font ascent/descent, which leaves the text sitting high.
 
 ### Talking head placement
+- **Full frame:** the head is large, shoulders cropped at the frame sides (face box about
+  28% of the frame height, head centre 45% down, hat never cut by the frame top). Framing is cut from the original 4K
+  footage, never by upscaling the 1080 cut.
+- **Between cuts** the head size alternates about ±10% (slightly bigger, slightly smaller);
+  cuts under 1.5 s keep the previous size.
+- **Within a cut** the head drifts in or out slowly (0.5% per second, at most 4%),
+  alternating direction from cut to cut.
 - **Split screen / head in the top half:** the head (hat top to chin), not the Vision
   face box, is centred vertically in the top half. Vision's face rectangle sits about a
   quarter of its height below the head centre, so centre the window on `cy − 0.25·h`.
@@ -105,8 +112,8 @@ See "### Music bed and mix" below: ducked bed, -14 LUFS, -1.5 dBTP.
 ## Audio, QA and retention (ZHEN-7361, 2026-10-21)
 
 ### Music bed and mix
-- The bed ducks **5 dB** under the voice and comes back up in pauses (0.043 open, 0.024 under
-  voice); `render_fd.py` prints the dip it measured on the cut.
+- The bed ducks **5 dB** under the voice and comes back up in pauses (**0.030** open, 0.017 under
+  voice: 30% quieter than the October 0.043/0.024, all shorts); `render_fd.py` prints the dip it measured on the cut.
 - The mix is normalised to **-14 LUFS** with a **-1.5 dBTP** ceiling.
 - Playback speed stays 1.3x for the next batch; Zhenia checks retention after it.
 
@@ -161,9 +168,14 @@ Apply these rules to every FD short using pop-ups, split screen, or captions.
 
 ### Overlays
 
-- Overlay text fills the full screen: large type, one or two words per line, sized to
-  about 90% of the frame width.
+- Overlay text fills the full screen: white capitals, one word per line (a word of three
+  letters or fewer shares a line with the next: "DO I", "AI OPS"), sized so the longest line
+  is 90% of the frame width.
 - Overlays are never numbered.
+
+### Pop-up motion
+
+- When the feedback asks for it, pop-ups slide in: the box from the left, the text from the right, 0.3 s.
 
 ### Opening quotes
 
