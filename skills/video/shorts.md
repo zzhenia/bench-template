@@ -151,6 +151,24 @@ Apply these rules to every FD short using pop-ups, split screen, or captions.
    - Text wraps to as many lines as needed
    - Font size: **≥ 76** (caption size)
    - Never shrink text to fit one line
+3. **Vertical centring:** the text block sits in the vertical middle of the pop-up box,
+   measured on ink (cap tops to descenders), same method as the title card.
+
+### Numbered lists
+
+- Font at least **80% larger** than the pop-up text, left-aligned, at the usual margin.
+- Only real lists are numbered. A single line or a phrase is never a list and never starts with "1.".
+
+### Overlays
+
+- Overlay text fills the full screen: large type, one or two words per line, sized to
+  about 90% of the frame width.
+- Overlays are never numbered.
+
+### Opening quotes
+
+- A short that opens with a quote shows it in overlay style: white letters, no mint box,
+  same font size as the current quote text, balanced vertically between the title band and the subtitles.
 
 ### Split screen captions
 
