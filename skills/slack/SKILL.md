@@ -413,6 +413,44 @@ background with N px of border, which is what "white background with a border" m
 to be re-attached where you are. For a Formula Daily post, the Ghost side is
 `daily_draft.py --date <D> image <file>` (formula-daily skill, step 3).
 
+## 5c. Voice memos — Zhenia's audio clips (ZHEN-7505)
+
+Zhenia records an audio clip with Slack's "record audio clip" button. Every one gets
+a transcript in the same thread and a ✅. This is the one case where a reply is owed even
+though no question was asked (it overrides §4 "no question → reaction only").
+
+**Trigger — any one of these in the inbound message:** an `[Audio]` / `Transcript:` block
+(the gateway already transcribed it: `tools.media.audio` auto-detects OpenAI
+`gpt-4o-transcribe`); an attachment whose content type starts with `audio/` (Slack clips
+are file subtype `slack_audio`, name like "Audio Recording … .m4a"); or a placeholder such
+as `[Slack file: … unavailable]` / a `📎 file:` line from `slack-thread.sh` that names an
+audio clip. Only Zhenia's clips count; audio a bot or colleague posts is an ordinary
+file (§5b).
+
+1. **Get the text.** If the gateway's transcript is in the message, use it as is.
+   Otherwise fetch the clip and transcribe it yourself:
+   ```sh
+   ~/.openclaw/tools/slack-file <you> <file-id or permalink> --out /tmp/memo-<file-id>.m4a
+   ~/.openclaw/tools/transcribe /tmp/memo-<file-id>.m4a --model small
+   ```
+   `--model small` over the default `base`: it keeps names and numbers; add `--lang es`
+   (or `ru`) only when you know the language. Empty output → reply "no speech found in
+   this clip" and add no ✅.
+2. **Reply once, in the clip's thread** (a top-level clip gets the thread under it), with
+   the `message` tool. The reply is the transcript and nothing else: the words as spoken,
+   light punctuation, paragraphs at the pauses; no summary, no "Here is your transcript",
+   no answer to what the memo asks.
+3. **React ✅** (`white_check_mark`) on that transcript reply, right after posting (§5:
+   `react` in a live turn, `reactions.add` from a cron or nested run).
+4. **Act on the memo only once it is settled.** Zhenia's ✅ click on the transcript
+   (`reactions.get … full=true`, `users` contains `U085EGDHTND`) means accepted: do what
+   the memo asks, from the transcript. If Zhenia posts an edited transcript in the thread,
+   that text is the corrected version: act on it and ignore the first. If neither
+   arrives, the memo is not acted on yet; no nagging.
+5. A clip that cannot be fetched (`file_not_found`, §5b) gets one plain line naming the
+   channel and asking for the clip to be re-sent where you are; file with Olga if it
+   repeats (§6).
+
 ## 6. When Slack breaks
 
 Retry once, silently. If it still fails, file it with Olga — one file
@@ -479,3 +517,4 @@ channel message to a live olga session and Zhenia gets duplicate answers (260914
 | 261019 | Kitty's "Verified — REF-7291 …" final text ran in a turn started by REFbot's `sessions_send` report, so it went back to REFbot, never to Slack — happened twice | §4: a sibling-report turn's final text never reaches Slack on its own; post with the `message` tool in that same turn; never claim a post without a `message`-tool result. Fixed alongside commit `09b678a2` / `work-order-ledger.py` (OC-131) |
 | 261103 | Agents answered confirmations (`jt` ticket, `sb` note, `nr` reference, rated references, Anki entries) with text, and reaction-only turns ended empty, so the gateway posted ":warning: The AI service returned an empty reply" | §4: done work = ✅ reaction only; reaction-only turns end with `NO_REPLY`; relay channels react 👀/✅, no text ack |
 | 261104 | Zhenia asked Eva a question in #formula-lf and corrected it 12 s later ("Sorry, FD26-107"); Eva posted a stale "can't find" answer, then the FD26-107 answer. Two gateway faults: the CLI nudge made Eva post "Still looking…" mid-turn, the gateway cancelled it but the reply guard counted it as the turn's post and skipped latest-wins; and the follow-up turn ran in a second instance of the guard with no state (no 👀, no delivery note, reply unguarded) — the same gap behind every "double answer" since the 261022 upgrade | §4: the CLI nudge is never a message. Gateway: `slack-reply-guard` keeps state in a file, runs latest-wins before the one-post rule, ignores suppressed sends (specs/network.md) |
+| 261105 | Zhenia wants to talk to the agents by voice: an audio clip must come back as a transcript in its thread, not be ignored or answered as if it were text (ZHEN-7505) | §5c: transcript reply + ✅; ✅ click = accepted, edited transcript = corrected version; gateway already transcribes clips natively (`media.md`), `slack-file` + `transcribe` are the fallback |
