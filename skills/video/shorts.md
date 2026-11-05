@@ -115,6 +115,9 @@ See "### Music bed and mix" below: ducked bed, -14 LUFS, -1.5 dBTP.
 - The bed ducks **5 dB** under the voice and comes back up in pauses (**0.030** open, 0.017 under
   voice: 30% quieter than the October 0.043/0.024, all shorts); `render_fd.py` prints the dip it measured on the cut.
 - The mix is normalised to **-14 LUFS** with a **-1.5 dBTP** ceiling.
+- The bed is only the track's quiet stretch, looped without a seam: the officemikado track plays
+  0:00–0:42 on repeat (it turns loud at 0:44). Loop points: `tools/on-demand/lf-edit/music_loop.py`
+  (`LOOPS`), shared with long form; `render_fd.py` uses it.
 - Playback speed stays 1.3x for the next batch; Zhenia checks retention after it.
 
 ### QA step after render
