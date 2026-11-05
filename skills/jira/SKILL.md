@@ -119,3 +119,14 @@ For large pages or SOP publishing, use the canonical converter:
 
 Preserving edits: read the current body, merge only the section you own (e.g., "Where it
 stands"), and PUT the merged result. Never overwrite the whole page from a stale local copy.
+
+## Creating REF books
+
+A REF Book is created only through the duplicate gate. `scripts/jira-gate.sh create REF "Author - Year - Title"`
+is the entry point (`--dry-run` runs the check and creates nothing). The same-book rule lives in one place,
+`lib/ref_match.py`: same lead surname and same normalised title (year, case, punctuation, subtitle after `:`,
+trailing `by <Author>` and leading article ignored; a 4+ word prefix counts). `scripts/ref-dedup.py check`
+and `evals/ref-no-duplicates.sh` both import it. Other paths that can create a REF Book call the same gate:
+`jira.sh create|create-child` (`scripts/ref-create-gate.sh`), the ref-review and jira-importer `JiraClient`s
+(`lib/ref_create_gate.py`), and `scripts/ref-headroom.py` (Founders batches, via `jira-gate.sh create`). The only
+override is `REF_ALLOW_DUP=1`, for a genuinely different edition. Test with `python3 lib/tests/test_ref_create_gate.py`.
