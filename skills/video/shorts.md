@@ -200,7 +200,7 @@ Captions must equal script/teleprompter text, corrected against the actual clip 
   one gets `_02`, `_03`… before the extension (`261022_0093_SF1_ai_02.mp4`). Never overwrite
   or reuse the earlier file's name.
 - **Drive — footage:** `1. Filming/<YYMM>FD/`
-- **Drive — edited output:** `2. Editing/<YYMM>FD/`
+- **Drive — edited output:** `2. Editing/<YYMM>FD/<YYMMDD>_<YYMM>FD_V<nn>/`, one folder per render batch (`261104_2611FD_V02`). A new batch is a new folder; earlier batches stay as they are. `up.py editing` picks the folder.
 - **Drive — animation assets:** `1. Briefs/animations/<id>-A0n/`
 
 Exact naming confirmed by `tools/on-demand/fd-shorts/render_fd.py` when it lands.
@@ -275,7 +275,7 @@ Two lead magnets, each with its own CTA ID:
 5. [ ] Pop-ups use title case and 90% width with wrapping (font ≥ 76)
 6. [ ] Split-screen captions centered on split line (y = 960), not overlapping animation
 7. [ ] Caption text matches script/teleprompter, corrected against actual clip (not vice versa)
-8. [ ] All shorts uploaded to Drive, replaced in-place, no errors
+8. [ ] All shorts uploaded to Drive into this batch's `<YYMMDD>_<YYMM>FD_V<nn>` folder, no errors
 
 ### Publishing
 
