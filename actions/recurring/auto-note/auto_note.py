@@ -78,6 +78,30 @@ def transcript_dirs() -> list[Path]:
     return list(dict.fromkeys(r / "projects" / escaped for r in roots if r))
 
 
+def cli_session_location(sid: str) -> tuple[str, int | None]:
+    """(tty, pid) of the live CLI running session *sid*, read from the CLI's
+    own session files (<config>/sessions/<pid>.json: {pid, sessionId}). This
+    reaches a window that never typed `>>topic` and so has no registry entry;
+    ("", None) when it is not running or sits on no tty."""
+    for cfg in dict.fromkeys(d.parents[1] for d in transcript_dirs()):
+        for f in (cfg / "sessions").glob("*.json"):
+            try:
+                d = json.loads(f.read_text())
+            except (json.JSONDecodeError, OSError):
+                continue
+            if d.get("sessionId") != sid or not d.get("pid"):
+                continue
+            pid = int(d["pid"])
+            try:
+                out = subprocess.run(["ps", "-o", "tty=", "-p", str(pid)],
+                                     capture_output=True, text=True, timeout=5).stdout.strip()
+            except (OSError, subprocess.SubprocessError):
+                continue
+            if out and out != "??":
+                return f"/dev/{out}", pid
+    return "", None
+
+
 def transcript_for(sid: str) -> Path | None:
     for d in transcript_dirs():
         if (d / f"{sid}.jsonl").exists():
@@ -383,10 +407,12 @@ def write_pink(session_id: str, message: str) -> bool:
     try:
         entry = json.loads((REGISTRY_DIR / f"{session_id}.json").read_text())
     except (OSError, json.JSONDecodeError):
-        return False
-    tty_path = entry.get("tty") or ""
-    if not tty_live(tty_path, entry.get("pid")):
-        return False
+        entry = {}
+    tty_path, pid = entry.get("tty") or "", entry.get("pid")
+    if not tty_live(tty_path, pid):
+        tty_path, pid = cli_session_location(session_id)   # no `>>` ever typed
+        if not pid:
+            return False
     try:
         with open(tty_path, "w") as fh:
             fh.write(f"\n{PINK}{message}\033[0m\n")
@@ -598,7 +624,21 @@ def autoclose(cfg: dict, state: dict, parsed_by_sid: dict, dry_run: bool) -> Non
     cpu_seen = state.setdefault("cpu", {})
     now = time.time()
 
-    for reg, entry in own_entries():
+    # A window that never typed `>>topic` has no registry entry. Once its note
+    # is written the topic is known, so find the CLI through its own session
+    # file and judge the window like any other.
+    entries = own_entries()
+    registered = {reg.stem for reg, _ in entries}
+    for sid, noted in state.get("noted", {}).items():
+        if sid in registered or sid not in parsed_by_sid or not noted.get("file"):
+            continue
+        tty_path, pid = cli_session_location(sid)
+        if pid:
+            entries.append((REGISTRY_DIR / f"{sid}.json",
+                            {"session_id": sid, "topic": noted.get("topic", ""),
+                             "tty": tty_path, "pid": pid, "unregistered": True}))
+
+    for reg, entry in entries:
         sid = reg.stem
         tty_path, pid, topic = entry.get("tty", ""), entry.get("pid"), entry.get("topic", "")
         if not tty_live(tty_path, pid):
@@ -627,8 +667,9 @@ def autoclose(cfg: dict, state: dict, parsed_by_sid: dict, dry_run: bool) -> Non
         mark = pending.setdefault(sid, {"at": now, "topic": topic})
         if mark.get("failed", 0) >= 2:
             continue  # gave up on this window; never retry every sweep
-        log(f"  autoclose {topic} ({sid[:8]}) after {int(idle_min)}m idle "
-            f"- resume with: claude --resume {sid}" + (" [DRY RUN]" if dry_run else ""))
+        log(f"  autoclose {topic} ({sid[:8]}) after {int(idle_min)}m idle"
+            f"{' (no >> typed; located via CLI session file)' if entry.get('unregistered') else ''}"
+            f" - resume with: claude --resume {sid}" + (" [DRY RUN]" if dry_run else ""))
         if dry_run:
             continue
         if close_window(entry):

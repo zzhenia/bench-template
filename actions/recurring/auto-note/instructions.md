@@ -31,8 +31,14 @@ a tab was forgotten, and finished tabs do not pile up.
 The `UserPromptSubmit` hook (`.claude/scripts/convo_session.sh`) records
 `{topic, tty, pid, cwd, last_prompt}` in `~/.claude/bench-sessions/<session_id>.json`
 on every prompt of a `>>` convo window, and shows any pending auto-note notice
-on the next prompt. Windows without a `>>` topic are never registered, so they
-are noted but never closed. Needs `jq` on PATH.
+on the next prompt. Needs `jq` on PATH.
+
+Windows without a `>>` topic are never registered, but they are still noted
+(the model names the topic from the transcript) and, since 261104, still
+reached and closed: the watcher finds the CLI through the CLI's own session
+file (`<config>/sessions/<pid>.json` holds `{pid, sessionId}`) and `ps` gives
+the tty. Once such a window's note is on file it is judged by the same idle,
+CPU and clean-stop rules as a registered one.
 
 ## Where the result shows up
 
