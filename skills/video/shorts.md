@@ -128,6 +128,7 @@ After every `render_fd.py` run, before upload:
 
 ### Retention rules
 - Put the hook in the first 3 s of every short.
+- TRIAL (Nov–Dec 2026, shorts only): the opening line does one of three jobs: (1) breaks an expectation, (2) promises a payoff, or (3) calls out a mistake. Never open like a classroom (no 'today we'll learn', no definition, no 'let's talk about'). Record which of the three each short used as its opener type.
 - Make the opening readable with sound off (title band and caption carry it).
 - Answer the hook's question by the end of the short.
 - Keep the speaker on screen for at least half of the short.
