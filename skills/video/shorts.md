@@ -68,6 +68,8 @@ lands on origin/main; report any mismatch to Kitty before rendering.
 - **Full frame:** the head is large, shoulders cropped at the frame sides (face box about
   35% of the frame height, head centre 45% down, hat never cut by the frame top). Framing is cut from the original 4K
   footage, never by upscaling the 1080 cut (zoom never past 2× the 2160-wide original).
+  The head sits horizontally centred: equal space left and right. Measure its position as the
+  median face box over 15 frames spread across the short, not 3.
 - **Between cuts** the head size alternates about ±10% (slightly bigger, slightly smaller);
   cuts under 1.5 s keep the previous size.
 - **Within a cut** the head drifts in or out slowly (0.5% per second, at most 4%),
@@ -87,7 +89,9 @@ lands on origin/main; report any mismatch to Kitty before rendering.
 - **Screen share without preview:** when the feedback says "full screenshot", the
   screenshot fills the frame and there is no head square.
 - **Light match:** footage shot in the second light (FD26-088 on) gets +8% contrast and its warm
-  yellow-pink cast pulled toward neutral (`LIGHT2` in render_fd).
+  yellow-pink cast pulled toward neutral (`LIGHT2` in render_fd). The wall behind reads
+  bluish-grey (more grey than blue), never beige-yellow or white, and the image is 15% darker
+  than the camera so the background light never outshines the face (`wall.json` gains per short).
 - **Animation:** the animation occupies the full 1080 × 1920 frame on its own brand
   background. Never scale it down over a blurred or stretched background.
 
@@ -178,8 +182,10 @@ Apply these rules to every short (FD, SMKS and any other type) using pop-ups, sp
 ### Overlays
 
 - Overlay text fills the full screen: white capitals, **every word on its own line** ("AI" / "OPS"),
-  each line stretched to 90% of the frame width so the words come out the same width. A very
-  short word grows at most 2× the smallest line. A newline in the edit sets the lines.
+  each line stretched to 90% of the frame width so every line is exactly the same width, short
+  words included ("AND" as wide as "OVERWHELMING"). Little one- or two-letter words (of, a, to…)
+  never stand on their own line: they ride with the next word ("LAYER" / "OF EVALS"); acronyms
+  like "AI" still get their own line. A newline in the edit sets the lines.
 - No shadow under the letters. Overlays never cover the subtitles.
 - Overlays are never numbered.
 
@@ -190,7 +196,7 @@ Apply these rules to every short (FD, SMKS and any other type) using pop-ups, sp
 ### Opening quotes
 
 - A short that opens with Zhenia reading a quote shows the quote as one big overlay: white
-  letters, no shadow, no mint box, as large as fits the frame. No title card and no subtitles
+  letters, no shadow, no mint box, as large as fits the frame, line height 0.94× the font size. No title card and no subtitles
   while it is up; subtitles start when the quote ends. The quote's extent comes from the
   script's quotation marks (`quotes.json` = number of opening rows).
 
