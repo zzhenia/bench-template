@@ -57,7 +57,8 @@ lands on origin/main; report any mismatch to Kitty before rendering.
 - Greedy wrap: a word stays on its line whenever it fits within 960 px; never push a
   word down to balance line lengths. Font size is the largest (220 down to 36) whose
   wrap fits in 3 lines
-- Line height: render_fd's pitch **× 1.1025** (1.05 × 1.05)
+- Line height: `TITLE_PITCH` **0.756** in render_fd
+- A short that opens on a quote has no title card (see Opening quotes)
 - The text block sits in the vertical middle of the band: the gap above the first line's
   cap tops equals the gap below the last line's descenders. Measure ink with PIL
   (`getbbox(anchor="ls")`) and place lines with drawtext `y_align=baseline`; never pad
@@ -65,8 +66,8 @@ lands on origin/main; report any mismatch to Kitty before rendering.
 
 ### Talking head placement
 - **Full frame:** the head is large, shoulders cropped at the frame sides (face box about
-  28% of the frame height, head centre 45% down, hat never cut by the frame top). Framing is cut from the original 4K
-  footage, never by upscaling the 1080 cut.
+  35% of the frame height, head centre 45% down, hat never cut by the frame top). Framing is cut from the original 4K
+  footage, never by upscaling the 1080 cut (zoom never past 2× the 2160-wide original).
 - **Between cuts** the head size alternates about ±10% (slightly bigger, slightly smaller);
   cuts under 1.5 s keep the previous size.
 - **Within a cut** the head drifts in or out slowly (0.5% per second, at most 4%),
@@ -85,6 +86,8 @@ lands on origin/main; report any mismatch to Kitty before rendering.
   screenshot or animation; covering a box corner or window chrome is fine.
 - **Screen share without preview:** when the feedback says "full screenshot", the
   screenshot fills the frame and there is no head square.
+- **Light match:** footage shot in the second light (FD26-088 on) gets +8% contrast and its warm
+  yellow-pink cast pulled toward neutral (`LIGHT2` in render_fd).
 - **Animation:** the animation occupies the full 1080 × 1920 frame on its own brand
   background. Never scale it down over a blurred or stretched background.
 
@@ -95,6 +98,7 @@ lands on origin/main; report any mismatch to Kitty before rendering.
   words are plain white. Implementation: one Dialogue event per word, proportional-duration
   split, inline `\1c` colour override on the active word only. Do NOT use `\k` sweep — it
   lights up the whole phrase instead of one word.
+- No captions under an opening quote; they start when the quote ends.
 
 ### Voice EQ chain
 ```
@@ -152,29 +156,31 @@ Reference JPEG:
 
 ## Formula Daily shorts — FD26-0NN rules
 
-Apply these rules to every FD short using pop-ups, split screen, or captions.
+Apply these rules to every short (FD, SMKS and any other type) using pop-ups, split screen, overlays or captions.
 
 ### Pop-ups
 
 1. **Title case:** "All pop-ups use title case."
-2. **Width and wrapping:** "Pop-up text is very small, and it gets cut off on the right and left because it's all fit in one line. You need to make it 90% of the width so that it wraps across multiple lines and the text is not smaller than the font size you use for the subtitles."
-   - Pop-up box width: **90% of frame width = 972 px** at 1080
-   - Text wraps to as many lines as needed
-   - Font size: **≥ 76** (caption size)
-   - Never shrink text to fit one line
+2. **Size and padding:** the box fits the text with the same padding on all four sides, and
+   is **at least 80%** and at most 90% of the frame width. The text grows (up to 150, never
+   under the 76 caption size, at most 3 lines) until the box reaches 80%.
 3. **Vertical centring:** the text block sits in the vertical middle of the pop-up box,
    measured on ink (cap tops to descenders), same method as the title card.
+4. **Never over the subtitles:** the box sits above a two-line caption.
+5. **Emoji:** an emoji in the text is drawn as the colour emoji (`<3` becomes ❤️).
 
 ### Numbered lists
 
 - Font at least **80% larger** than the pop-up text, left-aligned, at the usual margin.
+- A wrapped item's second line aligns with the item's first word, never with its number.
 - Only real lists are numbered. A single line or a phrase is never a list and never starts with "1.".
 
 ### Overlays
 
-- Overlay text fills the full screen: white capitals, one word per line (a word of three
-  letters or fewer shares a line with the next: "DO I", "AI OPS"), sized so the longest line
-  is 90% of the frame width.
+- Overlay text fills the full screen: white capitals, **every word on its own line** ("AI" / "OPS"),
+  each line stretched to 90% of the frame width so the words come out the same width. A very
+  short word grows at most 2× the smallest line. A newline in the edit sets the lines.
+- No shadow under the letters. Overlays never cover the subtitles.
 - Overlays are never numbered.
 
 ### Pop-up motion
@@ -183,8 +189,10 @@ Apply these rules to every FD short using pop-ups, split screen, or captions.
 
 ### Opening quotes
 
-- A short that opens with a quote shows it in overlay style: white letters, no mint box,
-  same font size as the current quote text, balanced vertically between the title band and the subtitles.
+- A short that opens with Zhenia reading a quote shows the quote as one big overlay: white
+  letters, no shadow, no mint box, as large as fits the frame. No title card and no subtitles
+  while it is up; subtitles start when the quote ends. The quote's extent comes from the
+  script's quotation marks (`quotes.json` = number of opening rows).
 
 ### Split screen captions
 
