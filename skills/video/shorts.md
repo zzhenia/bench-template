@@ -88,10 +88,10 @@ lands on origin/main; report any mismatch to Kitty before rendering.
   screenshot or animation; covering a box corner or window chrome is fine.
 - **Screen share without preview:** when the feedback says "full screenshot", the
   screenshot fills the frame and there is no head square.
-- **Light match:** footage shot in the second light (FD26-088 on) gets +8% contrast and its warm
-  yellow-pink cast pulled toward neutral (`LIGHT2` in render_fd). The wall behind reads
-  bluish-grey (more grey than blue), never beige-yellow or white, and the image is 15% darker
-  than the camera so the background light never outshines the face (`wall.json` gains per short).
+- **Low-light profile:** footage shot in low light (FD26-088 on) gets only `LOW_LIGHT` in
+  render_fd: contrast 1.12, saturation unchanged, blue +4%, applied to the original footage.
+  No other grade, LUT or wall gain on top. Never grade an earlier render again; start from the
+  original footage. Reuse this profile whenever the low light comes back.
 - **Animation:** the animation occupies the full 1080 × 1920 frame on its own brand
   background. Never scale it down over a blurred or stretched background.
 
