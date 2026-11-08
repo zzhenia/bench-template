@@ -256,8 +256,8 @@ When you recovered the context, open with the answer, not with how you found it.
 - **This is a deciding rule, not optional.** Zhenia's message needs no text when it
   contains no question, no instruction and no decision you must record: an opinion, a
   reaction to your post, a thank-you, an 'ok', a vent, a thought they are sharing. Then
-  the whole turn is one reaction (👍 or 👀) on their message and nothing else — no
-  'noted', no restatement, no next step. A message with a verb aimed at you ('update the
+  the whole turn is one 👍 reaction on their message and nothing else — no 'noted', no
+  restatement, no next step, and no 👀 (Zhenia, 261108: one reaction says "seen"). A message with a verb aimed at you ('update the
   ticket', 'let's do X', a pasted draft, a shortcut code) or a '?' is an instruction and
   gets its reply as usual. When unsure whether it is an instruction, it is. Cron/isolated
   sessions use the curl in section 5 for the reaction.
@@ -270,7 +270,9 @@ When you recovered the context, open with the answer, not with how you found it.
 - **A reaction-only turn ends with exactly `NO_REPLY`, never empty text.** An empty
   final answer makes the gateway post ":warning: The AI service returned an empty reply.
   Please try again." under your name. After the reaction, the turn's final text is the
-  literal `NO_REPLY` and nothing else.
+  literal `NO_REPLY` and nothing else. The gateway may still count that as an empty reply
+  and start the turn again on another model; the reply guard tells that run to stay
+  silent and drops its ⚠️ notice. Never add a word of text to avoid it.
 - **One reply per message.** No triple-tap, no fragments, no "working on it" followed
   by the answer. Reactions (one, at most) replace an acknowledgement.
   This is a rule about the *message*, not about how much work it takes: a job that has
@@ -379,8 +381,10 @@ correct a message you have not yet acted on.
 
 - **A message that needs no text (§4) gets only the reaction — nothing else, ever** —
   then `NO_REPLY` as the turn's final text, never an empty answer (§4).
-- React like a person: one emoji when you saw something and need not reply (👍 ✅ 👀).
-  One reaction per message, maximum. Never a reaction plus a reply that says the same.
+- React like a person: 👍 when the message needs no text, ✅ when the thing asked for is
+  made. One reaction per message, maximum. Never a reaction plus a reply that says the same.
+- 👀 is the gateway's own "seen" mark: the reply guard adds it before you run and removes
+  it once you react. Never add 👀 yourself.
 - **Live conversation:** the `react` tool action works.
 - **Cron / isolated session:** the `react` tool fails ("requires the exact current
   conversation"). Use the Web API right after sending, with the message `ts`:
@@ -518,3 +522,4 @@ channel message to a live olga session and Zhenia gets duplicate answers (260914
 | 261103 | Agents answered confirmations (`jt` ticket, `sb` note, `nr` reference, rated references, Anki entries) with text, and reaction-only turns ended empty, so the gateway posted ":warning: The AI service returned an empty reply" | §4: done work = ✅ reaction only; reaction-only turns end with `NO_REPLY`; relay channels react 👀/✅, no text ack |
 | 261104 | Zhenia asked Eva a question in #formula-lf and corrected it 12 s later ("Sorry, FD26-107"); Eva posted a stale "can't find" answer, then the FD26-107 answer. Two gateway faults: the CLI nudge made Eva post "Still looking…" mid-turn, the gateway cancelled it but the reply guard counted it as the turn's post and skipped latest-wins; and the follow-up turn ran in a second instance of the guard with no state (no 👀, no delivery note, reply unguarded) — the same gap behind every "double answer" since the 261022 upgrade | §4: the CLI nudge is never a message. Gateway: `slack-reply-guard` keeps state in a file, runs latest-wins before the one-post rule, ignores suppressed sends (specs/network.md) |
 | 261105 | Zhenia wants to talk to the agents by voice: an audio clip must come back as a transcript in its thread, not be ignored or answered as if it were text (ZHEN-7505) | §5c: transcript reply + ✅; ✅ click = accepted, edited transcript = corrected version; gateway already transcribes clips natively (`media.md`), `slack-file` + `transcribe` are the fallback |
+| 261108 | Zhenia's "Perfect, thank you!" got 👀 + ✅ and then "⚠️ OpenClaw couldn't finish this request" under Eva's name; the same day Haiku re-answered a message Eva had deliberately left at `NO_REPLY` (#formula-lf). Zhenia: a message with no request gets one reaction, a 👍, no eyes, no error text | §4, §5: no-request message = 👍 only; 👀 is the gateway's and goes when you react. Gateway: claude-cli counts a bare `NO_REPLY` as an empty reply and re-runs the turn on the fallback model, then posts the ⚠️ notice — `slack-reply-guard` keeps the re-run silent, drops the notice, removes 👀 when the agent reacted (specs/network.md) |
