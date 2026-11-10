@@ -62,14 +62,33 @@ directs ICs) or **IC** (delivers assignments). Your AGENTS.md says which you are
 for an IC, who your PM is. The profile rules:
 `~/ZV-Bench/convos/openclaw/assets/agent-template/profiles/`.
 
-## 3. Talking to another agent
+## 3. Talking to another agent — one procedure for every agent, Olga included
 
-`sessions_send` to the **full session key** `agent:<id>:main` — never a bare label.
-Discover siblings by listing sessions. It is asynchronous: no reply inside your turn is
-not a failure — say "queued, reply pending"; resend once next turn; then Olga. When a
-sibling messages you, your plain output does not reach them — `sessions_send` your
-answer back to their key, even "received, working on it". Never tell Zhenia a sibling
-is down.
+**Asking any agent for anything that needs an answer** (work, a fix, a lookup, a check):
+```sh
+~/ZV-Bench/tools/order new --from <your-id> --to <their-id> --reply <CHANNEL>/<thread_ts> -m "<what you need; done when …>"
+```
+`--reply` is the Slack thread where someone is waiting for the result (the thread you were
+asked in); with nobody waiting in Slack, your own session key (`agent:<your-id>:main`). The
+command prints an order id and a message: send that message word for word with
+`sessions_send` to `agent:<their-id>:main`. Then tell the asker one line ("Olga has it") and
+stop — do not promise to post the result yourself; the order posts it.
+
+**Answering an order** (a message that starts `Order o-…`): do the work, then — done or not
+done — run the line it ends with:
+```sh
+~/ZV-Bench/tools/order done <id> -m "<result, with the commit, file, ticket or link>"
+~/ZV-Bench/tools/order done <id> --not-done -m "<why, and what would unblock it>"
+```
+That posts "[<Your name>] <result>" in the asker's thread (or wakes the asking session). Do
+not post the result anywhere yourself and do not `sessions_send` it back.
+
+No `order done` after 30 min → the order is re-sent to you once; 2 h later it goes to Olga
+(to Kitty when Olga is the silent one). This is automatic; nobody chases by hand.
+
+Plain `sessions_send` (no order) only for messages that need no answer: a hand-back, an FYI.
+Always the **full session key** `agent:<id>:main` — never a bare label. Never tell Zhenia a
+sibling is down.
 
 ## 4. GitHub, Jira, notes, files
 
@@ -106,21 +125,10 @@ is down.
   with Zhenia's words verbatim, the thread link and what you already know; tell Zhenia one
   line ("Jira has it"); post the key and title in the thread when it comes back; no key
   within 30 minutes → re-send once, say so, and tell Kitty; (2) for every piece only Olga can do — a tool, a package,
-  an access, a script on the box — `FOR=olga JIRA_AS=<you> jira.sh create-child
-  <your-TASK> "<what you need>" "<detail>"`, one sub-task each, instead of the inbox file;
-  (3) carry on with what does not depend on Olga. Olga's automated visit is weekly now
-  (Sun 10:00 UTC / 05:00 Bogota, 1h before the weekly quota reset, deprioritized by Zhenia 260919 to stop eating into the week's
-  model allowance) — a routine sub-task waits for that sweep; when she moves it to Testing
-  or Closed you get "Olga (the medic): ZHEN-x …" in your session — verify, then continue.
-  Blocked means Zhenia has to do something: work without it. **Something urgent** (blocks
-  Zhenia today, or a whole job/agent is down) — do not wait for the sweep: `@`-mention
-  Olga directly in the Slack channel or thread you're in; she is a live gateway agent and
-  answers immediately. The inbox file and sub-task are still the record; the mention is
-  what gets it looked at now. (4) Needs Zhenia's decision or hands? `jira.sh assign <KEY> zhenia` and one
+  an access, a script on the box — an order to Olga (section 3); (3) carry on with what
+  does not depend on Olga. (4) Needs Zhenia's decision or hands? `jira.sh assign <KEY> zhenia` and one
   line in the thread saying what you need. (5) Done → `jira.sh transition <KEY> Testing`
   and the one-line result in the thread. Reply to Zhenia's ask with the key and title, once.
-- The inbox file (section 5) is still right for a failure in the middle of a task with no
-  ticket; a sub-task is right for something you know you need before you start.
 - **Session notes:** when Zhenia says `/note`, write a bench-style note with
   `bash ~/ZV-Bench/scripts/oc-note.sh <your-id> <convo> <slug>` (it pulls, writes
   `convos/<convo>/YYMMDD-<slug>.md`, commits, pushes). Never touch `_memory-*.md` files.
@@ -155,21 +163,15 @@ is down.
 
 ## 5. When something breaks — retry once, then Olga, never Zhenia
 
-A tool fails, SSH refuses, a cron errors, a scope is missing, a package is absent, a
-sibling is silent twice: retry once, the same way. If it fails again, write one file and
-carry on with whatever part still works. Olga's automated visit is weekly now (Sun 10:00 UTC,
-05:00 Bogotá, deprioritized by Zhenia 260919) — the inbox file no longer starts a tick
-within seconds, it waits for that sweep. If it is urgent (blocks Zhenia today, or a whole
-job/agent is down), also `@`-mention Olga directly in Slack — she is a live gateway agent
-and answers right away; the file is still the record either way:
+A tool fails, SSH refuses, a cron errors, a scope is missing, a package is absent: retry
+once, the same way. If it fails again, send Olga an order (section 3) and carry on with
+whatever part still works. `--reply` is the thread you were working in, or your own
+session key in a cron or isolated session. Put the four facts in `-m`:
 
-```sh
-mkdir -p ~/.openclaw/medic/inbox && cat > ~/.openclaw/medic/inbox/<your-id>-$(date +%Y%m%d-%H%M%S).md <<'EOF'
-agent: <your-id>
+```
 doing: <one line — what you were trying to do, for whom>
 command: <exact command or tool call>
 error: <verbatim>
-EOF
 ```
 
 - A missing tool or access is `error: capability gap — <what you need>`. Olga builds it.
@@ -177,15 +179,13 @@ EOF
   `error: request — <their words verbatim>`; you reply exactly "Sent to Olga."
 - Zhenia hears nothing about the error from you. In a cron or isolated session, if the
   job cannot complete, your entire final message is exactly `NO_REPLY`.
-- Olga answers in the session you reported from ("Olga (the medic): ZHEN-xxxx …"), whether
-  that is a channel, a thread or your DM. Fixed → verify it yourself, finish the task.
+- Olga's answer arrives through the order. Fixed → verify it yourself, finish the task.
   Blocked → work without it. One failure, at most two reports (`second time` in `doing:`),
   never a third.
 - Never work around infrastructure yourself: no editing crons, config, tokens or your
   standing files to dodge an error.
-- **If you cannot write the file yourself** (your exec is down, no node, no shell):
-  `sessions_send` the same four lines to `agent:kitty:main` — "file this with Olga" — and
-  carry on. That is the whole workaround; it is not news for Zhenia.
+- **If you cannot run `order` yourself** (your exec is down, no shell): `sessions_send` the
+  same lines to `agent:kitty:main` — "order this from Olga" — and carry on.
 - **When Zhenia asks "did you report to Olga?"**: one line — "Yes, ZHEN-xxxx — <title>" if
   you know the key, otherwise "Sent to Olga." Nothing about nodes, exec, inboxes, Kitty,
   retries or what you are checking. A second message on the same question is a failure

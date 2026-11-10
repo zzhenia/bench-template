@@ -192,7 +192,7 @@ in the relevant spec, so the weekly audit sees it.
 **Nobody reaches Zhenia with a technical problem. Olga first.** No bot message to Zhenia
 (Slack DM or channel) ever carries an error, a retry, a missing scope, or any machinery
 language. An agent or bot that is stuck, broken, out of a capability, or unsure goes to
-Olga's inbox first (`~/.openclaw/medic/inbox/`); Olga's `needs_human` goes to Kitty. Kitty
+Olga first, by an order (`tools/order`, network SKILL §3); Olga's `needs_human` goes to Kitty. Kitty
 finds the place in the system that solves it. Permission requests and capability asks reach
 Zhenia **only as Jira tickets assigned to them**, never as inline messages. Only when a fix
 was tried and failed, and the reason is written down on the ticket, does Kitty bring Zhenia
@@ -201,7 +201,10 @@ one message: what was tried, why it cannot be fixed, the one step only a human c
 **Every request gets an answer back to the requester.** Whoever asks for work or help
 (Kitty to a bot, a bot to another bot, a bot to Olga) is told the result by the one who
 handled it — done or not done, with the artefact: a comment on the Jira ticket, a line
-in the Confluence digest, a pushed file. The handler comes back on its own, at every
+in the Confluence digest, a pushed file. The mechanism is the same for every pair of agents:
+the requester opens it with `tools/order new` and the handler closes it with `tools/order
+done`, which posts the result where the requester is waiting (network SKILL §3). Re-sends
+after 30 min and hand-over to Olga after 2 h more are automatic. The handler comes back on its own, at every
 checkpoint and at the end; the requester never has to ask. A requester that hears a
 result passes it up the chain the same day, so whoever commissioned the work at the top
 (Zhenia, through Kitty) hears it without asking. A request with no answer is a failure
