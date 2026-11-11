@@ -22,7 +22,7 @@ do not have enough of the thread to draft.
 
 ## Pass 2 — after drafting, before reporting
 
-Run `EVAL.md` on the draft yourself and put the result in your report (SKILL.md
+Run `EVAL.md` (the scored 24-item checklist) on the draft yourself and put the result in your report (SKILL.md
 gives the one-line format). Below 80%, fix the failed items and run it again; a
 draft never goes back to whoever ordered it below the gate. Every claim about
 Zhenia's own practice is checked against the source (SKILL.md, Voice and Tone):
