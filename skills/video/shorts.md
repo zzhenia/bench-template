@@ -228,9 +228,8 @@ Captions must equal script/teleprompter text, corrected against the actual clip 
 
 - **Filename:** `YYMMDD_<id>_bot.mp4` — date is the **render date** (always today, never
   the footage date); `<id>` is the FD26-0NN short id.
-- **Same-day re-render (every short type):** a new version rendered on a day that already has
-  one gets `_02`, `_03`… before the extension (`261022_0093_SF1_ai_02.mp4`). Never overwrite
-  or reuse the earlier file's name.
+- **Same-day versions (every short type):** see "File names" in `skills/video/SKILL.md`
+  (first file of the day has no suffix; a second makes them `_01`, `_02`; new date restarts).
 - **Drive — footage:** `1. Filming/<YYMM>FD/`
 - **Drive — edited output:** `2. Editing/<YYMM>FD/<YYMMDD>_<YYMM>FD_V<nn>/`, one folder per render batch (`261104_2611FD_V02`). A new batch is a new folder; earlier batches stay as they are. `up.py editing` picks the folder.
 - **Drive — animation assets:** `1. Briefs/animations/<id>-A0n/`

@@ -20,6 +20,17 @@ Every video task starts here. Pick the branch for your format, then follow it en
 
 `style.md` (LF house style: LFnn templates = artboards of YT_video_assets.ai, layering rules, cuts) is read before any LF edit and grows with every round of review comments.
 
+## File names
+
+Every rendered video, long form and shorts, before it goes to Drive:
+
+- `YYMMDD_<job>LF.mp4` (shorts: `YYMMDD_<job>_SFn.mp4`). YYMMDD is the day it was rendered.
+  Nothing else in the name: no `draft`, no `-vN`, no `_ai`.
+- A second version on the same date: the first becomes `_01`, the new one `_02`, then `_03`…
+  (`261111_0102LF_01.mp4`, `261111_0102LF_02.mp4`). Rename the earlier file on Drive when `_02` lands.
+- A new date restarts the index: the first file that day has no suffix again.
+- List the Drive folder for today's prefix before naming. Never overwrite a file.
+
 ## Where tools run
 
 **Video renders prefer the Mac and never wait for it.** This covers every render, re-render,
