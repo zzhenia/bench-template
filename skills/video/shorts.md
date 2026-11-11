@@ -210,6 +210,20 @@ Captions must equal script/teleprompter text, corrected against the actual clip 
 
 ---
 
+## Formula shorts cut from a long form
+
+- **Sound matches the LF.** Stereo output (voice copied to both channels, never a mono mix):
+  a mono short normalised to −14 LUFS drives each channel about 3 dB hotter into the limiter.
+  No voice compressor or EQ (the Voice EQ chain above is for FD only); the LF has none.
+  Check crest factor against the LF's after render.
+- **Diagrams** are re-drawn for the short's panel with no background of their own, centred
+  in it. When a diagram has a sequence (e.g. a down arrow, then an up arrow), zoom in to the
+  nodes being discussed and show the steps in the order they are spoken.
+- **Repeated words and stutters** are cut from the short even when the LF kept them.
+  Re-transcribe the render to confirm the passage reads clean.
+
+---
+
 ## Output naming and Drive folders
 
 - **Filename:** `YYMMDD_<id>_bot.mp4` — date is the **render date** (always today, never
