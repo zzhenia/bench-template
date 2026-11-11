@@ -100,9 +100,9 @@ git push -q origin main
 
 - Push only what you were asked to create. `git commit -a` sweeps up other people's work in
   progress — never use it here.
-- **Editorial and long-form drafts go in `writing/ZV/editorial/<Publication>/`** — that is where
-  Zhenia looks. Never invent a new top-level folder for writing; `writing/` already has one.
-- Then tell Zhenia the path, and only then. "It's in `~/ZV-Bench/writing/ZV/editorial/Formula/`"
+- **Editorial and long-form drafts go in `research/ZV/editorial/<Publication>/`** — that is where
+  Zhenia looks. Never invent a new top-level folder for writing; `research/` already has one.
+- Then tell Zhenia the path, and only then. "It's in `~/ZV-Bench/research/ZV/editorial/Formula/`"
   is a claim that it is on their machine too.
 - This is the one exception to "the bench is read-only for you": a direct request from Zhenia
   for a file at a path. Notes still go through `oc-note.sh`.

@@ -1,6 +1,6 @@
 ---
 name: editorial
-description: Everything Zhenia publishes as writing — the <YYMMDD>_ED<nnnn>_<INTENT>.md naming in writing/ZV/editorial/Formula/, Medium, reddit, and linkedin drafted here; Ghost and the social platforms posted by Zhenia.
+description: Everything Zhenia publishes as writing — the <YYMMDD>_ED<nnnn>_<INTENT>.md naming in research/ZV/editorial/Formula/, Medium, reddit, and linkedin drafted here; Ghost and the social platforms posted by Zhenia.
 ---
 
 # Editorial — one piece, every platform it goes to
@@ -8,7 +8,7 @@ description: Everything Zhenia publishes as writing — the <YYMMDD>_ED<nnnn>_<I
 **Whose skill this is: whichever agent Zhenia hands the material to.** It covers
 everything Zhenia publishes as writing — Medium, Ghost, LinkedIn, Reddit — and
 the one rule underneath all of it: **the piece lives in the bench, not on the
-platform.** A platform holds a copy; `writing/ZV/editorial/Formula/` holds the
+platform.** A platform holds a copy; `research/ZV/editorial/Formula/` holds the
 piece.
 
 [[formula-daily]] is the Ghost end of this and keeps its own trigger ("ghost").
@@ -16,7 +16,7 @@ This file owns the naming, the file itself, and Medium.
 
 ## The file — naming, and where it lives
 
-Everything publishable is a markdown file in `writing/ZV/editorial/Formula/`,
+Everything publishable is a markdown file in `research/ZV/editorial/Formula/`,
 named:
 
 ```
@@ -33,7 +33,7 @@ named:
 - **INTENT** — where this version goes: `MD` Medium, `GH` Ghost, `LI` LinkedIn,
   `RD` Reddit.
 
-Take the next free number: `ls writing/ZV/editorial/Formula/ | sort -t_ -k2 |
+Take the next free number: `ls research/ZV/editorial/Formula/ | sort -t_ -k2 |
 tail -1`. Never renumber an existing piece, and never reuse a number for a
 different argument.
 
@@ -79,7 +79,7 @@ different argument.
 1. **Get the file.** If Zhenia named one, `~/.openclaw/tools/bench-file <name>`
    and use it as-is — their edit pass is the version that ships, and
    you do not rewrite it. Otherwise write the draft to the bench yourself, as a
-   markdown file in `writing/ZV/editorial/Formula/`, named as above. Open it
+   markdown file in `research/ZV/editorial/Formula/`, named as above. Open it
    with the header block:
 
    ```markdown
@@ -219,7 +219,7 @@ different argument.
 
 **"reddit" closes one post** — everything Zhenia pasted in that thread since the
 last "reddit" is the material, or a named ED file (its Medium version becomes the
-source). Write the draft to `writing/ZV/editorial/Formula/`, named as
+source). Write the draft to `research/ZV/editorial/Formula/`, named as
 `<YYMMDD>_ED<nnnn>_RD.md`.
 
 Open the file with:
@@ -261,7 +261,7 @@ Reddit has no drafts API and the app registration fails — so Zhenia copies you
 
 **"linkedin" closes one post** — everything Zhenia pasted in that thread since the
 last "linkedin" is the material, or a named ED file (its Medium version becomes the
-source). Write the draft to `writing/ZV/editorial/Formula/`, named as
+source). Write the draft to `research/ZV/editorial/Formula/`, named as
 `<YYMMDD>_ED<nnnn>_LI.md`.
 
 Open the file with:

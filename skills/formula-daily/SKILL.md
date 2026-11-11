@@ -244,7 +244,7 @@ job picks it up. No approval step.
 The LinkedIn post follows the rules at https://zvi.atlassian.net/wiki/spaces/~288856893/pages/1474428929 (Formula — Everyday CTA Policy). **Eva reads that page every time; the skill does not copy or embed the policy.** The text gets the social-craft passes; the open-question rule applies (unlike the Daily).
 
 On "pub", after `schedule` succeeds for the Ghost post:
-1. Locate the LI markdown file (`writing/ZV/editorial/Formula/<YYMMDD>_LI_*.md`), commissioned
+1. Locate the LI markdown file (`research/ZV/editorial/Formula/<YYMMDD>_LI_*.md`), commissioned
    from Writer — never write it yourself. Eva has the Reddit or LinkedIn permalink from the
    engagement thread and passes it through in Writer's brief so Writer can write the Source
    line correctly (same hand-off for the YT short in step 2 below).
@@ -262,7 +262,7 @@ On "pub", after `schedule` succeeds for the Ghost post:
      hook (not the LI post reworded), and the lead-magnet CTA by ZVLM ID.
    - First-mention rule: every real person named in the script gets a 1–2 word descriptor on first mention — see `skills/writing/SKILL.md` Universal Rules.
    - Dense-opener rule: if the script's first sentence packs jargon or context the viewer lacks, add one short plain lead-in before it — see `skills/writing/VOICE.md` (Lead-in before a dense opener).
-   - Writer saves it as `writing/ZV/editorial/Formula/<YYMMDD>_FD26-NNN_short.md`.
+   - Writer saves it as `research/ZV/editorial/Formula/<YYMMDD>_FD26-NNN_short.md`.
    - Wait for Writer to deliver before running the append.
    - If the short has not arrived by the time everything else is done, append LI only and
      tell Kitty in one line. Never skip silently.
