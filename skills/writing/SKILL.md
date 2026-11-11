@@ -4,22 +4,31 @@ description: Apply writing style rules for clear, engaging, human-sounding conte
 model: sonnet
 ---
 
-Follow every rule below when drafting or editing content. The request is: $ARGUMENTS
+The one writing skill. Writer (and anyone else drafting) opens this file first,
+every time, and follows it. The request is: $ARGUMENTS
 
-Rules are **universal** (always apply) or **format-specific** (articles, SOPs, academic). Two
-files sit beside this one and apply on top of it:
+This file holds the rules for every format. The files beside it add to it by job:
 
-- `VOICE.md` — anything published under Zhenia's name (Reddit, LinkedIn, Formula
-  posts, scripts). Read it before drafting a word of that.
-- A Writer script brief leads with the voice: the first paragraph of every
-  commission is who is speaking and three sample sentences from Zhenia's own
-  blurb or past scripts; structure and facts come after.
-- A Writer script brief's kicker instruction names only two things: where the
-  viewer downloads the thing and the one next video to watch. Never a callback
-  to the opening, a comment prompt, or a lead magnet line.
-- `CRAFT.md` — the structural and copy library (StoryBrand, Copywriting Secrets)
-  for scripts and social posts. `ILLUSTRATION.md` is the image brief for Formula
-  artwork.
+| Writing | Also read |
+|---|---|
+| Anything published under Zhenia's name | `VOICE.md` |
+| A social post, comment, reply or short | `SOCIAL.md` (passes, closing question) |
+| A script, blog post or article | `CRAFT.md` (structure, opening, kicker) |
+| An image brief for Formula artwork | `ILLUSTRATION.md` |
+| Any draft for Zhenia, before reporting it | `EVAL.md` (scored check, 80% gate) |
+
+Whoever orders the writing names what, for whom, the source and the destination.
+The order never lists these files: applying them is the writer's job.
+
+The writer's report names what it read and the result, in one line:
+`Read: SKILL, VOICE, SOCIAL, EVAL · EVAL 21/23 (91%) · Claims about Zhenia: 2, both in the source.`
+
+A Writer script brief leads with the voice: the first paragraph of every
+commission is who is speaking and three sample sentences from Zhenia's own
+blurb or past scripts; structure and facts come after. Its kicker instruction
+names only two things: where the viewer downloads the thing and the one next
+video to watch. Never a callback to the opening, a comment prompt, or a lead
+magnet line.
 
 ---
 
@@ -32,6 +41,7 @@ files sit beside this one and apply on top of it:
 - **Write like you speak.** But don't be cheesy. Avoid cliches and obscure metaphors.
 - **Active voice.** 90%+ of the time. Passive voice makes writing ambiguous and hard to follow.
 - **Gender-neutral language.** Use "they" instead of "he" or "she."
+- **Claims about Zhenia come from the source.** Every first-person habit, number, story or result ("the order I use on my own files", "I ran PARA for eight months") must appear in the brief, the blurb, Zhenia's paste or `~/ZV-Bench/convos/openclaw/agents/eva-workspace/cmo-context.md`. Not there, not written: make the point without the "I". Never invent one to satisfy a rule that asks for personal evidence.
 - **First mention of real people.** On the first mention of any real named person, put a 1–2 word descriptor immediately before the name: *mathematician Claude Shannon*, *business professor Sophie Leroy*, *psychologist Theresa Glomb*. Later mentions use the name alone. Zhenia and the reader are never named in the draft; this rule does not apply to them.
 
 ## Readability (Hemingway Standard)

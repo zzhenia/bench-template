@@ -74,7 +74,7 @@ Kitty classifies every request out loud before assigning it.
   schedule, no state. Lives in `skills/<name>/SKILL.md`. **Only Skillbot writes and
   commits to `skills/`**; **only Evalbot writes and commits to `evals/`
   and every tool's `eval.md`** (machine-written state/log files excepted). The file
-  is Skillbot's even when the subject is yours (Eva and `social-craft`, `writing`,
+  is Skillbot's even when the subject is yours (Eva and `writing`,
   `editorial`): the agent who wants the change supplies the wording in a work order and
   replies `→ kitty → skillbot: <change>` (Zhenia, 260917).
 - **Tool** — a thing that runs: code, a cron or launchd entry, a state file, a

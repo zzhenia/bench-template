@@ -1,6 +1,6 @@
-# Social Craft Eval — Draft Scoring Checklist
+# Writing Eval — Draft Scoring Checklist
 
-**Purpose:** Scored eval checklist for Eva to run against every Writer draft before it reaches Zhenia. Gate: 80%. Below gate, return failed items to Writer for another pass — never deliver to Zhenia below 80%.
+**Purpose:** Scored checklist the writer runs on every draft before reporting it (part of the writing skill, SOCIAL.md Pass 2). Gate: 80%. Below the gate the writer fixes the failed items and runs it again; nothing below 80% is reported.
 
 **Score:** passed items / applicable items × 100. If item doesn't apply to the draft (e.g., question rule for Formula Daily blog post), exclude from denominator.
 
@@ -23,14 +23,14 @@
 
 9. ✓/✗ **None of these phrases present:** "In conclusion", "It is important to note", "That being said", "Furthermore", "Moreover", "Additionally" as an opener, "crucial/vital role", "game changer", "leverage", "unlock", "streamline", "dive into", "in today's fast-paced world", "hot take", "no fluff", "whether you're a X or a Y", "silently failing" / "fails silently" / "silent failure", "earns its keep" / "earn its keep", "the part to get right" / "the thing to get right", emoji inside a sentence
 
-**Core rules (from social-craft skill + VOICE.md):**
+**Core rules (from SOCIAL.md + VOICE.md):**
 
 10. ✓/✗ **First line starts at the content** — no throat-clearing, no restating their question
 11. ✓/✗ **At least one concrete detail** — plugin name, number, date, specific moment (not "many users find...")
 12. ✓/✗ **No sentence over ~25 words** — roughly 25 words is ceiling
 13. ✓/✗ **Not three sentences of the same length in a row** — vary length on purpose
 14. ✓/✗ **One claim only** — everything either supports it or goes
-15. ✓/✗ **Evidence is Zhenia's own practice** — "I ran PARA for eight months and abandoned it because..." not "Many users find that..."
+15. ✓/✗ **Evidence is Zhenia's own practice, as the source states it** — "I ran PARA for eight months and abandoned it because..." not "Many users find that...". Every first-person habit, number or story is in the brief, blurb, Zhenia's paste or cmo-context.md; one that is not fails this item, even if the rest of the draft is clean. No source, no "I"
 16. ✓/✗ **No hedging** — no "perhaps", "it could be argued", or similar uncertainty language
 17. ✓/✗ **No pitch, no unsolicited Formula link** — link only if they asked for exactly that thing, mention only, not a pitch
 18. ✓/✗ **No speaking for community, no flattery of question, no apology for length** — answer the person, not the audience
@@ -54,36 +54,21 @@ Score: `(P / A) × 100`
 
 **Gate:** 80%
 
-- **≥80%:** Pass. Send to Zhenia.
-- **<80%:** Fail. Return list of failed items to Writer for another pass. Do not send to Zhenia.
+- **≥80% and item 15 passed:** Pass. Report it.
+- **<80%, or item 15 failed:** Fix the failed items and run the check again. Do not report it.
 
 ---
 
-## How to use (Pass 2 step in social-craft skill)
+## How to use (SOCIAL.md, Pass 2)
 
-Eva runs this checklist against every Writer draft:
-
-1. Open `social-craft/EVAL.md`
-2. Go through each of the 24 items, mark ✓ (pass) or ✗ (fail)
-3. Calculate score: (passed / applicable) × 100
-4. If ≥80%: send to Zhenia
-5. If <80%: reply to Writer with the list of failed items only (do not send the draft itself to Zhenia)
-
-Example reply to Writer (score 75%, 15/20 passed):
-
-> Score: 75% (below 80% gate)
-> Failed items:
-> - Item 3: Tidy triplet detected ("tool, workflow, system")
-> - Item 11: No concrete detail beyond plugin names
-> - Item 12: One sentence is 31 words
-> - Item 20: Closing question is "What's your take?" (survey question)
-> 
-> Please revise and resubmit.
+The writer runs it on every draft and puts the score in the report line
+(SKILL.md). Whoever posts the draft re-checks item 15 and item 21 before it
+reaches Slack; one miss sends it back to the writer with the item number.
 
 ---
 
 ## References
 
 - **VOICE.md:** ~/ZV-Bench/skills/writing/VOICE.md (five tells, permanently banned phrases)
-- **social-craft/SKILL.md:** Pass 2 step where this eval runs
+- **SOCIAL.md:** Pass 2 step where this eval runs
 - **CRAFT.md:** ~/ZV-Bench/skills/writing/CRAFT.md (structural library, Miller StoryBrand)

@@ -251,7 +251,7 @@ Rules:
 Flow:
 
 1. Write the draft file as above.
-2. Run it through [[social-craft]] — same passes as Medium.
+2. Run it through [[writing]] (SOCIAL.md) — same passes as Medium.
 3. Commit and push (bench flow in [[bench-recall]]).
 4. Reply in the thread with the post inside a code block (title and body), ready for Zhenia to paste into Reddit by hand.
 
@@ -299,7 +299,7 @@ Rules:
 Flow:
 
 1. Write the draft file as above.
-2. Run it through [[social-craft]] — same passes as Medium and reddit.
+2. Run it through [[writing]] (SOCIAL.md) — same passes as Medium and reddit.
 3. Commit and push (bench flow in [[bench-recall]]).
 4. Reply in the thread with three parts:
    - The post text in a code block
@@ -356,11 +356,11 @@ nothing to throw away:
 ## LinkedIn and Reddit — use the commands
 
 **Reddit** — use the "reddit" command (documented above). Zhenia provides the
-thread and material; the agent writes the `_RD` file, runs [[social-craft]],
+thread and material; the agent writes the `_RD` file, runs [[writing]] (SOCIAL.md),
 and replies with the draft for Zhenia to post by hand.
 
 **LinkedIn** — use the "linkedin" command (documented above). Same flow: write
-the `_LI` file, run [[social-craft]], and reply with the composer link.
+the `_LI` file, run [[writing]] (SOCIAL.md), and reply with the composer link.
 
 Both platforms require native writing — never republish the Medium text verbatim.
 Reddit removes copy-pasted articles as self-promotion. LinkedIn buries a post

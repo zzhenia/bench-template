@@ -32,7 +32,7 @@ read right after this file.
   `~/ZV-Bench/scripts/bench-recall.sh <words>`. The rule and the reading order are in
   `~/ZV-Bench/skills/bench-recall/SKILL.md`.
 - **Skills live in one place**: `~/ZV-Bench/skills/<name>/SKILL.md` (this file,
-  `slack`, `bench-recall`, `calendar`, `social-craft`, `formula-daily`, `editorial`,
+  `slack`, `bench-recall`, `calendar`, `formula-daily`, `editorial`,
   `writing`).
   Your own `skills/` folder holds only what is yours;
   for anything shared it holds a pointer, never a copy.

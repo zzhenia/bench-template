@@ -1,25 +1,8 @@
----
-name: social-craft
-description: Passes every public draft under Zhenia's name goes through — voice, banned machine-writing patterns, and one open question at the end of every social draft.
----
+# Social drafts — part of the writing skill
 
-# Social craft passes
-
-**Whose skill this is: any agent drafting text Zhenia will publish** — Eva on
-Reddit and LinkedIn today, whoever runs a platform tomorrow. The procedure does
-not change with the agent.
-
-Two shared files carry the substance, both in the bench clone on this box:
-
-- `~/ZV-Bench/skills/writing/VOICE.md` — how anything published as Zhenia
-  sounds, and the machine-writing patterns that are banned. **Read it before you
-  draft.**
-- `~/ZV-Bench/skills/writing/CRAFT.md` — the structural library (Miller's
-  StoryBrand, Edwards' Copywriting Secrets). Eva runs it over scripts; here it is
-  the same books and the same moves on a shorter canvas.
-
-This skill is the procedure. Those files are the substance. Nothing you draft for
-a platform skips it — digest drafts included.
+Read after `SKILL.md` and `VOICE.md` for any social post, comment, reply or short
+under Zhenia's name, digest drafts included. `CRAFT.md` is the structural library
+behind Pass 1.
 
 ## Pass 1 — before drafting
 
@@ -37,22 +20,22 @@ do not have enough of the thread to draft.
 - **Formula's spine** — Problem/Agitate/Solve, or Before/After/Bridge, or a plain
   answer. Most comments are a plain answer, and that is correct.
 
-## Pass 2 — after drafting, before it reaches Slack
+## Pass 2 — after drafting, before reporting
 
-**Use `social-craft/EVAL.md`** — scored 24-item checklist. Eva runs this against every draft.
+Run `EVAL.md` on the draft yourself and put the result in your report (SKILL.md
+gives the one-line format). Below 80%, fix the failed items and run it again; a
+draft never goes back to whoever ordered it below the gate. Every claim about
+Zhenia's own practice is checked against the source (SKILL.md, Voice and Tone):
+one without a source is cut, not reported.
 
-1. Open `~/ZV-Bench/skills/social-craft/EVAL.md`
-2. Go through each of the 24 items; mark ✓ (pass) or ✗ (fail)
-3. Calculate score: (passed items / applicable items) × 100
-   - Skip items that don't apply to the draft (e.g., question rule for blog posts)
-4. **Gate: 80% minimum**
-   - **≥80%:** Pass to Zhenia
-   - **<80%:** Return to Writer with the list of failed items only; do not send to Zhenia
+The person who posts the draft re-checks two items before it reaches Slack: the
+claims about Zhenia (each one is in the source) and the named facts (each one
+verified with a real search). One miss sends the draft back to the writer.
 
 **Quick reference (full details in EVAL.md):**
 - **Ban sweep.** Read VOICE.md's banned machine-writing patterns: announced insight, contrast pivot, tidy triplet, summary close, undersized landing, label opener, oblique tail clause. Cut the frames.
 - **Permanently banned phrases:** Check for "In conclusion", "It is important to note", "Furthermore", "leverage", "unlock", "game changer", etc. (full list in EVAL.md item 9)
-- **Core rules:** First line at content, concrete detail, ~25 word ceiling per sentence, one claim, evidence from Zhenia's practice (not "many users"), no hedging, no pitch
+- **Core rules:** First line at content, concrete detail, ~25 word ceiling per sentence, one claim, evidence from Zhenia's practice as the source states it (never invented, never "many users"), no hedging, no pitch
 - **Length:** Reddit 60–150 words (unless question demands more), LinkedIn comment 40–80, LinkedIn post <200, X one thought
 - **Closing question** (skip for blog/Formula Daily): open, specific, genuinely unanswered, not a survey
 - **Spelling:** Never "correct" British to American or vice versa; match what Zhenia pasted
@@ -99,30 +82,3 @@ Distinct from the oblique tail clause (VOICE.md): glued = two half-ideas joined 
 Must-FAIL: "Business professor Sophie Leroy called it attention residue in a 2009 paper, the part of your mind that stays on the task you just left, and I run into it most days." (definition wedged mid-sentence; ', and' changes subject)
 
 This qualifies, not contradicts, the no-staccato and two-part rules: joining is permitted when the connection is kept; it is forbidden when the join hides the logic.
-
-## The three command words: fix, ghost, medium
-
-A message from Zhenia that **starts with one of these words** is a command about the text
-that follows (or the text pasted earlier in the thread). It is never a question to answer
-and never an invitation to discuss the content.
-
-| Word | Means | Reply |
-|---|---|---|
-| **fix** | Commission Writer to edit the text (Zhenia, 260914 — never do the line edit yourself): grammar, rhythm, machine tells, length the same or shorter. Keep every point Zhenia made. Do not answer it, do not reply to the person it is addressed to, do not add a claim. Fact-check any named claim before it goes back | the fixed text as plain chat text, nothing else — never a code block (Zhenia, 260914: plain text reads better in Slack); one line after it only if you added the closing question |
-| **ghost** | Build and schedule the Formula Daily post from it — `formula-daily` skill | the post's `preview_url` + `edit_url` |
-| **medium** | Draft it on Medium — `editorial` skill (`medium publish` = live) | the draft link |
-
-"fix" at the start of a message means the text is Zhenia's own draft, wherever it will be
-posted. Treating it as a Reddit thread to respond to is the failure mode.
-
-## When Zhenia pastes their own draft back ("fix")
-
-Zhenia's words outrank every rule here. `sessions_send` the paste to Writer
-(`agent:writer:main`, or a job slug if the thread already has one) with: fix
-grammar, rhythm and the machine tells, keep every point they made, do not add a
-claim of your own, same length or shorter. Review what comes back against
-VOICE.md, fact-check any named claim it contains with a real `web_search`, and
-return the whole thing as plain chat text, ready to paste — never wrapped in a
-code block (Zhenia, 260914). If their draft has no
-closing question, add one in their register — that is the one addition you are
-allowed to make, and say in a single line after the block that you added it.
