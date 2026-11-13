@@ -1,5 +1,6 @@
 ---
 name: calendar
+model: haiku
 description: Read or manage Zhenia's Google Calendar through the existing OpenClaw helper. Use for availability, event lookup, scheduling, or Calendar access diagnosis; not for Drive or Sheets.
 ---
 
