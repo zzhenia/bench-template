@@ -9,13 +9,13 @@ every time, and follows it. The request is: $ARGUMENTS
 
 This file holds the rules for every format. The files beside it add to it by job:
 
-| Writing | Also read |
-|---|---|
-| Anything published under Zhenia's name | `VOICE.md` |
-| A social post, comment, reply or short | `SOCIAL.md` (passes, closing question) |
-| A script, blog post or article | `CRAFT.md` (structure, opening, kicker) |
-| An image brief for Formula artwork | `ILLUSTRATION.md` |
-| Any draft for Zhenia, before reporting it | `EVAL.md` (scored check, 80% gate) |
+| Writing                                   | Also read                               |
+| ----------------------------------------- | --------------------------------------- |
+| Anything published under Zhenia's name    | `VOICE.md`                              |
+| A social post, comment, reply or short    | `SOCIAL.md` (passes, closing question)  |
+| A script, blog post or article            | `CRAFT.md` (structure, opening, kicker) |
+| An image brief for Formula artwork        | `ILLUSTRATION.md`                       |
+| Any draft for Zhenia, before reporting it | `EVAL.md` (scored check, 80% gate)      |
 
 Whoever orders the writing names what, for whom, the source and the destination.
 The order never lists these files: applying them is the writer's job.
