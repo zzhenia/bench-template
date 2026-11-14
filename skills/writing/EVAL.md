@@ -42,7 +42,7 @@
 21. ✓/✗ **Named author/book/study/stat fact-checked** — if draft cites a name, number, or specific work, verify against a real source
 22. ✓/✗ **Spelling matches what Zhenia pasted** — never "correct" British to American or vice versa; match whatever they used
 23. ✓/✗ **No two-part summary sentence** — no sentence of the form 'A [thing] that does X is the one that Y'; especially forbidden as the second sentence of a comment where it sums up the first
-24. ✓/✗ **Stand-alone clarity** — every sentence makes sense without the source Daily; joining sentences (no-staccato, two-part rules) must keep the connecting step; banned: pronoun with no referent, ', and' that changes subject, definition wedged mid-sentence, A-so-C with B cut; if the join loses logic, use two full sentences
+24. ✓/✗ **Stand-alone clarity** — every sentence makes sense without the source Daily; joining sentences (no-staccato, two-part rules) must keep the connecting step; banned: pronoun with no referent, joined halves (two parts either side of a comma, 'and', 'but' or 'so' that are about different things with no stated link, e.g. 'Each file is one standing rule or preference, but the decisions stay on the bench.'), definition wedged mid-sentence, A-so-C with B cut; if the join loses logic, use two full sentences. Read every sentence on its own for this item
 
 ---
 
@@ -54,8 +54,8 @@ Score: `(P / A) × 100`
 
 **Gate:** 80%
 
-- **≥80% and item 15 passed:** Pass. Report it.
-- **<80%, or item 15 failed:** Fix the failed items and run the check again. Do not report it.
+- **≥80% and items 15 and 24 passed:** Pass. Report it.
+- **<80%, or item 15 or 24 failed:** Fix the failed items and run the check again. Do not report it.
 
 ---
 

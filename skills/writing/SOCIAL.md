@@ -77,8 +77,10 @@ is added. This rule is for social only.
 
 Distinct from the oblique tail clause (VOICE.md): glued = two half-ideas joined into one sentence; oblique tail = second clause refers to an unstated premise via vague referents.
 
-**Stand-alone clarity: every sentence must make sense to a reader who never saw the source Daily. Joining sentences (no-staccato, two-part rules) must never drop the step that connects them. Banned: a pronoun with no clear referent, a clause bolted on with ', and' that changes subject, a definition wedged mid-sentence, A-so-C with B cut. If the join loses the logic, use two full sentences.**
+**Stand-alone clarity: every sentence must make sense to a reader who never saw the source Daily. Joining sentences (no-staccato, two-part rules) must never drop the step that connects them. Banned: a pronoun with no clear referent, a clause bolted on with ', and' / ', but' / ', so' that changes subject (joined halves: two parts about different things with no stated link), a definition wedged mid-sentence, A-so-C with B cut. If the join loses the logic, use two full sentences.**
 
 Must-FAIL: "Business professor Sophie Leroy called it attention residue in a 2009 paper, the part of your mind that stays on the task you just left, and I run into it most days." (definition wedged mid-sentence; ', and' changes subject)
+
+Must-FAIL: "Each file is one standing rule or preference, but the decisions stay on the bench." (joined halves: the files and the decisions are two separate points with no link)
 
 This qualifies, not contradicts, the no-staccato and two-part rules: joining is permitted when the connection is kept; it is forbidden when the join hides the logic.
