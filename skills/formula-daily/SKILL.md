@@ -271,7 +271,13 @@ On "pub", after `schedule` succeeds for the Ghost post:
    python3 tools/on-demand/ghost-blog/scripts/fd_scripts_append.py \
      --li <li_file> [--yt <yt_file>]
    ```
-   Tracker rows go on top (row 2, newest first). The script reads the next free FD26 ID from the **tracker** (Formula Daily tab, ID
+   Tracker rows go on top (row 2, newest first), and only through `fd_tracker_add.py` — never add a tracker row by hand (two sessions did, and FD26-118 landed twice):
+   ```
+   python3 tools/on-demand/ghost-blog/scripts/fd_tracker_add.py --fd FD26-NNN \
+     --title "..." --cta ZVLM-NNN --status Scheduled --ghost-id <post id> --date YYYY-MM-DD
+   ```
+   It is idempotent: an ID already in column A prints "FD26-NNN already in tracker row N" and changes nothing, so it is safe if another session already added it. `--dry-run` shows the row without writing. If the tracker holds a repeated ID, `fd-handedited-sync` logs `DUPLICATE tracker id`, stops sorting and deletes nothing; tell Kitty, a human removes the extra row.
+   `fd_scripts_append.py` reads the next free FD26 ID from the **tracker** (Formula Daily tab, ID
    column, sheet `1zaFnxMkVRwRSE2pF3j0IU7Y2MIzOl48jNlOMkik9vC0`) — not a running count
    — backs up the doc, and appends one entry above the grey divider of the LI tab for the FD
    ID's day (and that month's YT tab if `--yt` was given): FD26-101–131 → "December 26 LI".
