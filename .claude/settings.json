@@ -8,6 +8,12 @@
             "command": "color=$(grep '^BENCH_COLOR=' \"$CLAUDE_PROJECT_DIR/config/bench.env\" 2>/dev/null | cut -d= -f2-); [ -n \"$color\" ] || { colors=(red blue green yellow purple orange pink cyan); color=${colors[$((RANDOM % 8))]}; }; printf '{\"systemMessage\":\"Bench colour: %s — type /color %s\"}' \"$color\" \"$color\"",
             "timeout": 5,
             "statusMessage": "Bench colour..."
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/actions/recurring/bench-update/check.sh\"",
+            "timeout": 20,
+            "statusMessage": "Checking for bench updates..."
           }
         ]
       }
