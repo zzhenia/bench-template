@@ -1,28 +1,30 @@
 # The Bench
 
-A personal knowledge and automation workspace built on Claude Code, Obsidian, and GitHub.
+A personal knowledge and automation workspace built on an agent CLI (Claude Code or Codex), Obsidian, and GitHub.
 
-Each team member runs their own bench — a private repo where Claude Code has persistent context, session notes are tracked as markdown, and repeatable tasks live as versioned actions.
+Each team member runs their own bench — a private repo where the agent has persistent context, session notes are tracked as markdown, and repeatable tasks live as versioned actions.
+
+---
+
+## Free and paid
+
+**Free (this template):** everything in this repo, run from your own CLI with no
+limitation. Every tool, skill, command and scheduled job listed below is included.
+
+**Paid:** the desktop app and agentic capability. Nothing in the free bench depends on it.
 
 ---
 
 ## Prerequisites
 
-- [Claude Code](https://claude.ai/code) (CLI)
-- **[Warp](https://warp.dev)** or **[Cursor](https://cursor.com)** — the two
-  supported hosts. Pick either; you can run both.
-- [Obsidian](https://obsidian.md) (optional — for note linking and search)
+- An agent CLI: [Claude Code](https://claude.ai/code) or [Codex](https://github.com/openai/codex).
+  Claude Code reads `CLAUDE.md`; Codex reads `AGENTS.md`, which carries the same rules.
+- Any editor or IDE with a terminal, or a terminal on its own
+- [Obsidian](https://obsidian.md) (optional, for note linking and search)
 - Python 3.10+
 - A GitHub account
 
-API integrations (Jira, Asana, Toggl) are optional — the bench works without them. `setup.sh` asks which project-management tool you use (`jira`, `asana` or `none`) and saves it as `PM_TOOL` in `config/bench.env`; with `none` there is no ticket step.
-
-> **On supported environments.** The bench runs in any terminal — Terminal.app,
-> iTerm, ssh — and every action works there. What Warp and Cursor add is the
-> environment layer: a project picker, a Claude session that starts named and
-> coloured, and a one-word command to open a project in its own window. Those
-> two are the only hosts with a setup kit and the only ones we fix bugs for.
-> VS Code, Zed and JetBrains are unsupported.
+API integrations (Jira, Asana, Toggl) are optional; the bench works without them. `setup.sh` asks which project-management tool you use (`jira`, `asana` or `none`) and saves it as `PM_TOOL` in `config/bench.env`; with `none` there is no ticket step.
 
 ---
 
@@ -39,17 +41,13 @@ mkdir -p ~/dev && cd ~/dev
 git clone https://github.com/your-username/my-bench.git
 ```
 
-Then open the folder in your host:
-
-- **Cursor** — `cursor ~/dev/my-bench`, or **File → Open Folder**. You should
-  see the bench files (`.claude`, `actions`, `config`, `convos`, …) at the root
-  of the sidebar, not nested inside a subfolder.
-- **Warp** — `cd ~/dev/my-bench`. The Project Explorer roots itself at the
-  nearest git toplevel, so it follows automatically.
+Open the folder in your editor, or `cd ~/dev/my-bench` in a terminal. The bench
+files (`.claude`, `actions`, `config`, `convos`, …) should sit at the root, not
+inside a subfolder.
 
 **3. Run setup**
 
-In a terminal at the repo root (in Cursor: ``Ctrl+` ``):
+In a terminal at the repo root:
 
 ```bash
 chmod +x setup.sh && ./setup.sh
@@ -59,30 +57,36 @@ This copies `config/keys.env.template` → `config/keys.env`. Fill in your API k
 
 **4. Enter your name**
 
-During setup you'll be asked: *"Hello! How shall I call you?"* — your name is saved in `config/keys.env` as `BENCH_OWNER` and appears in the Actions Dashboard header (e.g. "Ben's Actions Dashboard"). You can change it anytime by editing `config/keys.env`.
+During setup you'll be asked: *"Hello! How shall I call you?"* Your name is saved in `config/keys.env` as `BENCH_OWNER` and appears in the Actions Dashboard header (e.g. "Ben's Actions Dashboard"). Change it anytime by editing `config/keys.env`.
 
-**5. Open in Claude Code**
-
-In Cursor, install the **Claude Code** extension from the Extensions panel
-(search "Claude Code" by Anthropic). In Warp, nothing to install. Either way:
+**5. Start your agent**
 
 ```bash
-claude .
+claude .     # or: codex
 ```
 
-Claude reads `CLAUDE.md` and `master-instructions.md` at the start of each
-session. Your commands (`/note`, `/push`, `/status`, `/ai`) are ready immediately.
+The agent reads the bench rules and `master-instructions.md` at the start of
+each session. Your commands (`/note`, `/push`, `/status`, `/ai`) are ready immediately.
 
-**6. Optional — install the environment layer**
+**6. Optional: install the startup layer**
 
-This is what makes a bench feel like a bench rather than a folder: a project
-picker on every new tab, `wp` / `cw` to open a project in its own window, and a
-Claude session that starts already named after the project.
+This is what makes a bench feel like a bench rather than a folder. It is one
+`~/.zshrc` block (`config/warp/zshrc-picker.zsh`); the setup notes are in the
+READMEs under `config/`. Once installed, every new terminal tab in the bench runs
+this sequence:
 
-- Warp: `config/warp/README.md` → *Apply on a new machine*
-- Cursor: `config/cursor/README.md` → *Apply on a new machine*
-
-Both install the same `~/.zshrc` block, so doing one first makes the other short.
+1. **Pick a conversation.** The tab opens on a numbered list of your most
+   recently used convos. Press a number or type a name; `r` opens a project
+   menu, `s`, a blank line or 30 s of silence gives a plain shell, and `bench`
+   brings the menu back any time.
+2. **Colour change.** The agent session starts named after the convo and gets a
+   random session colour, so tabs are easy to tell apart. The `>>name` first
+   message is staged, unsent, and costs nothing until you press Enter.
+3. **Automatic notes.** After 15 minutes of quiet, `auto-note` writes the session
+   note into the convo folder for you. `/note` still writes one on demand.
+4. **Closing windows.** A tab whose note is written and that has stayed idle for
+   60 minutes is closed for you. `/e` writes the note and closes the tab now;
+   `claude --resume <id>` reopens any closed session.
 
 ---
 
@@ -92,7 +96,7 @@ Once setup is complete, work through these to get familiar with your bench:
 
 - [ ] **Review the Getting Started checklist** — you're reading it now!
 - [ ] **Enter your name** — run `./setup.sh` and answer the welcome prompt (or edit `BENCH_OWNER` in `config/keys.env` directly)
-- [ ] **Pick a bench colour** — `./setup.sh` asks (red, blue, green, yellow, purple, orange, pink, cyan). It colours the Cursor window, with a dark and a light variant that follow the system, and the Claude session. Switch later with `python3 scripts/bench-colour.py <colour>`
+- [ ] **Pick a bench colour** — `./setup.sh` asks (red, blue, green, yellow, purple, orange, pink, cyan). It colours the editor window, with a dark and a light variant that follow the system, and the agent session. Switch later with `python3 scripts/bench-colour.py <colour>`
 - [ ] **Create your first note** — start a conversation with Claude, then run `/note` to save a session note to a convo folder
 - [ ] **Create your first action** — copy `actions/on-demand/meeting-minutes/` to a new folder, rename it, and edit `instructions.md`
 - [ ] **Open the Actions Dashboard** — run `bash actions/on-demand/actions-dashboard/run.sh` and visit http://localhost:7391 to see your actions listed
@@ -107,11 +111,11 @@ your-bench/
 ├── master-instructions.md   ← Claude's operating guide for this bench
 ├── bench-index.csv          ← index of all actions and convos + ticket links
 ├── CLAUDE.md                ← always-loaded operating rules
+├── AGENTS.md                ← the same rules for Codex (link to CLAUDE.md)
 ├── config/
 │   ├── bench.env            ← non-secret settings (PM_TOOL, BENCH_COLOR)
 │   ├── keys.env.template    ← copy to keys.env and fill in your API keys
-│   ├── warp/                ← Warp setup kit (zshrc block, wp, tab configs)
-│   └── cursor/              ← Cursor setup kit (cw, per-project folderOpen tasks)
+│   └── warp/ cursor/        ← terminal setup kits (startup picker, open-in-window)
 ├── scripts/                 ← shared utilities (jira.sh, …)
 ├── actions/
 │   ├── on-demand/           ← manually triggered actions
@@ -162,20 +166,37 @@ Claude will answer your question. When you run `/note`, it automatically creates
 
 To continue an existing convo, use the same `>> name` to restore context from previous notes.
 
-### Commands
+### Default tools and skills
 
-| Command | What it does |
+All of these ship with the free bench.
+
+| Command / skill | What it does |
 |---------|-------------|
 | `/note` | Writes a session note to the active convo folder; offers to post to the linked ticket |
 | `/push` | Commits and pushes all changes; creates notes; offers to post to linked tickets |
-| `/status` | Runs automation-status and shows a snapshot of scheduled jobs |
-| `/ai` | Processes all `@ai` inline annotations in a file |
-| `/dashboard` | Opens the Actions Dashboard in your browser (starts it if not running) |
-| `/dashboard stop` | Stops the dashboard |
-| `/dashboard restart` | Restarts the dashboard |
-| `/eod` | End-of-day wrap-up — note, commit, push, stop services |
+| `/sync` | Commits local work, pulls what changed on GitHub, pushes. No notes, no tickets |
+| `/e` | Writes the session note now and closes the tab |
+| `/eod` | End-of-day wrap-up: note, commit, push, stop services |
 | `/bugs` | Records bugs to carry into the next session |
+| `/status` | Shows a snapshot of the scheduled jobs |
+| `/ai` | Processes all `@ai` inline annotations in a file |
 | `/nb` | Unwraps hard-wrapped text (clipboard, inline text, or a file) |
+| `/atl` | Redoes the last answer at half the length |
+| `/dashboard` | Opens the Actions Dashboard (`stop`, `restart` to manage it) |
+| `bench-recall` | Searches past convo notes before answering about earlier work |
+| `writing` | Style rules for anything written: articles, scripts, emails, SOPs |
+| `jira` | Opening Jira issues and updating Confluence pages |
+| `toggl` | Reading and writing Toggl time entries within the free-plan rate limit |
+
+**On-demand actions** (`actions/on-demand/`): `actions-dashboard` (local web
+dashboard), `automation-status` (what `/status` runs), `bench-ticket` (ticket
+lookup and comment posting), `meeting-minutes` (example action to copy).
+
+**Scheduled jobs** (`actions/recurring/`): `auto-note` (notes and closes idle
+tabs), `context-trim` (past a token limit, offers a note and a clean restart),
+`convo-memory` (nightly compression of convo notes), `python-repin` and
+`brew-check` (keep the Python and Homebrew tools that jobs call working),
+`weekly-check-ins`.
 
 ### Bench Index (`bench-index.csv`)
 
