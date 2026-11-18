@@ -16,6 +16,23 @@ session_id=$(printf '%s' "$payload" | jq -r '.session_id // empty')
 cwd=$(printf '%s' "$payload" | jq -r '.cwd // empty')
 prompt=$(printf '%s' "$payload" | jq -r '.prompt // .message // .content // empty')
 
+# ── freeze ─────────────────────────────────────────────────────────────────
+# `/freeze` marks this tab so auto-note never auto-closes it, and is blocked
+# here so it reaches no model and leaves the idle clock alone. Any other
+# message unfreezes the tab. actions/on-demand/freeze/freeze.sh owns the mark.
+if [ -n "${CLAUDE_PID:-}" ]; then
+  if printf '%s' "$prompt" | grep -qE '^[[:space:]]*/freeze[[:space:]]*$'; then
+    if out=$(bash "$CLAUDE_PROJECT_DIR/actions/on-demand/freeze/freeze.sh" --pid "$CLAUDE_PID" 2>&1); then
+      reason="Frozen: this tab will not auto-close. Typing anything unfreezes it."
+    else
+      reason="Not frozen: $out"
+    fi
+    jq -n --arg r "$reason" '{decision:"block", reason:$r}'
+    exit 0
+  fi
+  rm -f "$HOME/.claude/bench-sessions/frozen/$CLAUDE_PID"
+fi
+
 topic=$(printf '%s' "$prompt" | head -1 \
   | sed -n 's/.*>>[[:space:]]*\([a-zA-Z0-9_-]*\).*/\1/p' \
   | tr '[:upper:]' '[:lower:]')

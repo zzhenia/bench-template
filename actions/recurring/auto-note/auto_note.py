@@ -616,6 +616,24 @@ def own_entries() -> list[tuple[Path, dict]]:
     return found
 
 
+def frozen(pid) -> bool:
+    """`/freeze` (actions/on-demand/freeze) marks a tab as never auto-closed. The
+    mark holds the CLI's start time, so a recycled pid does not inherit it."""
+    if not pid:
+        return False
+    f = REGISTRY_DIR / "frozen" / str(pid)
+    try:
+        want = f.read_text().strip()
+        got = subprocess.run(["ps", "-o", "lstart=", "-p", str(pid)], capture_output=True,
+                             text=True).stdout
+    except (OSError, subprocess.SubprocessError):
+        return False
+    if " ".join(got.split()) == want:
+        return True
+    f.unlink(missing_ok=True)
+    return False
+
+
 def autoclose(cfg: dict, state: dict, parsed_by_sid: dict, dry_run: bool) -> None:
     ac = cfg["autoclose"]
     if not ac["enabled"]:
@@ -643,6 +661,9 @@ def autoclose(cfg: dict, state: dict, parsed_by_sid: dict, dry_run: bool) -> Non
         tty_path, pid, topic = entry.get("tty", ""), entry.get("pid"), entry.get("topic", "")
         if not tty_live(tty_path, pid):
             pending.pop(sid, None); cpu_seen.pop(sid, None)
+            continue
+        if frozen(pid):
+            pending.pop(sid, None)
             continue
 
         cpu_now = tty_cpu(tty_path.removeprefix("/dev/"))

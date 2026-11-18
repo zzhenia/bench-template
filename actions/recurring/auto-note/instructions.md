@@ -25,6 +25,12 @@ a tab was forgotten, and finished tabs do not pile up.
    sends HUP to the tab's shell, TERM, then KILL, and logs "closed" only when
    every process is gone. Any new activity cancels a pending close. Reopen with
    `claude --resume <session id>` (in the log line).
+4. **Frozen tabs.** `/freeze` in a tab exempts it from auto-close until the
+   next message typed there. The prompt hook writes
+   `~/.claude/bench-sessions/frozen/<cli pid>` and stops the prompt, so no model
+   runs and the idle clock is untouched. The status line shows a cyan `FROZEN`
+   tag while it holds. `actions/on-demand/freeze/freeze.sh --all` freezes every
+   Claude tab in Cursor, `--list` shows them, `--off` clears one.
 
 ## How it finds windows
 

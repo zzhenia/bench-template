@@ -69,5 +69,10 @@
         ]
       }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "f=\"${CLAUDE_PROJECT_DIR:-.}/actions/on-demand/freeze/statusline.sh\"; if [ -f \"$f\" ]; then bash \"$f\"; else printf '\\033[34m%s\\033[0m' \"$(jq -r '.workspace.current_dir // .cwd')\"; fi",
+    "refreshInterval": 10
   }
 }
