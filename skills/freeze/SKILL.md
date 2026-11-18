@@ -7,8 +7,10 @@ model: haiku
 The `UserPromptSubmit` hook normally handles a bare `/freeze` before it reaches
 you. If you are reading this, do it yourself, with no questions:
 
-1. Run `tools/on-demand/freeze/freeze.sh` (or `tools/on-demand/freeze/freeze.sh --all`
-   when the argument is `all`).
+1. Run `freeze.sh` from the first folder that has it: `tools/on-demand/freeze/`,
+   `actions/on-demand/freeze/` (bench template), else
+   `~/dev/dev-ZV/ZV-Bench/tools/on-demand/freeze/`. Add `--all` when the
+   argument is `all`.
 2. Reply with one line: `Frozen: this tab will not auto-close. Typing anything unfreezes it.`
    or `Not frozen: <the script's error>`.
 
