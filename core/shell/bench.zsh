@@ -57,7 +57,8 @@ typeset -g BENCH_CONVO_GLOB=${BENCH_CONVO_GLOB:-$ZV_CONVO_GLOB}
 bench_cfg BENCH_DEV_DIR "$HOME/dev";              typeset -g BENCH_DEV=$REPLY
 bench_cfg BENCH_OTHER_WINDOW;                     typeset -g BENCH_OTHER_WINDOW=$REPLY
 bench_cfg BENCH_OTHER_WINDOW_LABEL "other bench"; typeset -g BENCH_OTHER_WINDOW_LABEL=$REPLY
-bench_cfg BENCH_CATCHUP_QUEUE "$HOME/.bench-catchup"; typeset -g BENCH_CATCHUP_QUEUE=$REPLY
+# Exported: core/tools/catchup, run from a session in this tab, queues into the same folder.
+bench_cfg BENCH_CATCHUP_QUEUE "$HOME/.bench-catchup"; typeset -gx BENCH_CATCHUP_QUEUE=$REPLY
 
 typeset -g BENCH_AI=claude   # claude | deepseek — chosen by bench_choose_ai below
 
@@ -148,7 +149,7 @@ convo() {
     else
       print -r -- "   r⏎ other repo…              s⏎ just a shell"
     fi
-    [[ -f $BENCH_DIR/tools/on-demand/catchup/catchup.py ]] \
+    [[ -f $BENCH_DIR/core/tools/catchup/catchup.py ]] \
       && print -r -- "   c⏎ catch up (convos since last run)"
     print -r -- ""
     local prompt="  pick (number, or type a name + Enter): " key
@@ -182,7 +183,7 @@ convo() {
       case $line in
         [rR]) bench_repo_menu; return $? ;;
         [sS]|'') print -r -- "  shell"; return 0 ;;
-        [cC]) if [[ -f $BENCH_DIR/tools/on-demand/catchup/catchup.py ]]; then
+        [cC]) if [[ -f $BENCH_DIR/core/tools/catchup/catchup.py ]]; then
                 cd -- "$BENCH_DIR" || return 1
                 bench_claude -n "Catchup" "catchup"
                 return $?
@@ -533,7 +534,7 @@ bench_menu_once() {
   [[ $BENCH_TERM_KIND == warp && -z $WARP_BOOTSTRAPPED ]] && return 0
   add-zsh-hook -d precmd bench_menu_once
 
-  # The catch-up tool (tools/on-demand/catchup, if this bench has it) queued this
+  # The catch-up tool (core/tools/catchup) queued this
   # tab: claim the oldest entry (line 1 title, line 2 ai, line 3 prompt file; ai `resume`: line 3 is a session id)
   # and launch it instead of the menu. Entries older than 2 min are leftovers
   # from a failed run: dropped.
