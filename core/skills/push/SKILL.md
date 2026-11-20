@@ -43,11 +43,11 @@ Commit **everything that's finished and unpushed** and push to remote. Follow th
 6. **Create session notes.** From the diff, identify which `convos/` folders are involved. For each relevant folder, create or append a session note following all rules in the `/note` command (YYMMDD-short-description.md, Convo Template, check for existing note today first). Files outside `convos/` do not automatically require a note — only create one if the change is clearly tied to a tracked conversation.
 
 7. **Post to tickets** — only if `PM_TOOL` in `config/bench.env` is `jira` or `asana`; with `none` or empty, skip this step. For each note written:
-   - Look up the slug in `bench-index.csv` using `bench_ticket.py lookup <slug>`.
+   - Look up the slug in `bench-index.csv` using `python3 core/tools/bench-ticket/bench_ticket.py lookup <slug>`.
    - If a ticket is linked, **show the user** the ticket key and title, the comment that would be posted, and a "Skip" option, and **ask for confirmation** before posting. Do NOT post automatically.
    - Only after the user confirms, run:
      ```bash
-     python3 tools/on-demand/bench-ticket/bench_ticket.py post <slug> <note-file> --key <KEY>
+     python3 core/tools/bench-ticket/bench_ticket.py post <slug> <note-file> --key <KEY>
      ```
      See CLAUDE.md "Ticket Posting — Confirmation Required".
    - If no ticket is linked, inform the user — do not search for or link tickets.

@@ -14,10 +14,15 @@ patterns=(
   '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b'
 )
 args=(); for p in "${patterns[@]}"; do args+=(-e "$p"); done
-hits=$(grep -rnIEo --exclude-dir=.git "${args[@]}" "$@" 2>/dev/null)
+# Only files git would publish: tracked or new, never ignored (caches, venvs, state).
+files=()
+while IFS= read -r f; do [ -f "$f" ] && files+=("$f"); done < <(git ls-files --cached --others --exclude-standard -- "$@")
+[ ${#files[@]} -gt 0 ] || exit 0
+set -- "${files[@]}"
+hits=$(grep -nIEo -H "${args[@]}" "$@" 2>/dev/null)
 if [ -s config/private-terms.txt ]; then
   terms=$(grep -vE '^\s*(#|$)' config/private-terms.txt)
-  [ -n "$terms" ] && hits+=$'\n'$(grep -rnIEoi --exclude-dir=.git -f <(echo "$terms") "$@" 2>/dev/null)
+  [ -n "$terms" ] && hits+=$'\n'$(grep -nIEoi -H -f <(echo "$terms") "$@" 2>/dev/null)
 fi
 if [ -s core/scan-allow.txt ]; then
   hits=$(echo "$hits" | grep -vE -f <(grep -vE '^\s*(#|$)' core/scan-allow.txt))

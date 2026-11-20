@@ -6,12 +6,12 @@ model: haiku
 
 If `personal/overlays/status.md` exists in this bench, read it first; where it differs from the steps below, it wins.
 
-Run the automation status script and display the result.
+Run the automation inventory and display the result.
 
 1. Run:
    ```bash
-   python3 tools/on-demand/automation-status/generate_status.py
+   python3 core/tools/automation-status/inventory.py
    ```
-2. The script writes a dated markdown snapshot to `tools/on-demand/automation-status/assets/YYMMDD-automations.md`.
-3. Read that file and display its contents inline — show both the summary table and the Details section.
-4. Report the output file path at the end.
+   It regenerates `AUTOMATIONS.md` at the bench root: every scheduled job, where and when it runs, model calls, Slack posts, 7-day cost, what it does.
+2. Read `AUTOMATIONS.md` and show the table inline.
+3. For the launchd detail view (last run status, log tails) run `python3 core/tools/automation-status/generate_status.py` and show the file it writes (`state/automation-status/YYMMDD-automations.md`).

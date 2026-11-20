@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>__LABEL__</string>
+    <!-- Homebrew Python (3.10+); python-repin keeps the version pinned -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>__PYTHON__</string>
+        <string>__BENCH_PATH__/core/tools/convo-memory/convo_memory.py</string>
+        <string>--all</string>
+    </array>
+    <!-- Nightly at 02:30 -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>2</integer>
+        <key>Minute</key>
+        <integer>30</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>/tmp/__LABEL__.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/__LABEL__.err</string>
+</dict>
+</plist>

@@ -38,16 +38,16 @@ Write a session note for this conversation. Follow these steps:
 3. **Choose a short description** — one or two kebab-case words summarising the session topic (e.g. `csv-fix`, `push-command`, `folder-structure`).
 
 4. **Check for an existing note** at `convos/<folder>/YYMMDD-<description>.md` and also any file matching `convos/<folder>/YYMMDD*.md`.
-   - If none exists → create `YYMMDD-<description>.md` from `convos/Templates/Convo Template.md`, replacing `{{TOPIC}}` with the folder name and `{{DATE}}` with today's date.
+   - If none exists → create `YYMMDD-<description>.md` from the template — `convos/Templates/Convo Template.md` if this bench has one, otherwise `core/skills/note/template.md` — replacing `{{TOPIC}}` with the folder name and `{{DATE}}` with today's date.
    - If one already exists → ask: "Today's note already exists as `<filename>`. Should I append to it, or create a new file `YYMMDD-<description>-02.md`?" Then act on the answer.
    - **Exception — auto-notes.** If the existing note contains an `#### Auto-note —` section or a `written automatically` HTML comment, it was written by the `auto-note` watcher while the window sat idle. **Append to it without asking**, under a `#### /note — <HH:MM>` heading, and cover anything the auto-note got wrong or missed. Do not create a second file, and do not delete the auto-note section.
 
 5. **Write the note content** — summarise what was actually discussed this session: key decisions, action items, open questions, references used.
 
 6. **Post to ticket** — only if `PM_TOOL` in `config/bench.env` is `jira` or `asana`; with `none` or empty, skip this step entirely. **ALWAYS confirm the target ticket with the user first. NEVER post automatically, even when only one ticket is linked.** Many convos are broad topics that span many different tickets (catch-all convos), so a single linked key is NOT a safe default to post to.
-   - First read the linked key(s) with `python3 tools/on-demand/bench-ticket/bench_ticket.py lookup <slug>`.
+   - First read the linked key(s) with `python3 core/tools/bench-ticket/bench_ticket.py lookup <slug>`.
    - Present the linked ticket(s) **with their titles** plus a "Skip — don't post" option, and **wait for the user to choose** the ticket relevant to *this* session.
-   - Only after the user confirms, post with an explicit key: `python3 tools/on-demand/bench-ticket/bench_ticket.py post <slug> <note-file> --key <KEY>`. It only posts to a key already linked to the slug.
+   - Only after the user confirms, post with an explicit key: `python3 core/tools/bench-ticket/bench_ticket.py post <slug> <note-file> --key <KEY>`. It only posts to a key already linked to the slug.
    - If the slug has no linked ticket, skip posting and say so — never search for or link a ticket.
 
 **Naming convention:** Always use `YYMMDD-short-description.md` — never a bare `YYMMDD.md`.

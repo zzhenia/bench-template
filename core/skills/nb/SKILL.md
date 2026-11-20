@@ -6,7 +6,7 @@ model: haiku
 
 If `personal/overlays/nb.md` exists in this bench, read it first; where it differs from the steps below, it wins.
 
-Run `scripts/nobreaks.sh` once. Do nothing else.
+Run `core/tools/nobreaks/nobreaks.sh` once. Do nothing else.
 
 This command exists so the user can copy text out of a terminal. It is not an
 invitation to investigate anything.
@@ -16,9 +16,9 @@ with no model turn. `/nb` is for text or a path handed over in the message.
 
 | They gave you | Run |
 |---|---|
-| Nothing (`/nb` bare) | `scripts/nobreaks.sh -p` |
-| Text after `/nb` | write it to the scratchpad, then `scripts/nobreaks.sh <file>` |
-| A file path | `scripts/nobreaks.sh <path>` |
+| Nothing (`/nb` bare) | `core/tools/nobreaks/nobreaks.sh -p` |
+| Text after `/nb` | write it to the scratchpad, then `core/tools/nobreaks/nobreaks.sh <file>` |
+| A file path | `core/tools/nobreaks/nobreaks.sh <path>` |
 
 ## Hard rules
 
