@@ -534,7 +534,7 @@ bench_menu_once() {
   add-zsh-hook -d precmd bench_menu_once
 
   # The catch-up tool (tools/on-demand/catchup, if this bench has it) queued this
-  # tab: claim the oldest entry (line 1 title, line 2 ai, line 3 prompt file)
+  # tab: claim the oldest entry (line 1 title, line 2 ai, line 3 prompt file; ai `resume`: line 3 is a session id)
   # and launch it instead of the menu. Entries older than 2 min are leftovers
   # from a failed run: dropped.
   local q t a f
@@ -545,6 +545,9 @@ bench_menu_once() {
     cd -- "$BENCH_DIR" || return 1
     if [[ $a == codex ]]; then
       print -n -- "\e]0;${t}\a"; codex "$(<$f)"
+    elif [[ $a == resume ]]; then
+      # Line 3 is a session id: reopen that session (a tab closed by mistake).
+      bench_claude -n "$t" --resume "$f"
     else
       bench_claude -n "$t" "$(<$f)"
     fi
