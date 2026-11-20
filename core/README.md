@@ -7,6 +7,8 @@ published to the bench template, and benches take it with `/update`.
   `bin/link-skills.sh`, next to the bench's own skills in `personal/skills/`.
 - `rules.md` — rules every session follows, loaded by `@core/rules.md` in the
   bench's `CLAUDE.md`.
+- `env/` — Cursor, Warp and Claude Code settings the bench needs, merged into
+  the machine's files by `env/apply.py` on setup and on every `/update`.
 - `bench-update/` — the daily update check and `/update`.
 - `bin/` — `link-skills.sh`, `scan-personal.sh` (blocks publishing when core
   holds a personal detail), `notices.sh` (shows notices from unattended jobs at

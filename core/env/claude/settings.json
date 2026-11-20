@@ -1,0 +1,11 @@
+{
+  "_comment": "Merged into ~/.claude/settings.json by core/env/apply.py, key by key. Auto permission mode, and the status line that shows the cwd and a frozen tab.",
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "f={{BENCH_DIR}}/core/tools/freeze/statusline.sh; if [ -f \"$f\" ]; then bash \"$f\"; else printf '\\033[34m%s\\033[0m' \"$(jq -r '.workspace.current_dir // .cwd')\"; fi",
+    "refreshInterval": 10
+  }
+}

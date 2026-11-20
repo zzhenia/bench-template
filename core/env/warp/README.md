@@ -1,58 +1,39 @@
 # Warp setup kit
 
-Reproduces the bench's terminal setup on a new machine. Warp is one of the two
-supported hosts; the other is Cursor, whose kit lives in `config/cursor/`. Both
-share the single `~/.zshrc` block in this folder.
-
-The `## Zed` section below is kept as a record of a trial that did not become a
-supported host. Don't extend it.
+The bench's terminal setup: Warp, plus the shell layer it shares with Cursor
+(`core/shell/bench.zsh`). Settings here are applied by `core/env/apply.py`
+(see `core/env/README.md`), on setup and on every `/update`.
 
 ## Contents
 
 | File | What it is |
 |------|------------|
-| `settings.toml.template` | Portable subset of `~/.warp/settings.toml` — deliberate keys only, with `{{PROJECT_DIR}}` placeholder |
-| `zshrc-picker.zsh` | The `.zshrc` block: new-tab project menu, `convo` launcher (rename + colour + staged `>>` message), `bench` command. Drives Warp, Zed **and** Cursor — see those sections |
-| `wp` | Executable — opens a project in a **new window** via `warp://…?new_window=true`, the only way to control the Project Explorer root. Install to `~/.local/bin/` |
-| `keybindings.yaml` | Custom keybindings. Copy to `~/.warp/`. Flat `"<action>": <keys>` map, one binding per action |
+| `settings.toml` | Warp settings the bench needs, merged into `~/.warp/settings.toml`. `{{BENCH_DIR}}` becomes the bench folder |
+| `keybindings.yaml` | Custom keybindings, merged into `~/.warp/keybindings.yaml`. Flat `"<action>": <keys>` map, one binding per action |
 | `img` | Executable — opens a Claude Code `[Image #N]` attachment from the on-disk cache. Install to `~/.local/bin/` |
-| `tab_configs/*.toml` | One coloured tab config per non-bench project. Copy to `~/.warp/tab_configs/` and edit each `directory` |
-| `claude-user-settings.template.json` | Portable subset of `~/.claude/settings.json` — `permissions.defaultMode: "auto"` and the cwd status line |
-| `claude-project-settings.template.json` | Portable subset of `<project>/.claude/settings.json` — SessionStart random-colour hook and the `>>topic` title hook |
+| `core/shell/wp` | Executable — opens a project in a **new window** via `warp://…?new_window=true`, the only way to control the Project Explorer root. Symlink into `~/.local/bin/` |
+
+A bench's own tab configs (one per project, with machine paths) live in its
+`config/warp/`, not here.
 
 ## Apply on a new machine
 
-1. **Back up first, always incrementing:** `~/.warp/settings.toml_oldNN` and
-   `~/.zshrc_oldNN` — glob for existing `_old*` and take the next number.
-   Never overwrite an existing backup.
-2. **Quit Warp fully (Cmd+Q)** before editing `settings.toml` — settings sync
-   re-serialises the file over hand edits from a running Warp. Re-read the
-   file afterwards to confirm the edit survived.
-3. Merge `settings.toml.template` into `~/.warp/settings.toml`, replacing
-   `{{PROJECT_DIR}}` with the machine's main working folder. Keep all four
-   `working_directory_config` sub-tables — a partial table is silently
-   ignored ("Invalid value" banner, default used).
-4. Validate: `python3 -c "import tomllib; tomllib.load(open('$HOME/.warp/settings.toml','rb'))"`.
-5. Append `zshrc-picker.zsh` to `~/.zshrc` and edit the two PER-MACHINE
-   sections (project list, bench checkout path). `zsh -n ~/.zshrc` to check.
-   Also `install -m 755 wp ~/.local/bin/wp` (no edits needed — it discovers
-   repos under `~/dev` itself).
-6. Merge `claude-user-settings.template.json` into `~/.claude/settings.json`
-   and `claude-project-settings.template.json` into the project's
-   `.claude/settings.json` (drop the `_comment` keys). Merge — never replace;
-   both files carry other machine-specific keys.
-7. Install the `img` helper onto `PATH`:
-   `cp config/warp/img ~/.local/bin/img && chmod +x ~/.local/bin/img`.
+1. `python3 core/env/apply.py` — merges `settings.toml` and `keybindings.yaml`
+   (and the Cursor and Claude Code settings), backing each file up first.
+   Warp settings sync can re-serialise the file over edits made while Warp
+   runs: if a value does not stick, quit Warp (Cmd+Q) and run it again.
+2. Add `source "<bench>/core/shell/bench.zsh"` to `~/.zshrc`. Projects go in
+   `config/projects.tsv`, settings in `config/bench.env`. Check with
+   `zsh -i -c 'type bench; type bench_claude_named'`. Also
+   `ln -s <bench>/core/shell/wp ~/.local/bin/wp`.
+3. Install the `img` helper onto `PATH`:
+   `cp core/env/warp/img ~/.local/bin/img && chmod +x ~/.local/bin/img`.
    **`~/.local/bin` is not on `PATH` by default on a clean machine** — check
    with `which img`, and if it comes back empty add
-   `export PATH="$HOME/.local/bin:$PATH"` to `~/.zshrc`. Smoke-test with
-   `img -l` (on a machine with no cached images yet, `img: no image cache at
-   …` is the correct answer, not a failure). Requires `python3` and macOS
-   `open`.
-8. Copy `tab_configs/*.toml` to `~/.warp/tab_configs/` and edit the
-   `directory` line in each to this machine's paths. Validate with
-   `python3 -c "import tomllib,glob; [tomllib.load(open(f,'rb')) for f in glob.glob('$HOME/.warp/tab_configs/*.toml')]"`.
-9. Relaunch Warp. Most keys hot-reload; `default_session_mode` needs the
+   `export PATH="$HOME/.local/bin:$PATH"` to `~/.zshrc`.
+4. Copy the bench's `config/warp/tab_configs/*.toml` (if any) to
+   `~/.warp/tab_configs/` and edit each `directory` line.
+5. Relaunch Warp. Most keys hot-reload; `default_session_mode` needs the
    relaunch.
 
 **Permission mode is set in two places on purpose** — `--permission-mode auto`
@@ -72,8 +53,8 @@ done
 ```
 
 A leading run of `default` means that session opened in manual mode. This
-only works for bare Claude Code CLI sessions — an agent runtime that wraps
-Claude Code may write a `mode` field instead of `permissionMode`, so the audit returns empty
+only works for bare Claude Code CLI sessions — OpenClaw's agent runtime
+writes a `mode` field instead of `permissionMode`, so the audit returns empty
 arrays there. On those machines `~/.claude.json` is the authoritative source
 for the auto-mode opt-in state.
 
@@ -98,7 +79,7 @@ plain shell without it), `expect` (ships with macOS).
 - **Readiness and acks: match the header, never word-painted text.** Claude
   paints footer and ack lines word-by-word with cursor moves between them, so
   a literal like `"color set"` never matches and the wait silently runs to its
-  timeout (this once cost 16s per launch). Wait for the `Claude Code`
+  timeout. Wait for the `Claude Code`
   header, settle 0.5s, and match acks with a regex that spans escapes
   (`-re {set.{0,40}to:}`). Timeouts are a fallback, never the path. Tested in
   Cursor; Warp pending.
@@ -137,7 +118,7 @@ placeholder:
 The `img` script opens them. Install it to a directory on `PATH`:
 
 ```sh
-cp config/warp/img ~/.local/bin/img && chmod +x ~/.local/bin/img
+cp core/env/warp/img ~/.local/bin/img && chmod +x ~/.local/bin/img
 ```
 
 ```sh
@@ -207,7 +188,7 @@ them in Preview.
 
 Cursor behaves exactly like Zed — same `~/.zshrc` block, no Cursor setting to
 change, terminals always open at the workspace root, so the `$PWD` gate does
-all the work. Bench workspace gets the picker; the other `BENCH_PROJECTS` roots
+all the work. Bench workspace gets the picker; the other `config/projects.tsv` roots
 auto-launch `bench_claude_named` with the 2s any-key bail. No tab colours.
 
 **A pick opens a new window, because the file tree belongs to the window.**
@@ -265,7 +246,7 @@ directory a window is born in. `wp` pulls that lever:
 
 **A tab config `name` must be URI-safe.** `warp://tab_config/<name>` silently
 opens nothing when the name contains a space, even percent-encoded — which is
-why the config for the folder `my project` is `name = "my-project"`.
+why the config for the folder `thumbnail drop` is `name = "thumbnail-drop"`.
 `wp` and `bench_warp_tab_config_here` both compare with spaces normalised to
 hyphens so the config still matches its folder.
 
@@ -307,9 +288,7 @@ hand anywhere.
 it, so a value that doesn't match the machine's actual checkout disables the
 picker everywhere and reads as "the picker broke". The gate therefore also
 fires when `BENCH_DIR` does not exist at all — a wrong path shows the menu
-in every tab (annoying, visible, fixable) rather than in none (silent). This
-bites on first apply whenever the template's `$HOME/dev/my-org/my-bench`
-doesn't match the real clone (e.g. `~/my-bench`).
+in every tab (annoying, visible, fixable) rather than in none (silent). 
 
 Each config calls `bench_claude_named '<project>'` via the pane's `commands`.
 **The tab config's `title` is not what names the tab** — Claude Code takes
@@ -319,8 +298,7 @@ milliseconds. `bench_claude_named` launches Claude under `expect` and sends
 `convo()`, minus the colour (the config's `color` covers that) and minus the
 staged `>>` message. It falls back to a plain launch when `expect` is missing
 or no name is passed. If a tab ever comes up with dead paste or no Project Explorer,
-that command is the first thing to remove (`commands = []`) — see the
-handshake failure mode under *Design decisions* above.
+that command is the first thing to remove (`commands = []`) (it can break the shell handshake).
 
 ## Warp facts that keep coming up
 

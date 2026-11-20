@@ -6,3 +6,4 @@
 :/Users/(you|me|name|user)$
 :/home/(you|me|user)$
 core/bin/scan-personal\.sh:
+^core/(env/warp/(README\.md|img)|scan-allow\.txt):[0-9]+:kitty$

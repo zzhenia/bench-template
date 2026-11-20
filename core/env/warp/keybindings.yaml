@@ -1,5 +1,5 @@
 ---
-# Canonical copy: <bench>/config/warp/keybindings.yaml
+# Merged into ~/.warp/keybindings.yaml by core/env/apply.py.
 #
 # Flat map of "<action>": <keys>. One binding per action — Warp takes a single
 # value here, not a list, so ctrl-1 is a swap rather than an addition.

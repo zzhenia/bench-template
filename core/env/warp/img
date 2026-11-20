@@ -10,7 +10,7 @@ the placeholder. This opens it.
 This is a standalone executable rather than a shell function on purpose, so it
 works from a plain shell AND from inside Claude Code's TUI via `!img 23`.
 
-Canonical copy: <bench>/config/warp/img
+Canonical copy: core/env/warp/img
 """
 
 import argparse

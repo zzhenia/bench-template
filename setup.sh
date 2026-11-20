@@ -42,6 +42,11 @@ if [ -z "$CURRENT_COLOR" ]; then
   fi
 fi
 
+# Cursor, Warp and Claude Code settings the bench needs (core/env): merged into
+# this machine's files, each backed up first; asks before changing your own values.
+echo ""
+python3 core/env/apply.py
+
 # Project-management tool for ticket comments (stored in config/bench.env)
 CURRENT_PM=$(grep '^PM_TOOL=' config/bench.env | cut -d= -f2-)
 if [ -z "$CURRENT_PM" ]; then
@@ -65,7 +70,7 @@ if [ "$(uname)" = "Darwin" ]; then
   mkdir -p "$AGENTS_DIR"
   NEW_PLIST=$(sed -e "s|__LABEL__|$LABEL|g" -e "s|__BENCH_PATH__|$BENCH_PATH|g" \
                   -e "s|__PYTHON__|$PYTHON_BIN|g" -e "s|__HOME__|$HOME|g" \
-                  actions/recurring/auto-note/com.bench.auto-note.plist)
+                  tools/recurring/auto-note/com.bench.auto-note.plist)
   if [ -f "$PLIST" ] && [ "$(cat "$PLIST")" = "$NEW_PLIST" ] \
      && launchctl list "$LABEL" >/dev/null 2>&1; then
     echo "  Auto-note already installed ($LABEL), skipping."
@@ -75,7 +80,7 @@ if [ "$(uname)" = "Darwin" ]; then
     if launchctl load "$PLIST"; then
       echo "✓ Auto-note on: idle convo windows get a session note after 15 min and"
       echo "  close after 60 min ($LABEL, every 5 min). Settings and how to turn it"
-      echo "  off: actions/recurring/auto-note/instructions.md"
+      echo "  off: tools/recurring/auto-note/instructions.md"
     else
       echo "  Could not load $PLIST. Load it by hand: launchctl load \"$PLIST\""
     fi
@@ -89,7 +94,7 @@ if [ "$(uname)" = "Darwin" ]; then
     OTHER_REPIN="$REPIN_PLIST"
   fi
   NEW_REPIN=$(sed -e "s|__LABEL__|$REPIN_LABEL|g" -e "s|__BENCH_PATH__|$BENCH_PATH|g" \
-                  actions/recurring/python-repin/com.bench.python-repin.plist)
+                  tools/recurring/python-repin/com.bench.python-repin.plist)
   if [ -n "$OTHER_REPIN" ]; then
     echo "  Python repin already runs for another bench ($OTHER_REPIN). Add"
     echo "  $BENCH_PATH to other_benches in that bench's python-repin/config.json."
@@ -102,7 +107,7 @@ if [ "$(uname)" = "Darwin" ]; then
     if launchctl load "$REPIN_PLIST"; then
       echo "✓ Python repin on: after every Homebrew Python update, jobs move to the new"
       echo "  version only once their libraries work there ($REPIN_LABEL). Details:"
-      echo "  actions/recurring/python-repin/instructions.md"
+      echo "  tools/recurring/python-repin/instructions.md"
     else
       echo "  Could not load $REPIN_PLIST. Load it by hand: launchctl load \"$REPIN_PLIST\""
     fi
@@ -117,7 +122,7 @@ if [ "$(uname)" = "Darwin" ]; then
     OTHER_BREWCHK="$BREWCHK_PLIST"
   fi
   NEW_BREWCHK=$(sed -e "s|__LABEL__|$BREWCHK_LABEL|g" -e "s|__BENCH_PATH__|$BENCH_PATH|g" \
-                    actions/recurring/brew-check/com.bench.brew-check.plist)
+                    tools/recurring/brew-check/com.bench.brew-check.plist)
   if [ -n "$OTHER_BREWCHK" ]; then
     echo "  Homebrew check already runs for another bench ($OTHER_BREWCHK). Add"
     echo "  $BENCH_PATH to other_benches in that bench's brew-check/config.json."
@@ -130,7 +135,7 @@ if [ "$(uname)" = "Darwin" ]; then
     if launchctl load "$BREWCHK_PLIST"; then
       echo "✓ Homebrew check on: after every Homebrew change, the tools your jobs call are"
       echo "  tested and repaired; you hear only when a repair fails ($BREWCHK_LABEL). Details:"
-      echo "  actions/recurring/brew-check/instructions.md"
+      echo "  tools/recurring/brew-check/instructions.md"
     else
       echo "  Could not load $BREWCHK_PLIST. Load it by hand: launchctl load \"$BREWCHK_PLIST\""
     fi
@@ -144,7 +149,7 @@ fi
 
 # Context trim: Claude Code mod that offers a note + clean restart past a token
 # limit. Loaded from ~/.claude/settings.json (and this bench's own login, if any).
-TRIM_DIR="$(pwd -P)/actions/recurring/context-trim"
+TRIM_DIR="$(pwd -P)/tools/recurring/context-trim"
 LOGIN_DIR=$(sed -n 1p .claude-login 2>/dev/null | sed "s|^~|$HOME|")
 for CFG in "$HOME/.claude" ${LOGIN_DIR:+"$LOGIN_DIR"}; do
   python3 - "$CFG/settings.json" "$TRIM_DIR" <<'PY'
@@ -166,7 +171,7 @@ with open(path, "w") as f:
     json.dump(cfg, f, indent=2)
     f.write("\n")
 print(f"✓ Context trim on in {path}: past 100K tokens a band offers to write the")
-print("  note and restart clean. Settings: actions/recurring/context-trim/config.json")
+print("  note and restart clean. Settings: tools/recurring/context-trim/config.json")
 PY
 done
 
@@ -179,7 +184,7 @@ echo "  2. Open this folder in Claude Code: claude ."
 echo "  3. Run /status to verify automations, /note to write your first session note."
 echo ""
 echo "  Optional — install the environment layer for your host:"
-echo "    Warp:   config/warp/README.md   (project picker, wp, tab configs)"
-echo "    Cursor: config/cursor/README.md (cw, Claude on window open)"
+echo "    Warp:   core/env/warp/README.md   (project picker, wp, tab configs)"
+echo "    Cursor: core/env/cursor/README.md (cw, Claude on window open)"
 echo "  Warp and Cursor are the two supported hosts. Any terminal runs the bench"
 echo "  fine, it just doesn't get the picker or the wp/cw commands."
