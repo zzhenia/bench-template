@@ -3,6 +3,8 @@
 Read `master-instructions.md` for the full workspace guide. The rules below are
 the most critical and apply to every session.
 
+Shared rules for every bench: @core/rules.md
+
 Everything here is the distributed default. Your own bench will grow rules this
 file doesn't have — add them here, not in a comment somewhere.
 

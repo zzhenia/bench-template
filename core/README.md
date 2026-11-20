@@ -5,6 +5,8 @@ published to the bench template, and benches take it with `/update`.
 
 - `skills/` — skills any bench can use. Linked into `.claude/skills` by
   `bin/link-skills.sh`, next to the bench's own skills in `personal/skills/`.
+- `rules.md` — rules every session follows, loaded by `@core/rules.md` in the
+  bench's `CLAUDE.md`.
 - `bench-update/` — the daily update check and `/update`.
 - `bin/` — `link-skills.sh`, `scan-personal.sh` (blocks publishing when core
   holds a personal detail), `notices.sh` (shows notices from unattended jobs at

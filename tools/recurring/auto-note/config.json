@@ -1,0 +1,16 @@
+{
+  "default_idle_minutes": 15,
+  "overrides": {
+    "_comment": "Per-convo note thresholds in minutes. Key = convo name as typed after >>."
+  },
+  "min_note_interval_minutes": 120,
+  "lookback_hours": 24,
+  "max_transcript_chars": 60000,
+  "enabled": true,
+  "notifications": true,
+  "banners": false,
+  "autoclose": {
+    "enabled": true,
+    "idle_minutes": 60
+  }
+}
