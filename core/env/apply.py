@@ -6,7 +6,7 @@ fragments and the file each one merges into. Per setting:
   missing here          -> added
   same value            -> nothing
   different value here  -> the user decides (bench value or theirs), once;
-                           the answer is remembered until the bench value changes.
+                           the answer is remembered per bench value (so per bench, when it holds the bench's folder).
 Every changed file is backed up first to <file>_oldNN (next free number).
 An environment whose app is not installed (target folder missing) is skipped.
 
@@ -354,9 +354,11 @@ def main(argv):
                     take = True
                 else:
                     ans = given.get(cid)
-                    mem = remembered.get(cid)
-                    if not ans and mem and mem.get("bench") == bench_s:
-                        ans = mem["choice"]
+                    mem = remembered.get(cid) or {}
+                    if "choice" in mem:            # older one-answer format
+                        mem = {mem["bench"]: mem["choice"]}
+                    if not ans:
+                        ans = mem.get(bench_s)
                     if not ans and interactive:
                         print(f"\n{env}: {label(key)}\n  here:  {show(here)}\n  bench: {show(bench)}")
                         while ans not in ("bench", "mine"):
@@ -366,7 +368,9 @@ def main(argv):
                         open_conflicts.append(f"CONFLICT {cid} | here: {show(here)} | bench: {show(bench)}")
                         continue
                     if not check:
-                        remembered[cid] = {"choice": ans, "bench": bench_s}
+                        # keyed by the bench value too: two benches on one Mac
+                        # (different folders) each keep their own answer
+                        remembered[cid] = {**mem, bench_s: ans}
                     take = ans == "bench"
                 if take:
                     doc.set(key, bench)
