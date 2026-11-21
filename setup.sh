@@ -58,6 +58,11 @@ if [ -z "$CURRENT_PM" ]; then
   echo "✓ PM tool: $PM (change it in config/bench.env)"
 fi
 
+# Nightly auto-push, then the bench update from the template (core/tools/auto-push)
+if [ "$(uname)" = "Darwin" ]; then
+  bash core/bin/install-schedules.sh auto-push
+fi
+
 # Auto-note + auto-close of idle convo windows (launchd, macOS only)
 echo ""
 if [ "$(uname)" = "Darwin" ]; then

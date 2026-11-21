@@ -59,11 +59,11 @@ json.dump({"last_run": datetime.datetime.now().isoformat(timespec="seconds"),
 PY
 }
 
-notice_path() { local d; d=$(git -C "$ROOT" rev-parse --absolute-git-dir 2>/dev/null) && echo "$d/bench-notices/auto-push"; }
+notice_path() { local d; d=$(git -C "$ROOT" rev-parse --absolute-git-dir 2>/dev/null) && echo "$d/bench-notices/${1:-auto-push}"; }
 
-notify() {  # text — Slack self-DM, else macOS notification; plus a session-start notice
+notify() {  # text [notice name] — Slack self-DM, else macOS notification; plus a session-start notice
   local token n
-  n=$(notice_path); [ -n "$n" ] && mkdir -p "$(dirname "$n")" && printf '%s\n' "$1" > "$n"
+  n=$(notice_path "${2:-auto-push}"); [ -n "$n" ] && mkdir -p "$(dirname "$n")" && printf '%s\n' "$1" > "$n"
   token=$(grep -E '^(export )?SLACK_USER_TOKEN=' "$ROOT/config/keys.env" 2>/dev/null | head -1 | sed -E 's/^(export )?SLACK_USER_TOKEN=//; s/^["'\'']//; s/["'\'']$//')
   python3 - "$token" "$1" <<'PY'
 import json, subprocess, sys, urllib.request
@@ -188,4 +188,17 @@ fi
 summary="staged=$n_staged pushed_ahead=$ahead pulled=$behind left_out=${#skipped[@]}"
 write_state "ok" "$summary"
 n=$(notice_path); [ -n "$n" ] && rm -f "$n"
+
+# ── bench update from the template (core/bench-update/auto.sh) ────────────────
+# Runs only after a clean push. Applies and pushes the template's new changes;
+# a conflict becomes a pull request on the template. Anything to say goes out
+# like a failure: Slack self-DM (else macOS notification) plus a session notice.
+if [ -f "$ROOT/core/bench-update/auto.sh" ]; then
+  upd=$(bash "$ROOT/core/bench-update/auto.sh" 2>>"$LOG")
+  msg=$(printf '%s\n' "$upd" | sed -n '/^NOTIFY: /,$p' | sed 's/^NOTIFY: //')
+  log "bench update: ${msg:-nothing to report}"
+  if [ -n "$msg" ]; then notify ":arrows_counterclockwise: *Bench update* ($NAME)
+$msg" bench-update
+  else n=$(notice_path bench-update); [ -n "$n" ] && rm -f "$n"; fi
+fi
 log "--- run end: $summary"

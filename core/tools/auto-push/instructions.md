@@ -31,6 +31,13 @@ Each run:
    aborts the rebase** — the local commit stays intact, nothing is
    auto-resolved. Pulling during the day is `bench-pull`'s job.
 6. `git push origin main`.
+7. Bench update (`core/bench-update/auto.sh`), only after a good push and only
+   on a bench with `BENCH_UPSTREAM_URL`: applies the template's new changes,
+   commits, pushes, and merges the bench's Cursor/Warp/Claude settings. A file
+   changed both here and in the template undoes the update and opens a pull
+   request on the template with this bench's version; once it is merged on
+   GitHub, the next night applies the result. A settings value the user set
+   differently waits for `/update` in a session.
 
 ## Settings (`config/bench.env`)
 
@@ -42,7 +49,9 @@ Each run:
 
 Any failure → Slack DM to the owner of `SLACK_USER_TOKEN` (`config/keys.env`),
 or a macOS notification without one, plus a notice shown at the next session
-start (cleared by the next good run). Success is silent.
+start (cleared by the next good run). Success is silent. The bench update
+reports the same way (notice `bench-update`): a pull request to merge, settings
+waiting for an answer, or an update that could not run.
 `state/auto-push/state.json` holds the last run; `state/auto-push/auto-push.log`
 has the history.
 
