@@ -74,11 +74,11 @@ for f in send:
     blob = api("git/blobs", {"content": base64.b64encode(data).decode(), "encoding": "base64"})
     tree.append({"path": f, "mode": mode, "type": "blob", "sha": blob["sha"]})
 
-subjects = git("log", "--format=%s", f"{base}..HEAD", "--", *send).splitlines()
-msg = f"core: {', '.join(send[:4])}{' …' if len(send) > 4 else ''} (from {name} {git('rev-parse', '--short', 'HEAD').strip()})"
-if subjects:
-    msg += "\n\n" + "\n".join(f"- {s}" for s in dict.fromkeys(subjects))
+# The template is public: the message names only the files, never this
+# bench's commit subjects (they carry personal topics and ticket keys).
+msg = f"core: {', '.join(send[:4])}{' …' if len(send) > 4 else ''}"
 t = api("git/trees", {"base_tree": api(f"git/commits/{head}")["tree"]["sha"], "tree": tree})
-c = api("git/commits", {"message": msg, "tree": t["sha"], "parents": [head]})
+c = api("git/commits", {"message": msg, "tree": t["sha"], "parents": [head],
+                         "author": {"name": "The Bench", "email": "bench@users.noreply.github.com"}})
 api("git/refs/heads/main", {"sha": c["sha"], "force": False}, method="PATCH")
 print(f"PUBLISHED {' '.join(send)}")

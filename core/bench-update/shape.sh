@@ -38,6 +38,24 @@ done
 bash core/bin/link-skills.sh >/dev/null 2>&1
 git add -A -- "$dir" personal/skills 2>/dev/null
 
+# Core files have one home: core/. A tracked file elsewhere with exactly the
+# same content as a core file is an old copy (scripts/nobreaks.sh,
+# .claude/scripts/*, config/warp/*) and is removed. convos/, personal/, state/
+# and node_modules/ are never checked; files under 64 bytes are skipped.
+git ls-files -s -- . ':!skills' ':!convos' ':!personal' ':!state' ':!**/node_modules/**' |
+awk -F'\t' '{split($1, m, " "); if (m[1] == "120000") next
+  if ($2 ~ /^core\//) core[m[2]] = $2; else { sha[NR] = m[2]; path[NR] = $2 } }
+  END { for (i in path) if (sha[i] in core) print path[i] "\t" core[sha[i]] }' |
+while IFS=$'\t' read -r f home; do
+  [ -f "$f" ] && [ "$(wc -c < "$f")" -ge 64 ] || continue
+  if [ -n "$(git status --porcelain -- "$f")" ]; then
+    echo "SHAPE: left $f alone: same as $home but it has uncommitted changes"
+  else
+    git rm -q -- "$f" && echo "SHAPE: removed old copy $f (home: $home)"
+    find "$(dirname "$f")" -depth -type d -empty -delete 2>/dev/null
+  fi
+done
+
 if [ ! -f master-instructions.md ]; then
   cp core/bench-update/master-instructions.template.md master-instructions.md
   git add master-instructions.md
