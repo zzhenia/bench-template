@@ -1,0 +1,17 @@
+.obsidian/
+.DS_Store
+config/keys.env
+*.app/
+__pycache__/
+*.pyc
+.vscode/
+# auto-note runtime files
+core/tools/auto-note/state.json
+core/tools/auto-note/auto-note.log
+core/tools/auto-note/.last-run
+core/tools/auto-note/.auto-note.lock
+# python-repin runtime files
+core/tools/python-repin/state.json
+core/tools/python-repin/.lock
+# context-trim generated types
+core/tools/context-trim/.claude-plugin/types/

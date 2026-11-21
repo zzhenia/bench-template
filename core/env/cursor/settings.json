@@ -1,0 +1,18 @@
+{
+    "_comment": "Merged into Cursor's user settings.json by core/env/apply.py. Why each key is here: README.md.",
+    "terminal.integrated.defaultLocation": "editor",
+    "task.allowAutomaticTasks": "on",
+    "terminal.integrated.tabs.title": "${sequence}",
+    "terminal.integrated.tabs.description": "",
+    "workbench.editor.autoLockGroups": {
+        "terminalEditor": false,
+        "vscode.markdown.preview.editor": false
+    },
+    "workbench.editorAssociations": {
+        "*.md": "vscode.markdown.preview.editor"
+    },
+    "terminal.integrated.commandsToSkipShell": [
+        "workbench.action.moveEditorToFirstGroup"
+    ],
+    "terminal.integrated.showExitAlert": false
+}

@@ -1,0 +1,84 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "color=$(grep '^BENCH_COLOR=' \"$CLAUDE_PROJECT_DIR/config/bench.env\" 2>/dev/null | cut -d= -f2-); [ -n \"$color\" ] || { colors=(red blue green yellow purple orange pink cyan); color=${colors[$((RANDOM % 8))]}; }; printf '{\"systemMessage\":\"Bench colour: %s — type /color %s\"}' \"$color\" \"$color\"",
+            "timeout": 5,
+            "statusMessage": "Bench colour..."
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/core/bench-update/check.sh\"",
+            "timeout": 20,
+            "statusMessage": "Checking for bench updates..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/core/hooks/convo_session.sh\"",
+            "timeout": 5,
+            "statusMessage": "Checking for >> topic..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/core/hooks/prompt_session_note.sh\"",
+            "if": "Bash(git push*)",
+            "timeout": 15,
+            "statusMessage": "Checking session note..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/core/hooks/check_ai_annotations.sh\"",
+            "timeout": 5,
+            "statusMessage": "Checking for @ai annotations..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/core/hooks/session-note.sh\"",
+            "timeout": 10,
+            "statusMessage": "Session note reminder..."
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/response-length-budget.py\"",
+            "timeout": 10,
+            "statusMessage": "Checking response length..."
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "f=\"${CLAUDE_PROJECT_DIR:-.}/core/tools/freeze/statusline.sh\"; if [ -f \"$f\" ]; then bash \"$f\"; else printf '\\033[34m%s\\033[0m' \"$(jq -r '.workspace.current_dir // .cwd')\"; fi",
+    "refreshInterval": 10
+  }
+}

@@ -1,0 +1,46 @@
+# Merged into ~/.warp/settings.toml by core/env/apply.py, key by key.
+# {{BENCH_DIR}} becomes this bench's folder, so new tabs open at the project picker.
+# working_directory_config needs all four sub-tables even with advanced_mode = false;
+# a partial table is ignored with an "Invalid value" banner.
+
+[appearance.vertical_tabs]
+enabled = true
+display_granularity = "panes"
+view_mode = "compact"
+primary_info = "command"
+compact_subtitle = "branch"
+show_details_on_hover = true
+
+[terminal]
+# write_only: programs may copy to clipboard via OSC 52, never read it
+osc52_clipboard_access = "write_only"
+# true = full-screen TUIs (Claude Code, vim, ranger) get mouse events; costs
+# the Warp right-click menu inside those panes. Per-session escape hatch:
+# Command Palette -> Toggle mouse reporting.
+mouse_reporting_enabled = true
+
+[terminal.input]
+input_box_type_setting = "universal"
+
+[general]
+# "terminal" = plain shell on new sessions; needs a full Warp relaunch to apply.
+default_session_mode = "terminal"
+
+[session.working_directory_config]
+advanced_mode = false
+
+[session.working_directory_config.global]
+mode = "custom_dir"
+custom_dir = "{{BENCH_DIR}}"
+
+[session.working_directory_config.new_tab]
+mode = "custom_dir"
+custom_dir = "{{BENCH_DIR}}"
+
+[session.working_directory_config.new_window]
+mode = "custom_dir"
+custom_dir = "{{BENCH_DIR}}"
+
+[session.working_directory_config.split_pane]
+mode = "custom_dir"
+custom_dir = "{{BENCH_DIR}}"

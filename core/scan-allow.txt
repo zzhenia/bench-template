@@ -1,0 +1,9 @@
+# Hits the personal-detail scan may ignore (extended regex, matched against
+# "file:line:match"). Keep this short; fix the file instead when you can.
+:(user|you|name|someone|noreply)@example\.(com|org)$
+:noreply@anthropic\.com$
+:(127\.0\.0\.1|0\.0\.0\.0)$
+:/Users/(you|me|name|user)$
+:/home/(you|me|user)$
+core/bin/scan-personal\.sh:
+^core/(env/warp/(README\.md|img)|scan-allow\.txt):[0-9]+:kitty$

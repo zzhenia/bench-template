@@ -1,0 +1,9 @@
+slug,type,convo_folder,action_folder,jira,asana
+weekly-check-ins,both,convos/weekly-check-ins,tools/recurring/weekly-check-ins,,
+convo-memory,action,,core/tools/convo-memory/,,
+auto-note,action,,core/tools/auto-note/,,
+context-trim,action,,core/tools/context-trim/,,
+python-repin,action,,core/tools/python-repin/,,
+brew-check,action,,core/tools/brew-check/,,
+freeze,action,,core/tools/freeze/,,
+bench-update,action,,core/bench-update/,,
