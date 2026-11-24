@@ -6,13 +6,13 @@ A Claude Code mod. After each turn in a session inside this bench (or in a
 
 - `1` writes the session note (`core/tools/auto-note`, same writer as the idle
   sweep), clears the conversation in the same window and resumes with `>><topic>`.
-  Messages typed while the note is written are held and sent after the resume line.
+  Messages typed while the note is written are held and sent after the resume line;
+  a pasted image is saved to `/tmp/context-trim/` and the carried message names its path.
 - `2` asks again `snooze_tokens` later.
 - `3` arms the restart: once the turn has ended and no background command or
   subagent is still running, it waits for your next message, so the last answer
   stays on screen. That message is held, `1` runs, and it is sent on after the
-  resume line. Slash commands and messages with images pass through without
-  firing it. While queued or armed, `1` restarts now, `2` cancels.
+  resume line. Slash commands pass through without firing it. While queued or armed, `1` restarts now, `2` cancels.
 
 A failed note is retried `max_attempts` times, `retry_seconds` apart, then the band
 shows one red line with the log path; `1` restarts without a note, `2` keeps going.

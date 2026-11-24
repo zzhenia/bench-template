@@ -42,6 +42,46 @@ let cfg = DEFAULTS
 let held: string | undefined
 const hold = (text: string) => { held = held ? `${held}\n\n${text}` : text }
 
+// A plugin can't re-attach a pasted image, so each one is saved to a file and
+// the carried message names its path for the new conversation to read.
+const HELD_DIR = '/tmp/context-trim'
+let shot = 0
+async function keep($: EngineInterface, e: { text: string; attachments?: readonly { type: string; id?: string; filename?: string }[] }) {
+  const lines = [e.text]
+  for (const a of e.attachments ?? []) {
+    let b64 = ''
+    let type = ''
+    let offset: number | undefined = 0
+    try {
+      while (a.id && offset !== undefined) {
+        const m = await $.prompt.media({ id: a.id, ...(offset ? { offset } : {}) })
+        if (!m.base64) break
+        b64 += m.base64
+        type = m.mediaType
+        offset = m.next
+      }
+    } catch {
+      b64 = ''
+    }
+    const name = a.filename ? ` ${a.filename}` : ''
+    if (!b64 || offset !== undefined) {
+      lines.push(`[${a.type}${name} could not be carried over; ask me to paste it again]`)
+      continue
+    }
+    const ext = (type.split('/')[1] ?? 'bin').replace('jpeg', 'jpg')
+    const path = `${HELD_DIR}/${Date.now()}-${++shot}.${ext}`
+    try {
+      await $.fs.write(`${path}.b64`, b64)
+      await $.process.run(['/usr/bin/base64', '-D', '-i', `${path}.b64`, '-o', path])
+      await $.process.run(['/bin/rm', '-f', `${path}.b64`])
+      lines.push(`[${a.type}${name} pasted with this message, saved at ${path}: read it]`)
+    } catch {
+      lines.push(`[${a.type}${name} could not be carried over; ask me to paste it again]`)
+    }
+  }
+  return lines.join('\n')
+}
+
 // The note is written by auto-note (same writer as the idle sweep); success is
 // its state.json recording a new note for this session.
 async function noted($: EngineInterface, sid: string) {
@@ -55,7 +95,8 @@ async function noted($: EngineInterface, sid: string) {
 
 async function restart($: EngineInterface, topic?: string, file?: string) {
   // Clear before going idle, so a message typed during the clear is still held.
-  await $.command.run({ command: 'clear' })
+  // A clear that fails still sends the held messages on.
+  try { await $.command.run({ command: 'clear' }) } catch { /* sent below either way */ }
   await update($, trim, (): Trim => ({ ...IDLE, limit: cfg.threshold_tokens }))
   const resume = topic
     ? `>>${topic} Context trimmed; continue from ${file ?? "today's note"}. Read it silently; do not list its open items back.`
@@ -66,6 +107,8 @@ async function restart($: EngineInterface, topic?: string, file?: string) {
 }
 
 async function writeNote($: EngineInterface) {
+  // A second press while the note is written starts nothing new.
+  if ((await read($, trim)).phase === 'working') return
   // Working from the keypress on, so the next typed message is held.
   await update($, trim, (t): Trim => ({ ...t, phase: 'working', attempt: 1 }))
   const sid = await $.session.id()
@@ -160,16 +203,17 @@ export const register: Register = on => {
   // A background command's end arrives as a task notification naming its id.
   on('prompt.submit', async ($, e, next) => {
     for (const m of e.text.matchAll(/<task-id>([^<]+)<\/task-id>/g)) shells.delete(m[1])
-    // Commands and images can't be carried across the clear, so they pass.
-    const typed = e.origin.kind === 'composer' && !e.command && !e.isMeta && !e.attachments?.length
+    // Slash commands run where they are typed, so they pass. Pasted images are
+    // saved to a file and carried over with the text.
+    const typed = e.origin.kind === 'composer' && !e.command && !e.isMeta
     const phase = typed ? (await read($, trim)).phase : 'idle'
     if (phase === 'armed') {
-      hold(e.text)
+      hold(await keep($, e))
       void writeNote($)
       return { drop: 'Restarting first; your message carries over.' }
     }
     if (phase === 'working' || phase === 'failed') {
-      hold(e.text)
+      hold(await keep($, e))
       return { drop: 'Held; sent after the restart.' }
     }
     return next(e)

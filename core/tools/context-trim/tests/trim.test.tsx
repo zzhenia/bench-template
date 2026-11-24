@@ -174,3 +174,26 @@ test('messages typed while the note is written carry over after the clear', asyn
     '>>the-bench Context trimmed; continue from convos/the-bench/261020-x.md. Read it silently; do not list its open items back.\n\nfirst question\n\nsecond question'])
   await ui.unmount()
 })
+
+// The test engine serves no image bytes ($.prompt.media is the engine's own
+// read), so this checks the message is held and carried; saving is live-only.
+test('a message with an image typed while the note is written carries over', async ($, on) => {
+  const calls: string[] = []
+  let release!: () => void
+  const gate = new Promise<void>(r => (release = r))
+  engine(on, { n: 150000 }, { json: '{"noted":{}}' }, calls, gate)
+  await $.session.start({ cwd: CWD, surface: 'terminal', isInteractive: true })
+  await $.turn.complete({ turnId: 't1', answer: '' } as any)
+
+  const ui = await $.ui.mount(BAND as any)
+  void ui.press({ key: 'restart' })
+  await new Promise(r => setTimeout(r, 5))
+  const r = await $.prompt.submit({ ...typed('[Image #6] grow the input'), attachments: [{ type: 'image', id: 'i6' }] })
+  expect((r as any).drop).toBe('Held; sent after the restart.')
+  expect(calls).toEqual([])
+
+  release()
+  for (let i = 0; i < 50 && calls.length < 3; i++) await new Promise(r => setTimeout(r, 1))
+  expect(calls[2]).toMatch(/\n\n\[Image #6\] grow the input\n\[image could not be carried over; ask me to paste it again\]$/)
+  await ui.unmount()
+})
